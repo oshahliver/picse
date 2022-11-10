@@ -21,50 +21,20 @@ public :: load_eos_tables, construct_new_planet, pure_curve
 
 contains
 
-!~ SUBROUTINE conversion(at, n_mats, y)
 
-!~ implicit none
-
-!~ integer, intent(in) :: n_mats
-!~ real(8), dimension(n_mats), intent(in) :: at
-!~ real(8), dimension(n_mats), intent(out) :: y
-
-!~ y = at2mat_max(at, n_mats)
-
-!~ END SUBROUTINE conversion
-
-
-SUBROUTINE load_eos_tables(all, table_dir)
+!#######################################################################
+!Load all EoS table files for subsequent table interpolations.
+SUBROUTINE load_eos_tables()
 
 implicit none
 
-logical, intent(in), optional :: all
-character(*), intent(in) :: table_dir
-real(8), dimension(n_out) :: res
-real(8), dimension(3) :: vals
-real(8) :: P, T
+character(*), parameter :: table_dir = "./data/EoS_tables/"
 integer :: n_tables=10, n_tables_hyd=4, o=1
-integer :: ph
-logical :: all_dummy
 
-if(.not.present(all))then
-  all_dummy = .true.
-else
-  all_dummy = all
-endif
+print *, "table directory:", table_dir
 
-T=4.38d2
-P=1.35d11
-
-vals=(/2d3, 1d9, 0d0/)
 call initiate(n_tables=n_tables, n_tables_hyd=n_tables_hyd, table_dir=table_dir)
-print *, 'compute...'
-call compute(which=(/1,2,3,4,5,6/), n_out=n_out, vals=vals, alloc=.true.,&
-ll=1, res=res, order=o, eps_H2O=0d0)
-print *, 'res =', res(:)
 
-call get_phase(ll=4, T=T, P=P, ph=ph, xiFe=vals(3))
-print *, 'phase =', ph
 
 END SUBROUTINE load_eos_tables
 

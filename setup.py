@@ -21,12 +21,12 @@ flags = ['-fcheck=all',
 '-fpic']
 
 #pre-defined hirarchy of the modules that need to be linked
-mods = ["run_params",
+mods = ["my_types",
+        "run_params",
 "constants", 
 "LinAlg",
 "class_table_new",
-"phase",
-"my_types", 
+"phase", 
 "eosfort", 
 "functions", 
 "eosmat", 
@@ -34,12 +34,13 @@ mods = ["run_params",
 "fortlayer", 
 "fortplanet"]
 
+
 #file name of the main routine
 main = "eosfort_wrapper"
 exe = "PICS"
 
 mod_command = ["gfortran", "-Og", "-c"]
-main_command = ["python3", "-m", "numpy.f2py", "--verbose", "--opt='-O3'", "--f90flags='-Wtabs'"]
+main_command = ["python3", "-m", "numpy.f2py", "-Ilib", "--verbose", "--opt='-O3'", "--f90flags='-Wtabs'"]
 
 for mod in mods:
   main_command.append(mod + ".o")
@@ -65,11 +66,17 @@ for arg in args_dict:
 t0 = time.time()
 
 print ("building shared libraries...")
+
 for mod in mods:
   mod_command.append("src/fortran/" + mod + '.f95')
   print ('executing:', mod_command)
   subprocess.call(mod_command)
   mod_command.pop(-1)
+
+
+subprocess.call("mv ./*.mod ./lib", shell = True)
+#subprocess.call("mv ./*.o ./lib", shell = True)
+
 
 print ("building main...")
 
@@ -77,13 +84,10 @@ print ("executing:", main_command)
 
 subprocess.call(main_command)
 
-subprocess.call("mkdir lib", shell = True)
-#subprocess.call("mkdir lib", shell = True)
-#subprocess.call("mkdir lib", shell = True)
-
+subprocess.call("mkdir -p lib", shell = True)
 subprocess.call("mv ./*.so ./lib", shell = True)
-subprocess.call("mv ./*.o ./lib", shell = True)
-subprocess.call("mv ./*.mod ./lib", shell = True)
+
+subprocess.call("rm ./*.o", shell = True)
 
 print ("Complete")
 

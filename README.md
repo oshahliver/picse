@@ -6,6 +6,11 @@ The PICS code (Planetary Interior Composition and Structure code) was developed 
 
 ## Installation
 
+-- Manual Installation
+
+For manual installation type:
+
+make install
 
 To permanently add the package path to an anaconda environment activate the corresponding environment and enter the command:
 
