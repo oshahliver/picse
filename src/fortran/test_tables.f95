@@ -1,45 +1,43 @@
 MODULE test
 
-use class_table
+   use class_table
 
-implicit none
+   implicit none
 
 !Why do I need to do it like this? Why can I not just
 !Define type(table_list) :: tables ??
-private
-public :: initiate, compute
-type(table_list), public :: tables
+   private
+   public :: initiate, compute
+   type(table_list), public :: tables
 
-contains 
+contains
 
-SUBROUTINE initiate(n_tables)
+   SUBROUTINE initiate(n_tables)
 
-implicit none
+      implicit none
 
-integer, intent(in) :: n_tables
-integer :: ord=1
-integer :: i,j
+      integer, intent(in) :: n_tables
+      integer :: ord = 1
+      integer :: i, j
 
-allocate(tables%objects(n_tables))
-allocate(tables%n_in_list(n_tables))
+      allocate (tables%objects(n_tables))
+      allocate (tables%n_in_list(n_tables))
 
-do i=1, n_tables
-  call init(self=tables%objects(i), label=i)
-enddo
+      do i = 1, n_tables
+         call init(self=tables%objects(i), label=i)
+      end do
 
-print *, 'We have the following objects:'
-do i=1, n_tables
-  write(*,*) tables%objects(i)%label
-enddo
+      print *, 'We have the following objects:'
+      do i = 1, n_tables
+         write (*, *) tables%objects(i)%label
+      end do
 
+      do i = 1, n_tables
+         call load(tables%objects(i), file_name='table.tab')
+         print *, 'The axes_lengths are:'
+         print *, tables%objects(i)%axes_lengths
+      end do
 
-do i=1, n_tables
-  call load(tables%objects(i), file_name='table.tab')
-  print *, 'The axes_lengths are:'
-  print *, tables%objects(i)%axes_lengths
-enddo
-
-
-END SUBROUTINE initiate
+   END SUBROUTINE initiate
 
 END MODULE test

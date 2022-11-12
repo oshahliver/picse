@@ -1,7 +1,7 @@
 FC=gfortran
 FFLAGS=-O3 -Wall -Wextra -std=f2008
 CONDAPATH="False"
-OUTFILE=PICS
+OUTFILE=fortplanet
 
 PROJDIR := $(realpath $(CURDIR)/..)
 SRCDIR := ./src/fortran
@@ -24,12 +24,13 @@ printvars:
 
 #Create static library from source files
 static:
-	gfortran -c -fPIC ${SRC}
+	gfortran -g -fbacktrace -fPIC -c ${SRC}
 	@mv ./*.o ./*.mod  ${TARGETDIR}
 
 #Create python wrapper from static library using f2py
 wrapper:
-	f2py -c -I${TARGETDIR} ${SRCDIR}/eosfort_wrapper.f95 ${OBJ} -m ${OUTFILE}
+	python3 -m numpy.f2py -c -I${TARGETDIR} ${SRCDIR}/eosfort_wrapper.f95 ${OBJ} -m ${OUTFILE}
+	f2py -c -I${TARGETDIR} ${SRCDIR}/functionsPy.f95 ${OBJ} -m fortfunctions
 	@mkdir -p ${TARGETDIR}
 	@mv ./*.so ${TARGETDIR}
 	
@@ -39,6 +40,7 @@ clean:
 install: static wrapper clean
 	@if(${CONDAPATH}="True");then\
 		conda develop ${CURDIR}/lib;\
+		conda develop ${CURDIR}/src/python;\
 	fi
 
 

@@ -24,7 +24,7 @@ from PIMPphysicalparams import T0_list, K0_list, K0prime_list, rho0_list, \
                                 
 from PIMPrunparams import eps_Psurf, eps_Mtot, eps_layer, param_colors, \
                     plot_units, suffix, eps_Mg_number, plot_params, eps_Tsurf,\
-                    color_list, layerCodes, external_temp_profiles
+                    color_list, layerCodes
 import numpy as np
 import time
 import functionTools as ftool
@@ -40,7 +40,7 @@ import fortfunctions
 import Material
 import readPREM
 
-fortplanet.wrapper.load_eos_tables(table_dir='/home/os18o068/Documents/PHD/Projects/Planets/eos_tables/')
+fortplanet.wrapper.load_eos_tables()
 warnings.filterwarnings("ignore")
 
 
@@ -77,7 +77,7 @@ def convert_X_ice_to_xi_ice(Si_number=None, xi_Fe=None, X_ice=None,
     SiMg = Si_number/(1.-Si_number)
     
     #Compute fractions without water
-    fractions = fortfunctions.functions.compute_abundance_vector(simg=SiMg, 
+    fractions = fortfunctions.functionspy.compute_abundance_vector(simg=SiMg, 
                                     femg=1./(1.-xi_Fe)-1.,
                                     n_mats=len(contents),
                                     ymgi=[material_YMg[i-1] for i in contents],
@@ -118,7 +118,7 @@ def convert_X_impurity_to_xi_impurity(Si_number=None, xi_Fe=None, X=None,
     SiMg = Si_number/(1.-Si_number)
     
     #Compute fractions without water
-    fractions = fortfunctions.functions.compute_abundance_vector(simg=SiMg, 
+    fractions = fortfunctions.functionspy.compute_abundance_vector(simg=SiMg, 
                                     femg=1./(1.-xi_Fe)-1.,
                                     n_mats=len(contents),
                                     ymgi=[material_YMg[i-1] for i in contents],
@@ -182,7 +182,7 @@ def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
     O_number_mantle = (1. + 2.*SiMg*Mg_number_mantle)/(2.+(2.*SiMg-1.)*Mg_number_mantle)
 
     #Compute the fractions in the mantle
-    fractions = fortfunctions.functions.compute_abundance_vector(simg=SiMg, 
+    fractions = fortfunctions.functionspy.compute_abundance_vector(simg=SiMg, 
                                                      femg=FeMg_mantle,
                                                      n_mats=len(contents[n]),
                                                      ymgi=[material_YMg[i-1] for i in contents[n]],
@@ -238,7 +238,7 @@ def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
 class Planet():
     def __init__(self, P_center=1.0e12, 
                  T_center=3000, 
-                 R_seed=.1, 
+                 R_seed=.123, 
                  contents=[[2]],
                  tempType = 1, 
                  layerType=1, 
@@ -248,7 +248,7 @@ class Planet():
                  layerradii = [], 
                  layerConstraint=[1], 
                  add_atmosphere=False, 
-                 eps_r=.1, 
+                 eps_r=.432, 
                  layermasses=[], 
                  layerpres=[],
                  M_surface_should=1., 
@@ -290,18 +290,17 @@ class Planet():
                  X_impurity_0_layers = [0., 0., 0., 0., 0.],
                  X_impurity_slope_layers = [0., 0., 0., 0., 0.],
                  P_CS = 50e9,
-                 core_segregation_model = True,
-                 inner_core_segregation_model = False, 
+                 core_segregation_type = 0,
+                 inner_core_segregation_type = 0, 
                  E_tot_should = 1.,
                  L_int_should = 1., 
                  L_eff_should = 1.,
-                 external_temp_index = 0,
                  **kwargs):
         
-        self.external_temp_index = external_temp_index
+
         self.measureTime = measureTime
-        self.core_segregation_model = core_segregation_model
-        self.inner_core_segregation_model = inner_core_segregation_model
+        self.core_segregation_type = core_segregation_type
+        self.inner_core_segregation_type = inner_core_segregation_type
         #print ('initializing planet ...')
         self.status='shadow of the future'
         self.M_H2 = 0.
@@ -438,6 +437,7 @@ class Planet():
         except IndexError:
             self.xi_all_core = None
             self.X_all_core = None
+
         #It is important that the inner core fraction is accounted for properly
         #If a BC are to met via toolkit.iterate(), the inner core fraction
         #must be updated each time the core mass is updated otherwise the
@@ -580,12 +580,12 @@ class Planet():
                               'xi_all_core':self.xi_all_core,
                               'X_all_core':self.X_all_core,
                               'P_CS':self.P_CS,
-                              'core_segregation_model':self.core_segregation_model,
-                              'inner_core_segregation_model':self.inner_core_segregation_model,
+                              'core_segregation_type':self.core_segregation_type,
+                              'inner_core_segregation_type':self.inner_core_segregation_type,
                               'E_tot_should':self.E_tot_should/(G * m_earth**2 / r_earth * 3/5),
                               'L_int_should':self.L_int_should/(4*np.pi*r_earth**2* sigmaSB*300**4),
                               'L_eff_should':self.L_eff_should/(4*np.pi*r_earth**2* sigmaSB*300**4),
-                              "external_temp_index": self.external_temp_index}
+                      }
         
         self.finals = {'P_surface_is':self.P_surface_is,
                        'M_surface_is':self.M_surface_is,
@@ -1068,12 +1068,12 @@ class Planet():
                               'xi_all_core':self.xi_all_core,
                               'X_all_core':self.X_all_core,
                               'P_CS':self.P_CS,
-                              'core_segregation_model':self.core_segregation_model,
-                              'inner_core_segregation_model':self.inner_core_segregation_model,
+                              'core_segregation_type':self.core_segregation_type,
+                              'inner_core_segregation_type':self.inner_core_segregation_type,
                               'E_tot_should':self.E_tot_should/(G * m_earth**2 / r_earth * 3/5),
                               'L_int_should':self.L_int_should/(4*np.pi*r_earth**2* sigmaSB*300**4),
                               'L_eff_should':self.L_eff_should/(4*np.pi*r_earth**2* sigmaSB*300**4),
-                              "external_temp_index": self.external_temp_index}
+                        }
         
         
     def Reset(self, **kwargs):
@@ -1156,19 +1156,19 @@ class Planet():
         self.fractions[3][2] = xi_impurity_0_upper#X_FeO
         self.Update_initials()
         '''
-        
+         
         #print ('Si#, Fe# layers in Construct():', self.Si_number_layers, self.Fe_number_layers)
         #print ('layer_dims =', layer_dims)
         #print ('fracs, conts new =', fracs, conts)
         self.M_surface_is, self.R_surface_is, self.P_surface_is, self.T_surface_is, \
         self.Mg_number_is, self.Si_number_is, self.Fe_count, self.Si_count, \
-        self.Al_count, self.Mg_count, self.O_count, self.H2O_count, self.H_count,\
+        self.Mg_count, self.O_count, self.H2O_count, self.H_count,\
         self.S_count, self.ocean_frac_is, self.MOI_is, layer_props_dummy, \
-        self.xi_H_core, self.P_H2_CMB, self.profiles, self.N_shells, \
-        self.N_shells_layers, fractions_dummy, self.T_CS, self.xi_Fe_mantle,\
+        self.profiles, self.N_shells, \
+        self.N_shells_layers, fractions_dummy, self.xi_Fe_mantle,\
         self.Si_number_mantle, self.mantle_exists, self.inner_core_exists, \
         self.outer_core_exists, self.E_grav, self.E_int = \
-        fortplanet.wrapper.construct_new_planet(t_center=self.T_center, 
+        fortplanet.wrapper.create_planet(t_center=self.T_center, 
                                         p_center=self.P_center,
                                         contents=conts,
                                         fractions=fracs,
@@ -1188,25 +1188,27 @@ class Planet():
                                         layertype=self.layerType,
                                         temptype=self.tempType,
                                         eps_r=self.eps_r,
-                                        eps_h2o=self.eps_H2O,
-                                        eps_al=self.eps_Al,
+                                        #eps_h2o=self.eps_H2O,
+                                        #eps_al=self.eps_Al,
                                         p_surface_should=self.P_surface_should,
                                         t_surface_should=self.T_surface_should,
-                                        omega=self.omega,
-                                        xi_h_core_predicted=self.xi_H_core_predicted,
+                                        spin=self.omega,
+                                        #xi_h_core_predicted=self.xi_H_core_predicted,
                                         subphase_res = self.subphase_res,
-                                        xi_stv=self.xi_Stv,
-                                        x_impurity_0_layers=self.X_impurity_0_layers,
-                                        x_impurity_slope_layers=self.X_impurity_slope_layers,
+                                        #xi_stv=self.xi_Stv,
+                                        #x_impurity_0_layers=self.X_impurity_0_layers,
+                                        #x_impurity_slope_layers=self.X_impurity_slope_layers,
                                         xi_all_core = self.xi_all_core,
                                         x_all_core = self.X_all_core,
-                                        p_cs = self.P_CS,
-                                        core_segregation_model = self.core_segregation_model,
+                                        pres_core_segregation = self.P_CS,
+                                        core_segregation_type = self.core_segregation_type,
                                         m_ocean_should = self.M_ocean_should,
                                         m_surface_should = self.M_surface_should,
                                         mg_number_should = self.Mg_number_should,
-                                        inner_core_segregation_model = self.inner_core_segregation_model,
-                                        external_temp_profile = np.array(external_temp_profiles[self.external_temp_index]))         
+                                        inner_core_segregation_type = self.inner_core_segregation_type,
+                                        r_surface_should = 1.,
+                                        m_core_should = 1.
+                                        )      
         
         self.status = 'constructed'
         for i in range(len(layer_props_dummy)):
@@ -1254,7 +1256,15 @@ class Planet():
                     
         print ('fractions after construct =', self.fractions)
         print ('contents after construct =', self.contents)
-                          
+
+
+        print ("M_surface is = ", self.M_surface_is)
+        print ("R_surface is = ", self.R_surface_is)
+        print ("T_surface is = ", self.T_surface_is)
+        print ("P_surface is = ", self.P_surface_is)
+        print ("Mg_number is = ", self.Mg_number_is)
+        print ("Si_number is = ", self.Si_number_is)
+
         #print ('fractions after construct =', self.fractions)
         self.MOI_is = self.MOI_is/self.M_surface_is/self.R_surface_is**2
         self.M_core_is = (self.layer_properties[0]['indigenous_mass'] + \
