@@ -32,7 +32,5 @@ pl.Construct()
 
 pl.prt()
 
-print ("N Mg =", pl.Mg_count)
-print ("N Si =", pl.Si_count)
-print ("N Fe =", pl.Fe_count)
+
 print ("Exit Code 0")

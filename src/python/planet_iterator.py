@@ -190,8 +190,8 @@ class Toolkit():
                 iterationLimit=25, update_val_should=False, echo=False,
                 updateType=0, unpredictable = True, deltaType=0,
                 write_learning_set=False, start_number=0, log=False, 
-                test_data_dir='test_set_00', passives=['xi_H_core'], test=False,
-                passive_predictors = [2], all_val_should_weights = ['lin'],
+                test_data_dir='test_set_00', passives=[], test=False,
+                passive_predictors = [], all_val_should_weights = ['lin'],
                 all_howval_weights = ['exp'], deltas = None):
         """Iteratively re-constructs a given planetary object changing a
         specified parameter (how) in each iteration to match a given other 

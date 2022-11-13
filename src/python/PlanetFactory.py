@@ -43,6 +43,8 @@ from PIMPrunparams import suffix, plot_params, external_temp_profiles
 from PIMPrunparams import grid_color, background_color, color_list
 import fortplanet
 import planet_iterator
+import kit_planet
+from utils import PlanetaryParams, RunParams
 
 tk = planet_iterator.Toolkit()
 
@@ -51,69 +53,100 @@ image_loc = '/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/'
 plt.rcParams["axes.axisbelow"] = False
 print ('I am loading the current version of PlanetFactory')
 
-def ReadPureCurve(T=300, ll=0):
-    """Reads in planets from pure curve directory and extract the M-R
-    values
-    """
-    planet_dir = 'pure_curve_'+str(ll)+'_T_'+str(T)
-    masses = []
-    radii = []
-
-    planet_loc = './'+planet_dir                              
-        
-    #Count planet outputs in subdirectory
-    planet_count = 0
-    for root, subsubdirs, subsubfiles \
-    in os.walk(planet_loc):
-        for subsubfile in subsubfiles:
-            if subsubfile.endswith('.pl'):
-                planet_count += 1
-    
-    numerate = np.arange(0, planet_count)
-    
-    #Generate planet target list
-    planet_names = []
-    for n in numerate:
-        if n < 10:
-            num = '00'+str(n)
-            
-        elif n < 100 and n >= 10:
-            num = '0'+str(n)
-            
-        else:
-            num = str(n)
-            
-        planet_names.append('planet_'+num+'.pl')
-
-    #Collect planet targets and initiate them
-    #for outputting
-    for name in planet_names:
-        planet_name = name.split('.')
-        planet_name = planet_name[0]
-        pl = PlanetTest.Planet(silence=True)
-        pl.load(loc = planet_loc+'/',
-                file_name = planet_name)
-        
-        masses.append(pl.finals['M_surface_is'])
-        radii.append(pl.finals['R_surface_is'])
-        
-    return np.array(masses), np.array(radii)
-
 
 class Workbench():
-    def __init__(self, **kwargs):
-        self.contents=contents
-        self.fractions=fractions
-        self.stuff=[]
+    def __init__(self, name = "my_workbench", description = "Hi I'm a workbench!", **kwargs):
+        self.name = name
+        self.description = description
+        self.planets = []
+
+
+    def initiate_planet(self, defaults = True):
         
-    def create_planet(self, methode='classic', contents=[], fractions=[]):
-        if methode == 'classic':
-            planet=Material.Planet(contents=contents, fractions=fractions,
-                                   tempType = 'adiabatic', P_center=1.0e12)
-            
-        if methode == 'bisection':
-            pass
-            
+        pass
+
+
+    def build_planet(self, **kwargs):
+
+        print("Hi there, let's build a friggin' planet!")
+
+
+        # The Si and Fe numbers must be given for each layer. Currently the default is to set these
+        # values as uniform in the mantle. For the core the composition is manually set anyways.
+        Si_number__layers = [0., 0., self.planetary_params.Si_number_mantle, self.planetary_params.Si_number_mantle]
+        Fe_number__layers = [0., 0., self.planetary_params.Fe_number_mantle, self.planetary_params.Fe_number_mantle]
+
+        # With the core and mantle compositions defined the core size can be computed to match the
+        # the bulk composition of the planet (Only for simple models!). 
+        print ('Estimating the core mass fraction...')
+        xi_all_core = Material.mat2at_core(xi = self.planetary_params.fractions[1], xiH = 0.)
+        SiMg = self.planetary_params.Si_number_mantle/(1. - self.planetary_params.Si_number_mantle)
+
+        # Compute desired total ocean mass from water mass fraction
+        M_ocean_should = self.planetary_params.M_surface_should * 10**self.planetary_params.ocean_fraction_should
+
+        #Note that the Si# in the mantle is taken here. The core mass
+        #is estimated assuming uniform distribution of lighter elements
+        #throughout the entire core. Since the integration starts with
+        #the inner core it's layermass must be set to the value of the
+        #core mass without lighter elements while the one for the outer
+        #core must correspond to the value with the impurities distributed
+        #in the entire core.
+        self.planetary_params.layermasses[0] = PlanetFort.compute_core_mass(Mg_number = self.planetary_params.Mg_number_should,
+                                            M_surface = self.planetary_params.M_surface_should,
+                                            Mg_number_mantle = 1.-self.planetary_params.Fe_number_mantle,
+                                            M_ocean = M_ocean_should,
+                                            SiMg = SiMg,
+                                            contents = self.planetary_params.contents,
+                                            xi_all_core = [1., 0., 0., 0., 0.],
+                                            M_IC = 1.)
+
+        self.planetary_params.layermasses[1] = PlanetFort.compute_core_mass(Mg_number = self.planetary_params.Mg_number_should,
+                                            M_surface = self.planetary_params.M_surface_should,
+                                            Mg_number_mantle = 1.-self.planetary_params.Fe_number_mantle,
+                                            M_ocean = M_ocean_should,
+                                            SiMg = SiMg,
+                                            contents = self.planetary_params.contents,
+                                            xi_all_core = xi_all_core,
+                                            M_IC = 0.)
+
+        pl = PlanetFort.Planet(**props)
+
+        pl.Construct()
+
+        print ("Starting iteration to match boundary conditions.")
+
+        whats = ['M_surface', 'T_surface']
+        hows = ['P_center', 'T_center']
+        vals_should = [m_earth, 300.]
+        predictors = ['linear', 'linear'] # Only linear predictors possible anyways, this parameter has no effect at this point
+        should_weights = ['log', 'lin']
+        how_weights = ['exp', 'exp']
+        accs = [1e-3, 1e-2]
+
+        tk.iterate(planet = pl,
+        what = whats,
+        how = hows,
+        val_should = vals_should,
+        acc = accs,
+        all_val_should_weights = should_weights,
+        all_howval_weights = how_weights,
+        unpredictable = True,
+        deltaType = 0,
+        iterationLimit = 20,
+        update_val_should = False,
+        write_learning_set = False)
+
+
+    def create_workflow(self):
+        pass
+
+    def run_workflow(self):
+        pass
+    
+    def analyise_planets(self):
+        pass
+
 
 class Toolkit():
     def __init__(self, a=0, b=0):
@@ -1624,6 +1657,7 @@ class Toolkit():
                                                 xi_S_core = xi_FeS,
                                                 xi_all_core = xi_all_core,
                                                 M_IC = 0.)
+
             print ('predicted IC and OC  1 =', layermasses[0], layermasses[1])
             #sys.exit()
             '''

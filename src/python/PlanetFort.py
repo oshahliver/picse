@@ -39,8 +39,9 @@ import fortplanet
 import fortfunctions
 import Material
 import readPREM
+from utils import get_project_root
 
-fortplanet.wrapper.load_eos_tables()
+fortplanet.wrapper.load_eos_tables(table_dir = "{}/data/EoS_tables/".format(get_project_root()))
 warnings.filterwarnings("ignore")
 
 
@@ -152,7 +153,7 @@ def convert_X_impurity_to_xi_impurity(Si_number=None, xi_Fe=None, X=None,
     
     return xi
 
-def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
+def compute_core_mass(contents = None, Mg_number=None, M_surface = 1.,
                     Mg_number_mantle = None, SiMg = None, M_ocean=0.,
                     xi_H_core=0., impurity=[], xi_S_core=0., n=3,
                     xi_all_core = [], M_IC = 0.):
@@ -175,12 +176,7 @@ def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
     Mg_number_mantle = min(Mg_number_mantle, .9999999999)
     FeMg_mantle = (1. - Mg_number_mantle) / Mg_number_mantle
     FeMg = (1. - Mg_number) / Mg_number
-        #Note that here the Si# is defined with respect to the iron
-    Si_number_mantle = SiMg/FeMg_mantle/(SiMg/FeMg_mantle + 1.)#1./Mg_number_mantle - 1)
-    #print ('FeMg =', FeMg)
-    #print ('Si# mantle =', Si_number_mantle)
-    O_number_mantle = (1. + 2.*SiMg*Mg_number_mantle)/(2.+(2.*SiMg-1.)*Mg_number_mantle)
-
+    
     #Compute the fractions in the mantle
     fractions = fortfunctions.functionspy.compute_abundance_vector(simg=SiMg, 
                                                      femg=FeMg_mantle,
@@ -214,10 +210,10 @@ def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
     Q3 = sum([fractions[i]*(1.-Mg_number_mantle)*material_YMg[contents[n][i]-1] 
               for i in range(len(contents[n]))])
     
-    Q4 = 1. - xi_H_core
-    Q5 = (mFe + xi_S_core*mS)*(1.-xi_H_core) + xi_H_core*mH
-    core_frac = (1.-M_ocean/M_surface)*(Q1/Q2-Mg_number*(Q1/Q2+Q3/Q2))/\
-                (Mg_number*(Q4/Q5-Q1/Q2-Q3/Q2)+Q1/Q2)
+    # Q4 = 1. - xi_H_core
+    # Q5 = (mFe + xi_S_core*mS)*(1.-xi_H_core) + xi_H_core*mH
+    # core_frac = (1.-M_ocean/M_surface)*(Q1/Q2-Mg_number*(Q1/Q2+Q3/Q2))/\
+    #             (Mg_number*(Q4/Q5-Q1/Q2-Q3/Q2)+Q1/Q2)
 
     Q4 = xi_all_core[0]
     m_core = [mFe, mH, mS, mSi, mO]
@@ -234,6 +230,13 @@ def ComputeCoreMass(contents = None, Mg_number=None, M_surface = 1.,
     #print ('')
     return core_frac * M_surface
 
+
+class Planet():
+    def __init__(self, run_params, planetary_params, **kwargs):
+        pass
+
+    def restore_params(self):
+        pass
 
 class Planet():
     def __init__(self, P_center=1.0e12, 
@@ -258,7 +261,6 @@ class Planet():
                  Fe_number_layers=[],
                  rhoType=1, 
                  echo=False, 
-                 brucite_dissoc=False, 
                  vapor_stop=False, 
                  Mg_number_should=Mg_number_solar, 
                  Si_number_should=0.,
@@ -269,8 +271,6 @@ class Planet():
                  gammas_layer = [1.36, 1.36, 1.96, 1.26, 1.0], #2.43 
                  layertemps = [0, 0, 0, 0, 0],
                  T_zero = [-1000, -1000, -1000., -1000., -1000.],
-                 inner_core_frac = None,
-                 M_ocean_should = 0.,
                  M_core_should = None, 
                  ocean_frac_should=-10.,
                  adiabatType=1,
@@ -278,23 +278,19 @@ class Planet():
                  silence = False, 
                  measureTime=False,
                  eps_T_zero = 0.0,
-                 eps_Al=0., 
-                 eps_H2O=0.,
                  omega= 0.,
-                 xi_H_core_predicted=0.,
-                 xi_FeO_mantle_predicted=0.,
-                 xi_Stv=0., 
-                 impurity = 1,
-                 xi_impurity = 0.,
+                 #xi_Stv=0., 
                  xi_S_core = 0.,
-                 X_impurity_0_layers = [0., 0., 0., 0., 0.],
-                 X_impurity_slope_layers = [0., 0., 0., 0., 0.],
                  P_CS = 50e9,
                  core_segregation_type = 0,
                  inner_core_segregation_type = 0, 
                  E_tot_should = 1.,
                  L_int_should = 1., 
                  L_eff_should = 1.,
+                 Si_number_mantle = .4,
+                 Mg_number_mantle = 1.,
+                #  run_params,
+                #  planetary_params,
                  **kwargs):
         
 
@@ -302,13 +298,7 @@ class Planet():
         self.core_segregation_type = core_segregation_type
         self.inner_core_segregation_type = inner_core_segregation_type
         #print ('initializing planet ...')
-        self.status='shadow of the future'
-        self.M_H2 = 0.
-        self.xi_H_core_predicted = xi_H_core_predicted
-        self.xi_FeO_mantle_predicted = xi_FeO_mantle_predicted
-        
-        #dissociation mechnism for Mg(OH)2 -> MgO + H2O in phase 2
-        self.brucite_dissoc = brucite_dissoc
+        self.status='Shadow of the Future'
         
         #if set to True construction is stopped if vapor phase is reached
         self.vapor_stop = vapor_stop
@@ -367,11 +357,7 @@ class Planet():
         self.gammas_layer = gammas_layer
         self.adiabatType = adiabatType
         self.eps_T_zero = eps_T_zero
-        self.eps_H2O = eps_H2O
-        self.eps_Al = eps_Al
-        self.xi_Stv = xi_Stv
-        self.impurity = impurity
-        self.xi_impurity = xi_impurity
+        #self.xi_Stv = xi_Stv
         self.simple_densities = []
         self.simple_MoI = None
         self.M_outer_mantle = 0.
@@ -388,7 +374,8 @@ class Planet():
         self.rho_mean = 0.
         self.T_CS = 0.
         self.xi_Fe_mantle = None
-        self.Si_number_mantle = None
+        self.Si_number_mantle = Si_number_mantle
+        self.Mg_number_mantle = Mg_number_mantle
         self.P_CS = P_CS
         self.logfO2 = None
         self.xi_S_mantle = 0e0
@@ -424,9 +411,6 @@ class Planet():
         self.M_H2O_mantle = 0.
         self.M_ocean = 0.
         self.M_mantle_is = 0.
-        self.impurity_count = 0
-        self.X_impurity_0_layers = X_impurity_0_layers
-        self.X_impurity_slope_layers = X_impurity_slope_layers
         
         try:
             self.xi_all_core = Material.mat2at_core(xi=self.fractions[1], 
@@ -549,7 +533,6 @@ class Planet():
                               'R_surface_should': self.R_surface_should/r_earth,
                               'rhoType':self.rhoType,
                               'echo':self.echo,
-                              'brucite_dissoc':self.brucite_dissoc,
                               'Mg_number_should':self.Mg_number_should,
                               'Si_number_should':self.Si_number_should,
                               'Si_number_layers':self.Si_number_layers,
@@ -566,17 +549,9 @@ class Planet():
                               'M_core_should':self.M_core_should,
                               'subphase_res':self.subphase_res,
                               'layerpres':self.layerpres,
-                              'eps_H2O':self.eps_H2O,
-                              'eps_Al':self.eps_Al,
-                              'xi_H_core_predicted':self.xi_H_core_predicted,
-                              'xi_FeO_mantle_predicted':self.xi_FeO_mantle_predicted,
-                              'xi_Stv':self.xi_Stv,
+                              #'xi_Stv':self.xi_Stv,
                               'omega':self.omega,
-                              'impurity':self.impurity,
-                              'xi_impurity':self.xi_impurity,
                               'xi_S_core':self.xi_S_core,
-                              'X_impurity_0_layers':self.X_impurity_0_layers,
-                              'X_impurity_slope_layers':self.X_impurity_slope_layers,
                               'xi_all_core':self.xi_all_core,
                               'X_all_core':self.X_all_core,
                               'P_CS':self.P_CS,
@@ -614,7 +589,6 @@ class Planet():
                        'M_ocean':self.M_ocean,
                        'rho_mean':self.rho_mean,
                        'M_mantle_is':self.M_mantle_is,
-                       'impurity_count':self.impurity_count,
                        'P_CS':self.P_CS,
                        'T_CS':self.T_CS,
                        'xi_Fe_mantle':self.xi_Fe_mantle,
@@ -626,7 +600,85 @@ class Planet():
                        'E_tot_is':self.E_tot_is,
                        'L_int_should':self.L_int_is,
                        'L_eff_should':self.L_eff_is}
+
+
+    def ComputeCoreMass(self, n = 3):
+        # contents = None, Mg_number=None, M_surface = 1.,
+        #                 Mg_number_mantle = None, SiMg = None, M_ocean=0.,
+        #                 xi_H_core=0., impurity=[], xi_S_core=0., n=3,
+        #                 xi_all_core = [], M_IC = 0.):
+        """Computes the core mass of a planet at given total mass, composition and
+        value for Mg#
+        """
+        '''
+        print ('\nCompute Core Mass:')
+        print ('contents = ', contents)
+        print ('Mg_number =', Mg_number)
+        print ('M_surface =', M_surface)
+        print ('Mg_number_mantle = ', Mg_number_mantle)
+        print ('SiMg =', SiMg)
+        print ('M_ocean =', M_ocean)
+        print ('xi_H_core =', xi_H_core)
+        print ('impurity =', impurity)
+        print ('xi_S_core =', xi_S_core)
+        '''
+        #print (contents, Mg_number, M_surface, Mg_number_mantle, SiMg, M_ocean, xi_H_core)
+        self.Mg_number_mantle = min(self.Mg_number_mantle, .9999999999)
+        FeMg_mantle = (1. - self.Mg_number_mantle) / self.Mg_number_mantle
+        FeMg = (1. - self.Mg_number_should) / self.Mg_number_should
+        SiMg = self.Si_number_mantle/(1. - self.Si_number_mantle)
+
+        #Compute the fractions in the mantle
+        fractions = fortfunctions.functionspy.compute_abundance_vector(simg=SiMg, 
+                                                        femg=FeMg_mantle,
+                                                        n_mats=len(self.contents[n]),
+                                                        ymgi=[material_YMg[i-1] for i in self.contents[n]],
+                                                        ysii=[material_YSi[i-1] for i in self.contents[n]],
+                                                        xih2oi=[0. for i in self.contents[n]],
+                                                        xifei=[1.-self.Mg_number_mantle for i in self.contents[n]],
+                                                        xialsii = [0. for i in self.contents[n]],
+                                                        xialmgi = [0. for i in self.contents[n]],
+                                                        contents = self.contents[n])
+        #Count 
+        #Note that the indices are shifted by one because the original definition
+        #of the arrays comes from the fortran code.
+        Q1 = sum([fractions[i]*self.Mg_number_mantle*material_YMg[self.contents[n][i]-1] 
+                for i in range(len(self.contents[n]))])
         
+        #Compute total normalized mass in the mantle
+        Q2 = sum([fractions[i]*self.Mg_number_mantle*material_YMg[self.contents[n][i]-1] 
+                for i in range(len(self.contents[n]))])*mMg+\
+                sum([fractions[i]*(1.-self.Mg_number_mantle)*material_YMg[self.contents[n][i]-1] 
+                    for i in range(len(self.contents[n]))])*mFe +\
+                sum([fractions[i]*material_YSi[self.contents[n][i]-1] 
+                    for i in range(len(self.contents[n]))])*mSi+\
+                sum([fractions[i]*material_YO[self.contents[n][i]-1] 
+                    for i in range(len(self.contents[n]))])*mO+\
+                sum([fractions[i]*material_YH[self.contents[n][i]-1] 
+                    for i in range(len(self.contents[n]))])*mH
+        
+        Q3 = sum([fractions[i]*(1.-self.Mg_number_mantle)*material_YMg[self.contents[n][i]-1] 
+                for i in range(len(self.contents[n]))])
+        
+        # Q4 = 1. #- xi_H_core
+        # Q5 = (mFe + xi_S_core*mS)#*(1.-xi_H_core) + xi_H_core*mH
+        # core_frac = (1.-M_ocean/self.M_surface_should)*(Q1/Q2-self.Mg_number_should*(Q1/Q2+Q3/Q2))/\
+        #             (self.Mg_number_should*(Q4/Q5-Q1/Q2-Q3/Q2)+Q1/Q2)
+
+        Q4 = self.xi_all_core[0]
+        m_core = [mFe, mH, mS, mSi, mO]
+        Q5 = sum([m_core[i] * self.xi_all_core[i] for i in range(len(self.xi_all_core))])
+        #print ('Q =', Q1, Q2, Q3, Q4, Q5)
+        core_frac = (1. - M_ocean / self.M_surface_should)
+        core_frac *= (Q1 / Q2 - self.Mg_number_should * (Q1 / Q2 + Q3 / Q2))
+        core_frac /= (self.Mg_number_should * (Q4 / Q5 - Q1 / Q2 - Q3 / Q2) + Q1 / Q2)
+        #print ('core mass old =', core_frac * M_surface)
+        core_frac = (1. - M_ocean / self.M_surface_should)
+        core_frac *= (Q3 / Q2 - Q1 / Q2 * FeMg)
+        core_frac += M_IC / self.M_surface_should * (1. / mFe - Q4 / Q5)
+        core_frac /= (Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2)
+        #print ('')
+
                 
     def prt(self, digits=4, **kwargs):
         print ('=======================================')
@@ -844,6 +896,7 @@ class Planet():
         self.pres.append(self.P_surface_is)
         self.dms.append(self.M_surface_is)
         self.dvols.append(self.R_surface_is**3 * 4/3 * np.pi)
+        
         #Update cleaned layer properties
         self.cleaned_layer_properties.append({"P_outer":self.pres[-1],
                                                   "T_outer":self.temps[-1],
@@ -937,15 +990,15 @@ class Planet():
         and boundary conditions after integration with the now known value
         for xi_H_core that would be required to match the Mg#
         """
-        cm = ComputeCoreMass(Mg_number=self.Mg_number_should,
+        cm = compute_core_mass(Mg_number=self.Mg_number_should,
                                                 M_surface=self.M_surface_should/m_earth,
                                                 Mg_number_mantle=1.-self.Fe_number_layers[2],
                                                 M_ocean=10**(self.ocean_frac_should)*self.M_surface_should/m_earth,
                                                 SiMg = self.Si_number_should/(1.-self.Si_number_should),
                                                 contents = self.contents,
                                                 xi_H_core=self.xi_H_core_predicted,
-                                                impurity=[self.xi_impurity],
-                                                xi_S_core = self.xi_S_core)
+                                                impurity=[self.xi_impurity])
+                                                #xi_S_core = self.xi_S_core)
         
         #print ('new core mass frac =', cm/self.M_surface_should*m_earth)
         
@@ -996,7 +1049,6 @@ class Planet():
                'M_ocean':self.M_ocean,
                'rho_mean':self.rho_mean,
                'M_mantle_is':self.M_mantle_is,
-               'impurity_count':self.impurity_count,
                 'P_CS':self.P_CS,
                 'T_CS':self.T_CS,
                 'xi_Fe_mantle':self.xi_Fe_mantle,
@@ -1037,7 +1089,6 @@ class Planet():
                               'R_surface_should': self.R_surface_should/r_earth,
                               'rhoType':self.rhoType,
                               'echo':self.echo,
-                              'brucite_dissoc':self.brucite_dissoc,
                               'Mg_number_should':self.Mg_number_should,
                               'Si_number_should':self.Si_number_should,
                               'Si_number_layers':self.Si_number_layers,
@@ -1054,17 +1105,9 @@ class Planet():
                               'M_core_should':self.M_core_should,
                               'subphase_res':self.subphase_res,
                               'layerpres':self.layerpres,
-                              'eps_H2O':self.eps_H2O,
-                              'eps_Al':self.eps_Al,
-                              'xi_H_core_predicted':self.xi_H_core_predicted,
-                              'xi_FeO_mantle_predicted':self.xi_FeO_mantle_predicted,
-                              'xi_Stv':self.xi_Stv,
+                              #'xi_Stv':self.xi_Stv,
                               'omega':self.omega,
-                              'impurity':self.impurity,
-                              'xi_impurity':self.xi_impurity,
-                              'xi_S_core':self.xi_S_core,
-                              'X_impurity_0_layers':self.X_impurity_0_layers,
-                              'X_impurity_slope_layers':self.X_impurity_slope_layers,
+                              #'xi_S_core':self.xi_S_core,
                               'xi_all_core':self.xi_all_core,
                               'X_all_core':self.X_all_core,
                               'P_CS':self.P_CS,
@@ -1116,49 +1159,7 @@ class Planet():
         print ('contents before construct =', self.contents)
         print ('xi_all_core before construct =', self.xi_all_core)
         print ('x_all_core before construct =', self.X_all_core)
-        #Use the currently predicted core mass and hydrogen content in the core
-        #to predict the FeO content in the mantle
-        #First predict the mass of the mantle
-        '''
-        M_core = (self.layermasses[0] + self.layermasses[1])*m_earth
-        M_ocean = self.M_surface_should * 10**self.ocean_frac_should
-        M_mantle = self.M_surface_should - M_core - M_ocean
-
-        #Now predict the total H content in the core
-        H_count = (1.-self.xi_S_core)*self.xi_H_core_predicted
-        H_count = H_count / (self.xi_S_core*(mS+mFe) + \
-                (1.-self.xi_S_core)*\
-                ((1.-self.xi_H_core_predicted)*mFe + \
-                 self.xi_H_core_predicted*mH))
-        
-        H_count = H_count * M_core
-        X_FeO = (mFe+mO)*H_count/2/M_mantle
-
-        self.X_impurity_0_layers[2] = X_FeO*0
-        self.X_impurity_0_layers[3] = X_FeO*0
-        m = mFe + mO
-        
-        #Convert FeO weight fraction to mole fraction
-        xi_impurity_0_upper = convert_X_impurity_to_xi_impurity(
-                                                    Si_number=self.Si_number_should, 
-                                                    xi_Fe=self.Fe_number_layers[3],
-                                                    X=self.X_impurity_0_layers[3], 
-                                                    contents = self.contents[3],
-                                                    m = m)
-
-        xi_impurity_0_lower = convert_X_impurity_to_xi_impurity(Si_number=self.Si_number_should, 
-                                                    xi_Fe=self.Fe_number_layers[2],
-                                                    X=self.X_impurity_0_layers[2], 
-                                                    contents = self.contents[2],
-                                                    m = m)
-        
-        self.fractions[2][2] = xi_impurity_0_lower#X_FeO
-        self.fractions[3][2] = xi_impurity_0_upper#X_FeO
-        self.Update_initials()
-        '''
-         
-        #print ('Si#, Fe# layers in Construct():', self.Si_number_layers, self.Fe_number_layers)
-        #print ('layer_dims =', layer_dims)
+    
         #print ('fracs, conts new =', fracs, conts)
         self.M_surface_is, self.R_surface_is, self.P_surface_is, self.T_surface_is, \
         self.Mg_number_is, self.Si_number_is, self.Fe_count, self.Si_count, \
@@ -1489,9 +1490,9 @@ class Planet():
         axis[ax][0].text(.05, pos0-2*d, 
                         r'$\xi_{\rm Fe} = \ $'+str(round(self.xi_Fe_mantle,4)),
                       transform = axis[0][0].transAxes) 
-        axis[ax][0].text(.05, pos0-3*d, 
-                        r'$\xi_{\rm S} = \ $'+str(round(self.xi_S_core,3)),
-                      transform = axis[0][0].transAxes) 
+        # axis[ax][0].text(.05, pos0-3*d, 
+        #                 r'$\xi_{\rm S} = \ $'+str(round(self.xi_S_core,3)),
+        #               transform = axis[0][0].transAxes) 
         axis[ax][0].text(.05, pos0-4*d, 
                         r'$T_{\rm S} = \ $'+str(round(self.T_surface_is,1)),
                       transform = axis[0][0].transAxes) 
