@@ -4,8 +4,8 @@ CONDAPATH="False"
 OUTFILE=fortplanet
 
 PROJDIR := $(realpath $(CURDIR)/..)
-SRCDIR := ./src/fortran
-TARGETDIR := ./lib
+SRCDIR := ./lib/fortran
+TARGETDIR := ./lib/fortran
 
 _SRC=my_types.f95 run_params.f95 constants.f95 LinAlg.f95 class_table_new.f95 phase.f95 eosfort.f95 functions.f95 eosmat.f95 fortshell.f95 fortlayer.f95 fortplanet.f95
 _OBJ=${_SRC:.f95=.o}
