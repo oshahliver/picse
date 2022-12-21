@@ -28,20 +28,26 @@ python3 -m pip install .
 
 ## Usage
 
+### Example 1: Default planet from base types
+
 ```python
 
-from pics.physicalparams import m_earth
-from pics.interiors import planet_iterator
-from pics.interiors import creator
+from pics.interiors import planet_iterator, planet_creator
 
 # initialize iterator instance
 iterator = planet_iterator.Toolkit()
 
 # initialize a telluric planet object
-planet = creator.TelluricPlanet()
+planet = planet_creator.TelluricPlanet()
 
-# perform initial construction of the planet
-planet.construct()
+# define planetary properties
+# parameters that are not specified will be assigned a
+# default value for the corresponding base type
+planetary_specs = {
+    "M_surface_should":1., # desired total mass
+    "T_surface_should":300., # desired surface temperature
+    "Mg_number_should":0.5, # desired bulk magnesium number
+    }
 
 # set up specifications for the iterator
 iterator_specs = {
@@ -57,5 +63,12 @@ iterator_specs = {
     "unpredictable": False, # --> no effect at this point
 }
 
+# perform initial construction of the planet
+planet.construct()
+
+# perform iteration on planetary object until desired accuracy for
+# all targets is reached
 iterator.iterate(planet=pl, **iterator_specs)
 ```
+
+### Example 2: Customized planet from base types
