@@ -142,79 +142,60 @@ class Toolkit:
 
         return all_what, all_how
 
-    def bisect(self, val_is, val_should, acc, direction, predictor=True, log=False):
-        reldev = (val_should - val_is) / val_should
-        # if the original criterion is no longer met, that means that the
-        # probed parameter has been overshoot. Then parameter delta must be
-        # reduced and the previous step undone
+    # def bisect(self, val_is, val_should, acc, direction, predictor=True, log=False):
+    #     reldev = (val_should - val_is) / val_should
+    #     # if the original criterion is no longer met, that means that the
+    #     # probed parameter has been overshoot. Then parameter delta must be
+    #     # reduced and the previous step undone
 
-        if direction[0] * direction[1] * reldev < -acc:
-            print("overshoot")
-            self.iteration = True
-            if predictor == "linear":
-                x1 = self.oldhowvals[-2]
-                x2 = self.oldhowvals[-1]
+    #     if direction[0] * direction[1] * reldev < -acc:
+    #         print("overshoot")
+    #         self.iteration = True
+    #         if predictor == "linear":
+    #             x1 = self.oldhowvals[-2]
+    #             x2 = self.oldhowvals[-1]
 
-                y1 = self.oldwhatvals[-2]
-                y2 = self.oldwhatvals[-1]
+    #             y1 = self.oldwhatvals[-2]
+    #             y2 = self.oldwhatvals[-1]
 
-                # Extract values for passive parameter
-                p1 = [self.oldpassivevals[i][-2] for i in range(len(self.passives))]
-                p2 = [self.oldpassivevals[i][-1] for i in range(len(self.passives))]
+    #             # Extract values for passive parameter
+    #             p1 = [self.oldpassivevals[i][-2] for i in range(len(self.passives))]
+    #             p2 = [self.oldpassivevals[i][-1] for i in range(len(self.passives))]
 
-                # compute predictor slope for passive parameter
-                self.passive_slope = [
-                    (p2[i] - p1[i]) / (x2 - x1) for i in range(len(self.passives))
-                ]
+    #             # compute predictor slope for passive parameter
+    #             self.passive_slope = [
+    #                 (p2[i] - p1[i]) / (x2 - x1) for i in range(len(self.passives))
+    #             ]
 
-                if log:
-                    x1 = np.log10(x1)
-                    x2 = np.log10(x2)
-                    y1 = np.log10(y1)
-                    y2 = np.log10(y2)
-                    val_should = np.log10(val_should)
+    #             if log:
+    #                 x1 = np.log10(x1)
+    #                 x2 = np.log10(x2)
+    #                 y1 = np.log10(y1)
+    #                 y2 = np.log10(y2)
+    #                 val_should = np.log10(val_should)
 
-                # compute predictor slope and intercept
-                slope = (y2 - y1) / (x2 - x1)
-                self.delta = (val_should - y2) / slope
+    #             # compute predictor slope and intercept
+    #             slope = (y2 - y1) / (x2 - x1)
+    #             self.delta = (val_should - y2) / slope
 
-            else:
-                self.oldhowvals.pop(-1)
-                self.oldwhatvals.pop(-1)
+    #         else:
+    #             self.oldhowvals.pop(-1)
+    #             self.oldwhatvals.pop(-1)
 
-                # perform bisection step
-                self.delta = self.delta * 0.5
-                self.bisection = True
-                print("starting bisection")
+    #             # perform bisection step
+    #             self.delta = self.delta * 0.5
+    #             self.bisection = True
+    #             print("starting bisection")
 
-            # print ('overshoot detected')
+    #         # print ('overshoot detected')
 
-        elif abs(reldev) <= acc:
-            self.iteration = False
-            # print ('desired precission reached')
+    #     elif abs(reldev) <= acc:
+    #         self.iteration = False
+    #         # print ('desired precission reached')
 
-        else:
-            self.iteration = True
+    #     else:
+    #         self.iteration = True
 
-    def fancy_iterate(
-        self,
-        planet=None,
-        what="M_surface",
-        how="P_center",
-        val_should=1.0 * m_earth,
-        acc=1.0e-3,
-        predictor="linear",
-        iterationLimit=25,
-        update_val_should=False,
-        echo=False,
-        updateType=0,
-        unpredictable=True,
-        deltaType=0,
-        write_learning_set=False,
-        start_number=0,
-        test_data_dir="test_set_00",
-    ):
-        pass
 
     def iterate(
         self,
@@ -485,7 +466,7 @@ class Toolkit:
                 newval[i] = max(newval[i], sanity_borders[how[i]][0])
 
                 if abs(reldev[i]) <= acc[i]:
-                    print("Desired precission for ", what[i], " reached.")
+                    print("\n --> Desired precission for ", what[i], " reached.")
 
                 # M_core has to be treated seperately here as it is not an attribute
                 # of the Planet class but rather the first entry of layer_masses of a
@@ -510,6 +491,7 @@ class Toolkit:
             print ('initial reldev =', reldev)
             print ('initial deltas =', self.delta)
             """
+            
             if sum(self.delta) == 0.0:
                 print("All parameters already satisfied")
                 self.iteration = False
@@ -885,9 +867,9 @@ class Toolkit:
                     pass
 
             if acc_reached_count == len(how):
-                print("Desired precission for all parameters reached!")
-                print("reldev =", reldev)
-                print("acc =", acc)
+                print("\n --> Desired precission for all parameters reached!")
+                print("relative deviations =", reldev)
+                print("desired accuracies =", acc)
                 self.iteration = False
 
             if count >= iterationLimit:

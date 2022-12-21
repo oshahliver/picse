@@ -7,6 +7,7 @@ This is a temporary script file.
 
 from pics.utils import test_interface
 import itertools
+from pics.utils.print_tools import print_planet
 from tabulate import tabulate
 from pics.utils import functionTools as ftool
 import numpy as np
@@ -358,8 +359,8 @@ class Planet:
             # integration from the solidus of iron-alloys
 
             # compute total core mass from bulk composition
-            self.layer_masses[0] = self.ComputeCoreMass(M_IC=1.0)
-            self.layer_masses[1] = self.ComputeCoreMass(M_IC=0.0)
+            self.layer_masses[0] = self.compute_core_mass(M_IC=1.0)
+            self.layer_masses[1] = self.compute_core_mass(M_IC=0.0)
 
         # Use more sophisticated multilinear regression models to predict the
         # core mass, central pressure, and central temperature.
@@ -382,7 +383,7 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
-    def ComputeCoreMass(self, n=3, M_IC=0.0, xi_all_core=[]):
+    def compute_core_mass(self, n=3, M_IC=0.0, xi_all_core=[]):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
@@ -494,27 +495,6 @@ class Planet:
         # print ('')
         return core_frac * self.M_surface_should
 
-    def update_core(self):
-        pass
-
-    def update_composition(self):
-        pass
-
-    def update_bulk(self):
-        pass
-
-    def update_mantle(self):
-        pass
-
-    def update_hydrosphere(self):
-        pass
-
-    def update_atmosphere(self):
-        pass
-
-    def update_orbit(self):
-        pass
-
     def update(self, default=False):
         """Computes all dependant planetary parameters"""
         self.update_composition()
@@ -533,228 +513,25 @@ class Planet:
         for key in fortplanet_input_keys:
             setattr(self, key, self.initials[key])
 
-    def show(self, style=0, digits=3):
+    def print(self, style=0, digits=3):
         """Prints out a simple overview of all relevant planetary parameters."""
-        show_parameters = self.__dict__
-        print("\n####################\nPlanet Label: {}\n".format(self.label))
+        print_planet(self, style = style, digits = digits)
 
-        if style == 0:
-            print("=======================================")
-            print("Planet properties:")
-            print("\n--------------------------------")
-            print("Layer details:")
-            print("--------------------------------")
 
-            # for i in range(len(self.layer_properties)):
-            #     print("\nlayer: ", i)
-            #     first_shell = self.layers[i].shells[0]
-            #     for j in range(len(self.contents[i])):
-            #         print(
-            #             round(first_shell.fractions[j] * 100, digits),
-            #             "%",
-            #             material_list[self.contents[i][j]],
-            #             " ph =",
-            #             self.layers[i].shells[-1].mix.mix[j].phase,
-            #         )
+    def update_layers(self, props):
+        for i in range(len(props)):
 
-            #     print(
-            #         "layer mass [M_earth]: ",
-            #         round(self.layers[i].indigenous_mass / m_earth, digits),
-            #     )
-            #     print(
-            #         "outer radius [R_earth]:",
-            #         round(self.layers[i].radius / r_earth, digits),
-            #     )
-            #     print("outer P [GPa]: ", round(self.layers[i].pres * 1.0e-9, digits))
-            #     print("outer T [K]: ", round(self.layers[i].temp, digits))
-
-            try:
-                print("\n--------------------------------")
-                print("Major parameters:")
-                print("--------------------------------")
-                print(
-                    "R_surface_is [R_earth]:",
-                    round(self.R_surface_is / r_earth, digits),
-                    "\nM_surface_is [M_earth]:",
-                    round(self.M_surface_is / m_earth, digits),
-                    "\nmean density [gcc]:",
-                    round(self.mean_density / 1000, digits),
-                    "\nT_surface_is [K]:",
-                    round(self.T_surface_is, digits),
-                    "\nT_surface_should [K]:",
-                    round(self.T_surface_should, digits),
-                    "\nT_center [K]:",
-                    round(self.T_center, digits),
-                    "\nP_surface_is [bar]:",
-                    round(self.P_surface_is * 1.0e-5, digits),
-                    "\nP_center [GPa]:",
-                    round(self.P_center * 1.0e-9, digits),
-                    "\nMOI factor:",
-                    round(self.moment_of_inertia_is, digits),
-                    "\n\nMg_number_should:",
-                    round(self.Mg_number_should, digits),
-                    "\nMg_number_is:",
-                    round(self.Mg_number_is, digits),
-                    # "\nSi_number_should:",
-                    # round(self.Si_number_should, digits),
-                    "\nSi_number_is:",
-                    round(self.Si_number_is, digits),
-                    #'\nxi_H_core:', round(self.xi_H_core, digits),
-                    #'\nxi_H_core_predicted:', round(self.xi_H_core_predicted, digits),
-                    #'\nP_H2_CMB [MPa]:', round(self.P_H2_CMB*1.0e-6, digits),
-                    # "\nluminosity_int_should [W]:",
-                    # round(
-                    #     self.L_int_should / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
-                    #     digits,
-                    # ),
-                    # "\nluminosity_int_is [W]:",
-                    # round(
-                    #     self.L_int_is / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
-                    #     digits,
-                    # ),
-                    # "\nE_tot_should [G M_E²/R_E]:",
-                    # round(self.E_tot_should / (G * m_earth**2 / r_earth * 3 / 5), digits),
-                    # "\nE_tot_is [G M_E²/R_E]:",
-                    # round(self.E_tot_is / (G * m_earth**2 / r_earth * 3 / 5), digits),
-                )
-
-                try:
-                    print(
-                        "M_H2O [wt%]:",
-                        round(
-                            (self.H2O_count + self.H_count / 2.0)
-                            * mH2O
-                            / self.M_surface_is
-                            * 100,
-                            digits,
-                        ),
-                    )
-                    print(
-                        "M_H2O core [wt%]:",
-                        round(
-                            self.H_count / 2.0 * mH2O / self.M_surface_is * 100, digits
-                        ),
-                    )
-                    print(
-                        "M_H2O mantle [wt%]:",
-                        round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
-                    )
-                    print("Ocean frac is:", round(10**self.ocean_fraction_is, digits))
-                    print(
-                        "Ocean frac should:",
-                        round(10**self.ocean_fraction_should, digits),
-                    )
-                    print(
-                        "Core mass frac:",
-                        round(self.M_core_is / self.M_surface_is * m_earth, digits),
-                    )
-                    print(
-                        "Core radius [km]:",
-                        round(self.layer_properties[1]["R_outer"] / 1000, digits),
-                    )
-                except ZeroDivisionError:
-                    print("M_H2O [wt%]: NaN")
-
-            except TypeError:
-                print("WARNING: Type Error in Planet.prt()")
-
-            print("\n--------------------------------")
-            print("Layer overview:")
-            print("--------------------------------")
-
-            dat = []
-            for i in range(len(self.layer_properties)):
-                lay = self.layer_properties[i]
-                material_str = ""
-                for c in range(len(self.contents[i])):
-                    frac = str(round(self.fractions[i][c] * 100, 1)) + "% "
-                    material_str += frac + material_list_fort[self.contents[i][c] - 1]
-                    if c < len(self.contents[i]) - 1:
-                        material_str += ", "
-
-                dat.append(
-                    [
-                        i,
-                        material_str,
-                        ftool.scinot(lay["R_outer"] / r_earth, digits=digits),
-                        ftool.scinot(lay["indigenous_mass"] / m_earth, digits=digits),
-                        ftool.scinot(lay["P_outer"] * 1.0e-9, digits=digits),
-                        ftool.scinot(lay["T_outer"], digits=digits),
-                        ftool.scinot(lay["rho_outer"], digits=digits),
-                    ]
-                )
-
-            tabl = tabulate(
-                dat,
-                headers=[
-                    "Layer",
-                    "Contents",
-                    "R [R_e]",
-                    "m [M_e]",
-                    "P [GPa]",
-                    "T [K]",
-                    "rho [kg m-3]",
-                ],
-            )
-
-            print()
-            print(f"{tabl}")
-            print()
-
-    def dump(self, traget):
-        pass
-
-    def write(self, target, format="csv"):
-        pass
-
-    def load(self, file):
-        pass
-
-    def construct(self, echo = False):
-        # Gather layer dims for fortplanet routine
-        layer_dims = [len(item) for item in self.contents]
-        conts = list(itertools.chain.from_iterable(self.contents))
-        fracs = list(itertools.chain.from_iterable(self.fractions))
-
-        # generate intput parameters for the planet constructor
-        kwargs = dict(
-            (name, getattr(self, key))
-            for name, key in zip(fortplanet_keys_translator, fortplanet_input_keys)
-        )
-
-        # convert contents and fractions nd lists to 1d lists
-        kwargs["fractions"] = fracs
-        kwargs["contents"] = conts
-
-        # store initial values for subsequent use by the planet_iterator
-        self.initials = dict([key, self.__dict__[key]] for key in fortplanet_input_keys)
-        
-        # fortran wrapper is called here
-        # output = test_interface.interface.do_some_science_stuff(**kwargs)
-        output = fortplanet.wrapper.create_planet(**kwargs)
-
-        # update planetary output parameters
-        for key, value in zip(fortplanet_output_keys, output):
-            setattr(self, key, value)
-
-        self.mean_density = self.M_surface_is / (
-            4.0 / 3.0 * np.pi * self.R_surface_is**3
-        )
-
-        self.status = "very much alive"
-        for i in range(len(self.layer_properties_dummy)):
-
-            self.layer_properties[i]["P_outer"] = self.layer_properties_dummy[i][0]
-            self.layer_properties[i]["T_outer"] = self.layer_properties_dummy[i][1]
-            self.layer_properties[i]["rho_outer"] = self.layer_properties_dummy[i][2]
-            self.layer_properties[i]["rho_inner"] = self.layer_properties_dummy[i][3]
-            self.layer_properties[i]["indigenous_mass"] = self.layer_properties_dummy[
+            self.layer_properties[i]["P_outer"] = props[i][0]
+            self.layer_properties[i]["T_outer"] = props[i][1]
+            self.layer_properties[i]["rho_outer"] = props[i][2]
+            self.layer_properties[i]["rho_inner"] = props[i][3]
+            self.layer_properties[i]["indigenous_mass"] = props[
                 i
             ][4]
             self.layer_properties[i]["mass_fraction"] = (
                 self.layer_properties_dummy[i][4] / self.M_surface_is
             )
-            self.layer_properties[i]["R_outer"] = self.layer_properties_dummy[i][5]
+            self.layer_properties[i]["R_outer"] = props[i][5]
             self.layer_properties[i]["n_shells"] = self.shell_count_layers[i]
 
             if i > 0:
@@ -788,18 +565,68 @@ class Planet:
         except IndexError:
             self.M_ocean_is = 0.
 
+
+    def construct(self, echo = False):
+        # Gather layer dims for fortplanet routine
+        layer_dims = [len(item) for item in self.contents]
+        conts = list(itertools.chain.from_iterable(self.contents))
+        fracs = list(itertools.chain.from_iterable(self.fractions))
+
+        # generate intput parameters for the planet constructor
+        kwargs = dict(
+            (name, getattr(self, key))
+            for name, key in zip(fortplanet_keys_translator, fortplanet_input_keys)
+        )
+
+        # convert contents and fractions nd lists to 1d lists
+        kwargs["fractions"] = fracs
+        kwargs["contents"] = conts
+
+        # store initial values for subsequent use by the planet_iterator
+        self.initials = dict([key, self.__dict__[key]] for key in fortplanet_input_keys)
+        
+        # fortran wrapper is called here
+        # output = test_interface.interface.do_some_science_stuff(**kwargs)
+        output = fortplanet.wrapper.create_planet(**kwargs)
+
+        # update planetary output parameters
+        for key, value in zip(fortplanet_output_keys, output):
+            setattr(self, key, value)
+
+        self.mean_density = self.M_surface_is / (
+            4.0 / 3.0 * np.pi * self.R_surface_is**3
+        )
+
+
+        self.update_layers(self.layer_properties_dummy)
+        self.status = "very much alive"
+
+
 class TelluricPlanet(Planet):
-    def __init__(self):
+    def __init__(self, planetary_params = {}, run_params = {}):
+                
         Planet.__init__(self, label="telluric")
+
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
+        
         pp.set_default_values()
         rp.set_default_values()
+        
+        # update planetary parameters if passed by user
+        for key, val in planetary_params.items():
+            pp.default_values.update({key:val})
+
+        # update run parameters if passed by user
+        for key, val in run_params.items():
+            rp.default_values.update({key:val})
+
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
 
 class AquaPlanet(Planet):
     def __init__(self):
+        raise NotImplementedError("Aqua planets will be available soon!")
         Planet.__init__(self, label="aqua")
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -810,6 +637,7 @@ class AquaPlanet(Planet):
 
 class InfernoPlanet(Planet):
     def __init__(self):
+        raise NotImplementedError("Inferno planets will be available soon!")
         Planet.__init__(self, label="inferno")
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -820,6 +648,7 @@ class InfernoPlanet(Planet):
 
 class IcePlanet(Planet):
     def __init__(self):
+        raise NotImplementedError("Ice planets will be available soon!")
         Planet.__init__(self, label="ice")
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -830,7 +659,7 @@ class IcePlanet(Planet):
 
 class CustomPlanet(Planet):
     def __init__(self, planetary_parameters={}, run_parameters={}):
-
+        raise NotImplementedError("Custom type planets will be available soon!")
         default_values1 = {
             "ocean_fraction_should": 0.25,
             "Mg_number_should": 0.6,
