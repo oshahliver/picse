@@ -26,9 +26,9 @@ Alternatively:
 python3 -m pip install .
 ```
 
-## Usage
+## Basic usage
 
-### Example 1: Default planet from base types
+### Example 1: Base-type planets
 
 ```python
 
@@ -44,8 +44,9 @@ planet = planet_creator.TelluricPlanet()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_specs = {
-    "M_surface_should":1., # desired total mass
-    "T_surface_should":300., # desired surface temperature
+    "M_surface_should":1., # desired total mass (in earth masses)
+    "T_surface_should":300., # desired surface temperature (in kelvin)
+    "P_surface_should":1., # desired surface pressure (in bar)
     "Mg_number_should":0.5, # desired bulk magnesium number
     "Fe_number_mantle":0.1, # iron number of the silicates
     "Si_number_mantle":0.4, # silicon number of the silicates
@@ -71,6 +72,13 @@ planet.construct()
 # perform iteration on planetary object until desired accuracy for
 # all targets is reached
 iterator.iterate(planet=pl, **iterator_specs)
+
+# display overview of planetary parameters
+planet.show()
 ```
 
-### Example 2: Customized planet from base types
+### Example 2: Customized planets
+
+## Advanced usage
+
+Coming soon (I hope!)
