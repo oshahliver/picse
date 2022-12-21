@@ -73,13 +73,16 @@ iterator_specs = {
     "unpredictable": False,  # --> no effect at this point
 }
 
+
+# Initialize a telluric planet instance with the specified properties
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
 
+# Perform initial structure integration
 pl.construct()
 
 print("Starting iteration to match boundary conditions.")
 
-
+# Pass planet instance to iterator to match boundary conditions
 iterator.iterate(planet=pl, **iterator_specs)
 
 pl.print()
