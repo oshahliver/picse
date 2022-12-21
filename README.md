@@ -2,7 +2,7 @@
 
 ## General Information
 
-The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the university of Bern and Zurich. It generates one dimensional, static structure and composition models of terrestrial planets and water-worlds.
+The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the university of Bern and Zurich. It generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. 
 
 ## Installation
 
@@ -94,13 +94,8 @@ iterator.iterate(planet=pl, **iterator_specs)
 # Model inspection
 #######################################################################
 
-# Check if convergence was reached (useful for debugging)
-pl.check_convergence()
-print("converged:", pl.converged)
-
 # print fundamental planeatary properties to standard output
 pl.print()
-print("contents =", pl.contents)
 
 # You can also access individual parameters as attributes
 print("total radius (km):", pl.R_surface_is * 1e-3)
