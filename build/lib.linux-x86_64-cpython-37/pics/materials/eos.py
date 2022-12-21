@@ -7,20 +7,19 @@ Created on Fri Jan 18 14:26:56 2019
 """
 import time
 import sys
-import PIMPtools
-import eosTablesUse as eosTab
+from pics.utils import PIMPtools
+from pics.materials import eosTablesUse as eosTab
 import numpy as np
-import plotTools
 from matplotlib import pyplot as plt
-import Mazevet2018EOS as mazevet
+from pics.materials import Mazevet2018EOS as mazevet
 import matplotlib.transforms as transforms
-import Feistel2006EOS as feistel
-import eoswater
-import phaseCheck
-import hydration
-import brucite_phase as bruce
-import functionTools as ftool
-from PIMPphysicalparams import (
+from pics.materials import Feistel2006EOS as feistel
+from pics.materials import eoswater
+from pics.materials import phaseCheck
+from pics.materials import hydration
+from pics.materials import brucite_phase as bruce
+from pics.utils import functionTools as ftool
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -73,7 +72,7 @@ from PIMPphysicalparams import (
     EOSstring_list,
 )
 
-from PIMPrunparams import color_list, grid_color, pressure_switch_H2O
+from pics.runparams import color_list, grid_color, pressure_switch_H2O
 from matplotlib.ticker import MultipleLocator
 from matplotlib import cm
 import matplotlib as mpl

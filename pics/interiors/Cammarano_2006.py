@@ -9,7 +9,7 @@ Created on Wed Mar 16 11:55:11 2022
 import numpy as np
 import pics.utils.functionTools as ftool
 import matplotlib.pyplot as plt
-from PIMPphysicalparams import R_solar, M_solar, m_earth, r_earth
+from pics.physicalparams import R_solar, M_solar, m_earth, r_earth
 
 # Parameters for conductive part of ice sheet and silicate mantle
 T0_list = [110.0, 273]

@@ -7,7 +7,7 @@ Created on Tue Dec  4 14:05:05 2018
 
 import matplotlib.ticker
 from matplotlib import pyplot as plt
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -37,7 +37,7 @@ from PIMPphysicalparams import (
     Mg_number_solar,
 )
 
-from PIMPrunparams import (
+from pics.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -54,7 +54,7 @@ import pics.utils.functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
-import pics.interiors.Atmosphere as Atmosphere
+import pics.atmos.Atmosphere as Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings

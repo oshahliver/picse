@@ -8,9 +8,9 @@ Created on Thu Dec 17 20:11:41 2020
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib
-from PIMPphysicalparams import m_earth, r_earth, G, R_solar, M_solar, MoI_solar
+from pics.physicalparams import m_earth, r_earth, G, R_solar, M_solar, MoI_solar
 import random
-import functionTools as ftool
+from pics.utils import functionTools as ftool
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 import pandas as pd
 import plotly.express as px
@@ -408,7 +408,7 @@ class analyticalModelSpirit:
                     mod.total_mass,
                     mod.total_radius,
                     mod.MOI,
-                    sum(mod.layer_masses[-(2 ** self.res) :]) / self.total_mass,
+                    sum(mod.layer_masses[-(2**self.res) :]) / self.total_mass,
                     mod.layer_masses[0] / sum(mod.layer_masses),
                 ]
                 for mod in self.filtered_models
@@ -485,7 +485,7 @@ class analyticalModelSpirit:
             mod.compute_moi()
             mod.compute_ocean()
 
-        omf = sum(mod.layer_masses[-(2 ** self.res) :]) / self.total_mass
+        omf = sum(mod.layer_masses[-(2**self.res) :]) / self.total_mass
 
         data = np.array(
             [
@@ -641,8 +641,8 @@ class analyticalModel:
         ]
         dRsq.append(0.0)
         dRsq = np.array(dRsq)
-        dRsq *= r_earth ** 2
-        dP = np.array([d ** 2 for d in self.layer_densities])
+        dRsq *= r_earth**2
+        dP = np.array([d**2 for d in self.layer_densities])
         dP *= dRsq * 2 * np.pi * G / 3.0
         # dP += self.surface_pressure
         self.layer_pressures = np.array([sum(dP[i:-1]) for i in range(self.n_layers)])
@@ -667,7 +667,7 @@ class analyticalModel:
                 * (1.0 / self.layer_radii[i] - 1.0 / self.layer_radii[i])
                 * self.layer_radii[i]
             )
-            dP = G * self.layer_densities[i - 1] * 4.0 * np.pi / 3.0 * a * r_earth ** 2
+            dP = G * self.layer_densities[i - 1] * 4.0 * np.pi / 3.0 * a * r_earth**2
             print("dP =", dP, self.layer_pressures[self.n_layers - i - 1])
             self.layer_pressures.append(
                 dP + self.layer_pressures[self.n_layers - i - 1]
@@ -686,7 +686,7 @@ class analyticalModel:
 
     def get_layer_masses(self):
         self.layer_masses = [
-            [self.total_mass * lmf / (2 ** self.res) for i in range(2 ** self.res)]
+            [self.total_mass * lmf / (2**self.res) for i in range(2**self.res)]
             for lmf in self.layer_mass_fractions
         ]
         self.layer_masses = np.array(self.layer_masses).flatten()
@@ -700,13 +700,13 @@ class analyticalModel:
         """Get density and mass for each layer by randomly sampling within
         predefined ranges.
         """
-        self.layer_densities = np.empty([self.n_layers * 2 ** self.res])
+        self.layer_densities = np.empty([self.n_layers * 2**self.res])
 
         c = 0
         # Loop over layers
         for i in range(self.n_layers):
             # Loop over sublayers
-            for j in range(2 ** self.res):
+            for j in range(2**self.res):
                 p = random.random()
 
                 low = dens_ranges[i][0]
@@ -768,10 +768,10 @@ class analyticalModel:
             R = self.layer_radii[i + 1] * r_earth
             R_before = self.layer_radii[i] * r_earth
 
-            I += 2.0 / 5.0 * M * (R ** 5 - R_before ** 5) / (R ** 3 - R_before ** 3)
+            I += 2.0 / 5.0 * M * (R**5 - R_before**5) / (R**3 - R_before**3)
 
         self.MOI = I / (
-            self.total_mass * m_earth * self.total_radius ** 2 * r_earth ** 2
+            self.total_mass * m_earth * self.total_radius**2 * r_earth**2
         )
 
     def compute_ocean(self):
@@ -882,7 +882,7 @@ def plot_j2toc22():
 
 
 def sigma_j2toc22(a, b, sa, sb):
-    return np.sqrt(1 / b ** 2 * sa ** 2 + (a / b ** 2) ** 2 * sb ** 2)
+    return np.sqrt(1 / b**2 * sa**2 + (a / b**2) ** 2 * sb**2)
 
 
 def h_f(MoI):
@@ -905,7 +905,7 @@ def J_2(omega, a, M, kf):
 
     """
 
-    return 5.0 / 6.0 * kf * (omega ** 2 * a ** 3 / (G * M))
+    return 5.0 / 6.0 * kf * (omega**2 * a**3 / (G * M))
 
 
 def C_22(omega, a, M, kf):
@@ -913,7 +913,7 @@ def C_22(omega, a, M, kf):
     assuming the body to be in hydrostatic equilibrium (Schubert et al. 1994)
     """
 
-    return 1.0 / 4.0 * kf * (omega ** 2 * a ** 3 / (G * M))
+    return 1.0 / 4.0 * kf * (omega**2 * a**3 / (G * M))
 
 
 def rho(r):
@@ -1085,9 +1085,9 @@ def MOI_factor(layer_masses, layer_radii):
         R = layer_radii[i + 1]
         R_before = layer_radii[i]
 
-        I += 2.0 / 5.0 * M * (R ** 5 - R_before ** 5) / (R ** 3 - R_before ** 3)
+        I += 2.0 / 5.0 * M * (R**5 - R_before**5) / (R**3 - R_before**3)
 
-    return I / (M_tot * R_tot ** 2)
+    return I / (M_tot * R_tot**2)
 
 
 def initiate_layer_masses(M, fractions):

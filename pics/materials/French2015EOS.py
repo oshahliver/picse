@@ -13,10 +13,10 @@ range.
 """
 
 import numpy as np
-import PIMPtools
-import functionTools as ftool
+from pics.utils import PIMPtools
+from pics.utils import functionTools as ftool
 from scipy.integrate import quad
-from PIMPphysicalparams import kBcgs, kB, mH, mO, NA, Rgas
+from pics.physicalparams import kBcgs, kB, mH, mO, NA, Rgas
 
 # Fit parameters from French 2015
 
@@ -42,21 +42,21 @@ def D(z=None, n=3, a=0.0):
     """Computes the Debye function in the interval [a,b]"""
 
     def integrand(x):
-        return x ** n / (np.exp(x) - 1.0)
+        return x**n / (np.exp(x) - 1.0)
 
-    return n / z ** n * quad(integrand, a, z)[0]
+    return n / z**n * quad(integrand, a, z)[0]
 
 
 def ue(d=None):
     """Electronic ground state contribution to free energy"""
     return (
-        a0 + a1 * d + a2 * d ** 2 + a3 * d ** 3 + a4 * np.log(d) + a5 * np.log(d) ** 2
+        a0 + a1 * d + a2 * d**2 + a3 * d**3 + a4 * np.log(d) + a5 * np.log(d) ** 2
     )
 
 
 def un(d=None):
     """Nuclear ground state contribution to free energy"""
-    return b0 + b1 * d + b2 * d ** 2 + b3 * np.exp(-b4 * d ** 10)
+    return b0 + b1 * d + b2 * d**2 + b3 * np.exp(-b4 * d**10)
 
 
 def ft(d=None, T=None):
@@ -64,7 +64,7 @@ def ft(d=None, T=None):
     K1 = 0.0
     K2 = 0.0
     for i in range(1):
-        Ti = 700.0 * 2.0 ** i
+        Ti = 700.0 * 2.0**i
         for k in range(3):
             kk = k - 4
             # print (i, kk, TABLE2_alpha[k])
@@ -76,7 +76,7 @@ def ft(d=None, T=None):
             )
 
     for j in range(4):
-        Tj = 1000.0 * 2.0 ** j
+        Tj = 1000.0 * 2.0**j
         for k in range(3):
             kk = k - 4
             # print (j, kk, TABLE2_gamma[j][k])
@@ -96,14 +96,14 @@ def dfedd(d=None, T=None):
     """Electronic ground state contribution obtained by differentiation of
     equation (9)
     """
-    return a1 + 2 * a2 * d + 3 * a3 * d ** 2 + a4 / d + 2 * a5 * np.log(d) / d
+    return a1 + 2 * a2 * d + 3 * a3 * d**2 + a4 / d + 2 * a5 * np.log(d) / d
 
 
 def dfndd(d=None, T=None):
     """Nuclear ground state contribution obtained by differentiation of
     equation (15)
     """
-    return b1 + 2 * b2 * d - 10 * b4 * d ** 9 * b3 * np.exp(-b4 * d ** 10)
+    return b1 + 2 * b2 * d - 10 * b4 * d**9 * b3 * np.exp(-b4 * d**10)
 
 
 def dftdd(d=None, T=None):
@@ -111,7 +111,7 @@ def dftdd(d=None, T=None):
     K1 = 0.0
     K2 = 0.0
     for i in range(1):
-        Ti = 700.0 * 2.0 ** i
+        Ti = 700.0 * 2.0**i
         for k in range(3):
             kk = k - 4
             # print (i, kk, TABLE2_alpha[k])
@@ -125,7 +125,7 @@ def dftdd(d=None, T=None):
             )
 
     for j in range(4):
-        Tj = 1000.0 * 2.0 ** j
+        Tj = 1000.0 * 2.0**j
         for k in range(3):
             kk = k - 4
             # print (j, kk, TABLE2_gamma[j][k])
@@ -143,13 +143,13 @@ def dftdd(d=None, T=None):
 
 def dfeddd(d=None, T=None):
     """Second density derivative of electronic contributiion"""
-    return 2 * a2 + 6 * a3 * d - a4 / d ** 2 - 2 * a5 / d ** 2 * (np.log(d) - 1.0)
+    return 2 * a2 + 6 * a3 * d - a4 / d**2 - 2 * a5 / d**2 * (np.log(d) - 1.0)
 
 
 def dfnddd(d=None, T=None):
     """Second density derivative of nuclear contribution"""
-    return 2 * b2 - 10.0 * b3 * b4 * d ** 8 * np.exp(-b4 * d ** 10) * (
-        9.0 - 10.0 * b4 * d ** 10
+    return 2 * b2 - 10.0 * b3 * b4 * d**8 * np.exp(-b4 * d**10) * (
+        9.0 - 10.0 * b4 * d**10
     )
 
 
@@ -159,7 +159,7 @@ def dftddd(d=None, T=None):
     K2 = 0.0
 
     for i in range(1):
-        Ti = 700.0 * 2.0 ** i
+        Ti = 700.0 * 2.0**i
         for k in range(3):
             kk = k - 4
             factor = kk / k0 * (kk / k0 - 1.0) * d ** (kk / k0 - 2.0)
@@ -172,7 +172,7 @@ def dftddd(d=None, T=None):
             )
 
     for j in range(4):
-        Tj = 1000.0 * 2.0 ** j
+        Tj = 1000.0 * 2.0**j
         for k in range(3):
             kk = k - 4
             factor = kk / k0 * (kk / k0 - 1.0) * d ** (kk / k0 - 2.0)
@@ -187,7 +187,7 @@ def dftdT(d=None, T=None):
     K1 = 0.0
     K2 = 0.0
     for i in range(1):
-        Ti = 700.0 * 2.0 ** i
+        Ti = 700.0 * 2.0**i
         for k in range(3):
             kk = k - 4
             # print (i, kk, TABLE2_alpha[k])
@@ -198,7 +198,7 @@ def dftdT(d=None, T=None):
             )
 
     for j in range(4):
-        Tj = 1000.0 * 2.0 ** j
+        Tj = 1000.0 * 2.0**j
         for k in range(3):
             kk = k - 4
             # print (j, kk, TABLE2_gamma[j][k])
@@ -220,7 +220,7 @@ def dftdT2(d=None, T=None):
     K1 = 0.0
     K2 = 0.0
     for i in range(1):
-        Ti = 700.0 * 2.0 ** i
+        Ti = 700.0 * 2.0**i
         for k in range(3):
             kk = k - 4
             # print (i, kk, TABLE2_alpha[k])
@@ -228,21 +228,21 @@ def dftdT2(d=None, T=None):
                 TABLE2_alpha[k]
                 * (
                     -12.0 / T * (Ti / T / (np.exp(Ti / T) - 1.0) - D(Ti / T))
-                    + 3.0 * np.exp(-Ti / T) * Ti / T ** 2
+                    + 3.0 * np.exp(-Ti / T) * Ti / T**2
                 )
                 * d ** (kk / 3.0)
             )
 
     for j in range(4):
-        Tj = 1000.0 * 2.0 ** j
+        Tj = 1000.0 * 2.0**j
         for k in range(3):
             kk = k - 4
             # print (j, kk, TABLE2_gamma[j][k])
             K2 += (
                 TABLE2_gamma[j][k]
                 * (
-                    -Tj / T ** 2 * 1.0 / (np.exp(Tj / T) - 1.0)
-                    + Tj ** 2 / T ** 3 * (np.exp(Tj / T - 1.0)) ** (-2) * np.exp(Tj / T)
+                    -Tj / T**2 * 1.0 / (np.exp(Tj / T) - 1.0)
+                    + Tj**2 / T**3 * (np.exp(Tj / T - 1.0)) ** (-2) * np.exp(Tj / T)
                     + np.exp(-Tj / T) * Tj / T / (1.0 - np.exp(-Tj / T))
                 )
                 * d ** (kk / 3.0)
@@ -350,7 +350,7 @@ def dPdrho_T(d=None, T=None, P=None):
     # Convert density into gcc
     d *= 1.0e-3
 
-    return (2 * d * dfdd(d=d, T=T) + d ** 2 * dfddd(d=d, T=T)) * 1.0e6
+    return (2 * d * dfdd(d=d, T=T) + d**2 * dfddd(d=d, T=T)) * 1.0e6
 
 
 def Pressure(d=None, T=None):
@@ -359,7 +359,7 @@ def Pressure(d=None, T=None):
     d *= 1.0e-3
 
     # Compute pressure in GPa
-    ptot = d ** 2 * (dfndd(d=d) + dfedd(d=d) + dftdd(d=d, T=T))
+    ptot = d**2 * (dfndd(d=d) + dfedd(d=d) + dftdd(d=d, T=T))
 
     # Return pressure in Pa
     return ptot * 1.0e9

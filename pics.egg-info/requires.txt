@@ -1,0 +1,10 @@
+astropy
+plotly
+tabulate
+scipy
+scikit-learn
+numpy
+pandas
+seafreeze
+iapws
+matplotlib

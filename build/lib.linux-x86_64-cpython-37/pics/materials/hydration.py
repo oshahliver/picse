@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from matplotlib import pyplot as plt
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     molar_mass_list,
     rho0_coeffs_Mg2SiO4,
     K0_coeffs_Mg2SiO4,
@@ -26,9 +26,9 @@ from PIMPphysicalparams import (
 
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-from PIMPrunparams import color_list, grid_color, plot_params, background_color
-import functionTools as ftool
-import plotTools
+from pics.runparams import color_list, grid_color, plot_params, background_color
+from pics.utils import functionTools as ftool
+from pics.utils import plotTools
 
 
 # Mantle geotherm from Stixrude 2009
@@ -2229,7 +2229,7 @@ for i in range(len(data_saturation_Mg2SiO4)):
 
             if dat[d][2] == 100:
                 ax.scatter(
-                    dat[d][0], dat[d][1], color=color_list[i], facecolor="", s=30
+                    dat[d][0], dat[d][1], color=color_list[i], facecolor="None", s=30
                 )
 
 # add unsaturated data

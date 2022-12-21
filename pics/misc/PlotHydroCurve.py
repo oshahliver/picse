@@ -8,8 +8,8 @@ Created on Wed Sep 23 14:38:11 2020
 
 import numpy as np
 from matplotlib import pyplot as plt
-from PIMPrunparams import color_list, pure_curves_color_list, material_plot_list_fort
-from PIMPphysicalparams import m_earth, r_earth, mH, mFe
+from pics.runparams import color_list, pure_curves_color_list, material_plot_list_fort
+from pics.physicalparams import m_earth, r_earth, mH, mFe
 import matplotlib
 import astropy.table
 from astropy.io import ascii

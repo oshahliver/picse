@@ -6,10 +6,10 @@ Created on Tue Jul 30 23:15:52 2019
 @author: oshah
 """
 
-import brucite_phase as bruce
-import phase_transitions_water_Wagner2002 as water
-from PIMPphysicalparams import phase_transition_coeffs_MgSiO3
-import eos
+from pics.materials import brucite_phase as bruce
+from pics.materials import phase_transitions_water_Wagner2002 as water
+from pics.physicalparams import phase_transition_coeffs_MgSiO3
+from pics.materials import eos
 
 
 def getPhase(ll=0, T=None, P=None, d=None, double_check=False):

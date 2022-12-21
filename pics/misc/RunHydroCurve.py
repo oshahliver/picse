@@ -19,7 +19,7 @@ toolkit = plfac.Toolkit()
 
 
 def delta_T_CMB(M):
-    return 1400.0 * M ** 0.75
+    return 1400.0 * M**0.75
 
 
 Fe_number_mantle = 0.24999

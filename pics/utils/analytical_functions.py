@@ -8,11 +8,11 @@ Created on Fri Jan 18 14:26:56 2019
 
 import time
 import sys
-import PIMPtools
+from pics.utils import PIMPtools
 import numpy as np
 from matplotlib import pyplot as plt
-import functionTools as ftool
-from PIMPphysicalparams import (
+from pics.utils import functionTools as ftool
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -218,7 +218,7 @@ def P_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     mm = gas_molar_mass_list[ll]
     a = a_VDW_list[ll]
     b = b_VDW_list[ll]
-    return d * Rgas * T / (mm - d * b) - d ** 2 * a / mm ** 2
+    return d * Rgas * T / (mm - d * b) - d**2 * a / mm**2
 
 
 def rho_VDW(P=0.0, T=0.0, ll=None, **kwargs):
@@ -233,7 +233,7 @@ def dPdrho_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     b = b_VDW_list[ll]
     return (
         Rgas * T / (mm - b * d)
-        - 2.0 * d * a / mm ** 2
+        - 2.0 * d * a / mm**2
         + b * d * Rgas * T / (mm - b * d) ** 2
     )
 

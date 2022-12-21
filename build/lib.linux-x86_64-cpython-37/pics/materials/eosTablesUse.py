@@ -128,7 +128,7 @@ class Table:
         right_delta = abs(x - right_value)
 
         # compute index of left and right values
-        left_index = int(left_value / a - 10 ** alpha)
+        left_index = int(left_value / a - 10**alpha)
         right_index = left_index + 1  # int(right_value/a+10**alpha)
 
         # NOTE: if the given value coincides with a existing grid point, the
@@ -138,12 +138,12 @@ class Table:
         # the precise result for this point
 
         # take closest grid point as core point
-        offset = int(left_value / a - 10 ** alpha)
+        offset = int(left_value / a - 10**alpha)
 
         # gather indices of all required neighbouring grid points around the
         # core point for n'th order interpolation scheme
         ind = [
-            9 * 10 ** alpha * (exponent - start) + offset + r
+            9 * 10**alpha * (exponent - start) + offset + r
             for r in relative_coordinates[order - 1]
         ]
 
@@ -165,7 +165,7 @@ class Table:
         r = []
         for i in range(order + 1):
             for j in range(order + 1):
-                r.append(x ** i * y ** j)
+                r.append(x**i * y**j)
 
         return r
 

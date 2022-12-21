@@ -9,7 +9,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 import pics.materials.Material as Material
 import pics.interiors.Planet as Planet
-import PlanetTest
+from pics.interiors import PlanetTest
 import pics.interiors.PlanetFort as PlanetFort
 import pics.utils.functionTools as ftool
 from matplotlib import pyplot as plt
@@ -27,11 +27,11 @@ from sklearn.linear_model import LinearRegression
 import astropy.table
 from astropy.io import ascii
 import time
-import readPREM
+from pics.utils import readPREM
 import pics.utils.logTrans as logTrans
 import random
 import pics.utils.plotTools as plotTools
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     m_earth,
     r_earth,
     Mg_number_solar,
@@ -62,13 +62,13 @@ from PIMPphysicalparams import (
     sigmaSB,
 )
 
-import phase_transitions_water_Wagner2002 as waterPhase
-from PIMPrunparams import suffix, plot_params, external_temp_profiles
-from PIMPrunparams import grid_color, background_color, color_list
-import fortplanet
+from pics.materials import phase_transitions_water_Wagner2002 as waterPhase
+from pics.runparams import suffix, plot_params, external_temp_profiles
+from pics.runparams import grid_color, background_color, color_list
+from pics.utils import fortplanet
 import pics.interiors.planet_iterator as planet_iterator
-import pics.interiors.kit_planet as kit_planet
-from utils import PlanetaryParams, RunParams
+from pics.interiors import creator
+from pics import physicalparams, runparams
 
 tk = planet_iterator.Toolkit()
 
@@ -122,7 +122,7 @@ class Workbench:
         # Compute desired total ocean mass from water mass fraction
         M_ocean_should = (
             self.planetary_params.M_surface_should
-            * 10 ** self.planetary_params.ocean_fraction_should
+            * 10**self.planetary_params.ocean_fraction_should
         )
 
         # Note that the Si# in the mantle is taken here. The core mass
@@ -625,7 +625,7 @@ class Toolkit:
             slope = dwhat / dhow
 
             # Project the development of the bisection for the next n steps
-            d = self.delta * 0.5 ** 2
+            d = self.delta * 0.5**2
 
             proj = newval + slope * d
             # print ('dhow, dwhat, slope, d, proj:', dhow, dwhat, slope, d, proj)
@@ -1173,8 +1173,8 @@ class Toolkit:
                     newpassiveval = [0.0 for i in range(len(passives))]
 
                 if log:
-                    val_should = 10 ** val_should
-                    self.delta = 10 ** self.delta
+                    val_should = 10**val_should
+                    self.delta = 10**self.delta
 
                 # newval can also not be larger than upper sanity bound
                 newval = min(newval, sanity_borders[how][1])
@@ -1792,7 +1792,7 @@ class Toolkit:
             # Fe number layers will be updated during run time.
             # Fe number is defined as Fe / (Fe + Mg) so it is always 1 in the core
             Fe_number_layers = [1.0, 1.0, Fe_number_mantle, Fe_number_mantle, 0.0]
-            M_ocean_should = M_surface_should * 10 ** ocean_frac_should
+            M_ocean_should = M_surface_should * 10**ocean_frac_should
             layermasses = [
                 0.0,
                 0.0,
@@ -1833,7 +1833,7 @@ class Toolkit:
         tc_pred, pc_pred, mc_pred = self.predict(
             M_surface_should,
             Mg_number_should,
-            10 ** ocean_frac_should,
+            10**ocean_frac_should,
             Si_number_mantle,
             T_surface_should,
             Fe_number_mantle,
@@ -2011,7 +2011,7 @@ class Toolkit:
             hows = ["P_center", "T_center"]
             vals_should = [
                 M_surface_should * m_earth,
-                E_tot_should * (G * m_earth ** 2 / r_earth * 3 / 5),
+                E_tot_should * (G * m_earth**2 / r_earth * 3 / 5),
             ]
             predictors = [predictor_P, predictor_E]
             should_weights = ["log", "log"]
@@ -2023,7 +2023,7 @@ class Toolkit:
             hows = ["P_center", "T_center"]
             vals_should = [
                 M_surface_should * m_earth,
-                L_int_should * 4.0 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4,
+                L_int_should * 4.0 * np.pi * r_earth**2 * sigmaSB * 300**4,
             ]
             predictors = [predictor_P, predictor_L]
             should_weights = ["log", "log"]
@@ -4224,7 +4224,7 @@ class Toolkit:
             return planets
 
     def probe_parameter_space(self, res=3, obj="earth", hyd=False):
-        N = 2 ** res
+        N = 2**res
         data_dir = "/home/os18o068/Documents/PHD/Projects/Planets/Data/Venus_vs_Earth/"
 
         if hyd:
@@ -4651,7 +4651,7 @@ class Toolkit:
                             dev_mass_list[acc].append(dev_mass)
                             dev_radius_list[acc].append(dev_radius)
                             dev_list[acc].append(
-                                np.sqrt(dev_mass ** 2 + dev_radius ** 2)
+                                np.sqrt(dev_mass**2 + dev_radius**2)
                             )
 
             print(len(survivors[acc]), "survivors for", acc_mass[acc])
@@ -5705,7 +5705,7 @@ class Toolkit:
                             )
 
                             dissoc_positions_error.append(
-                                np.sqrt((sigma_delta) ** 2 + sigma_mass ** 2)
+                                np.sqrt((sigma_delta) ** 2 + sigma_mass**2)
                             )
 
                             found_dissoc = True
@@ -5764,7 +5764,7 @@ class Toolkit:
                             )
 
                             fulldissoc_positions_error.append(
-                                np.sqrt((sigma_delta) ** 2 + sigma_mass ** 2)
+                                np.sqrt((sigma_delta) ** 2 + sigma_mass**2)
                             )
 
                             found_fulldissoc = True
@@ -6308,7 +6308,7 @@ class Toolkit:
         except OverflowError:
             digits = 1
 
-        sigma_T = sigma_T * 10 ** digits
+        sigma_T = sigma_T * 10**digits
 
         mean_T = round(mean_T, digits)
         sigma_T = int(sigma_T)
@@ -6323,7 +6323,7 @@ class Toolkit:
         except OverflowError:
             digits = 1
 
-        sigma_P = sigma_P * 10 ** digits
+        sigma_P = sigma_P * 10**digits
 
         mean_P = round(mean_P, digits)
         sigma_P = int(sigma_P)
@@ -6375,8 +6375,8 @@ class Toolkit:
             dy = p2[1] - p1[1]
 
             rotn = (
-                np.degrees(np.arctan2(dy, dx)) * np.sqrt(1.0 - Mg_number ** 2)
-                - 0.02 * 1.0 / Mg_number ** 3
+                np.degrees(np.arctan2(dy, dx)) * np.sqrt(1.0 - Mg_number**2)
+                - 0.02 * 1.0 / Mg_number**3
             )
 
             error = water_contents_error[i]
@@ -6384,7 +6384,7 @@ class Toolkit:
             # compute how many digits of water contents must be displayed
             # according to the uncertainty of the value
             digits = abs(int(np.log10(error))) + 1
-            error = error * 10 ** digits
+            error = error * 10**digits
 
             # add Mg# label to plot
             ax.annotate(
@@ -6434,7 +6434,7 @@ class Toolkit:
             xylabel1 = (x_pos + 0.15, y_pos + 0.065 * Mg_number + 0.05)
             xylabel2 = (
                 x_pos - 0.2,
-                y_pos - 0.01 * Mg_number + 0.025 + 1.0 / Mg_number ** 2 * 0.001,
+                y_pos - 0.01 * Mg_number + 0.025 + 1.0 / Mg_number**2 * 0.001,
             )
 
             p1 = axx.transData.transform_point((x[0], y[0]))
@@ -6444,8 +6444,8 @@ class Toolkit:
             dy = p2[1] - p1[1]
 
             rotn = (
-                np.degrees(np.arctan2(dy, dx)) * np.sqrt(1.0 - Mg_number ** 2)
-                - 0.02 * 1.0 / Mg_number ** 3
+                np.degrees(np.arctan2(dy, dx)) * np.sqrt(1.0 - Mg_number**2)
+                - 0.02 * 1.0 / Mg_number**3
             )
 
             # add Mg# label to plot
@@ -6542,7 +6542,7 @@ class Toolkit:
                 # to the uncertainty of the value
                 try:
                     digits = abs(int(np.log10(error))) + 1
-                    error = error * 10 ** digits
+                    error = error * 10**digits
 
                     plot_val_string = str(round(pos, digits))
                     plot_err_string = str(int(error))
@@ -6599,7 +6599,7 @@ class Toolkit:
                 # to the uncertainty of the value
                 try:
                     digits = abs(int(np.log10(error))) + 1
-                    error = error * 10 ** digits
+                    error = error * 10**digits
 
                     plot_val_string = str(round(pos, digits))
                     plot_err_string = str(int(error))
@@ -7374,13 +7374,13 @@ class Toolkit:
     def create_planet_grid(self, res=3, write=False):
         planets = []
 
-        masses = np.logspace(0, 0, 2 ** res)
-        Mg = np.linspace(0.5, 0.5, 2 ** res)
-        temps = np.linspace(300.0, 1500.0, 2 ** res)
+        masses = np.logspace(0, 0, 2**res)
+        Mg = np.linspace(0.5, 0.5, 2**res)
+        temps = np.linspace(300.0, 1500.0, 2**res)
 
-        for i in range(2 ** res):
-            for j in range(2 ** res):
-                for k in range(2 ** res):
+        for i in range(2**res):
+            for j in range(2**res):
+                for k in range(2**res):
                     of = -8
                     im = 0
                     m = masses[i]
@@ -7402,7 +7402,7 @@ class Toolkit:
                         predictor_T="none",
                         ocean=o,
                         ocean_frac_should=of,
-                        temp_jumps=[0.0, T0 * m ** 0.75, 0.0, 0.0, 0.0],
+                        temp_jumps=[0.0, T0 * m**0.75, 0.0, 0.0, 0.0],
                         Si_number_mantle=sim,
                         P_surface_should=1e5,
                         T_surface_should=1500.0,
@@ -7578,7 +7578,7 @@ class Toolkit:
         Ts,
         Fe_number_mantle,
         xi_Fe_core,
-        model_path="/home/os18o068/Documents/PHD/Projects/Planets/Data/planet_grid_test/",
+        model_path="./data/planet_grid_test/",
         model_name="models_with_ocean.pkl",
     ):
 

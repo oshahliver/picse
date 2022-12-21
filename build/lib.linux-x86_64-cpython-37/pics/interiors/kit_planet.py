@@ -4,7 +4,7 @@ Spyder Editor
 
 This is a temporary script file.
 """
-import test_interface
+from pics.utils import test_interface
 import itertools
 import copy
 
@@ -292,8 +292,9 @@ class Planet:
         fracs = list(itertools.chain.from_iterable(self.fractions))
 
         # Call the fortran routine to construct the planet
-        input_keys = ['a', 'b', 'c']
-        kwargs = (dict((name, getattr(self, name)) for name in input_keys))
+        input_keys = ["a", "b", "c"]
+        kwargs = dict((name, getattr(self, name)) for name in input_keys)
+        # executable is called here
         output = test_interface.interface.do_some_science_stuff(**kwargs)
 
 

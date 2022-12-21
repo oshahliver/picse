@@ -325,7 +325,7 @@ for axx in range(len(ax)):
             else:
                 xx = x.T[j]
 
-            ax[axx].semilogx(10 ** x1, xx, color=colors[j], linestyle=linestyles[k])
+            ax[axx].semilogx(10**x1, xx, color=colors[j], linestyle=linestyles[k])
 
             if axx == 1:
                 ax[axx].set_yscale("log")

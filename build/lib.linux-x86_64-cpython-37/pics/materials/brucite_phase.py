@@ -8,7 +8,7 @@ Created on Tue May 28 18:05:17 2019
 import numpy as np
 from matplotlib import pyplot as plt
 import copy
-from PIMPrunparams import color_list, grid_color
+from pics.runparams import color_list, grid_color
 from matplotlib.ticker import AutoMinorLocator
 
 # define tripple points of Mg(OH)2

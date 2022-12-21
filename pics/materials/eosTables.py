@@ -648,7 +648,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (i + self.x_start),
                     10 ** (i + 1 + self.x_start),
-                    9 * 10 ** self.alpha_x + 1,
+                    9 * 10**self.alpha_x + 1,
                     endpoint=True,
                 )
 
@@ -657,7 +657,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (i + self.x_start),
                     10 ** (i + 1 + self.x_start),
-                    9 * 10 ** self.alpha_x,
+                    9 * 10**self.alpha_x,
                     endpoint=False,
                 )
 
@@ -686,7 +686,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (j + self.y_start),
                     10 ** (j + 1 + self.y_start),
-                    9 * 10 ** self.alpha_y + 1,
+                    9 * 10**self.alpha_y + 1,
                     endpoint=True,
                 )
 
@@ -694,7 +694,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (j + self.y_start),
                     10 ** (j + 1 + self.y_start),
-                    9 * 10 ** self.alpha_y,
+                    9 * 10**self.alpha_y,
                     endpoint=False,
                 )
 
@@ -791,7 +791,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (i + x_start),
                     10 ** (i + 1 + x_start),
-                    9 * 10 ** self.alpha_x + 1,
+                    9 * 10**self.alpha_x + 1,
                     endpoint=True,
                 )
 
@@ -800,7 +800,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (i + x_start),
                     10 ** (i + 1 + x_start),
-                    9 * 10 ** self.alpha_x,
+                    9 * 10**self.alpha_x,
                     endpoint=False,
                 )
 
@@ -827,7 +827,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (j + y_start),
                     10 ** (j + 1 + y_start),
-                    9 * 10 ** self.alpha_y + 1,
+                    9 * 10**self.alpha_y + 1,
                     endpoint=True,
                 )
 
@@ -835,7 +835,7 @@ class Table:
                 arr = np.linspace(
                     10 ** (j + y_start),
                     10 ** (j + 1 + y_start),
-                    9 * 10 ** self.alpha_y,
+                    9 * 10**self.alpha_y,
                     endpoint=False,
                 )
 
@@ -1257,14 +1257,14 @@ class Table:
         left_delta = abs(val - left_value)
         right_delta = abs(val - right_value)
 
-        left_index = int(left_value / a - 10 ** alpha)
+        left_index = int(left_value / a - 10**alpha)
         right_index = left_index + 1  # int(right_value/a+10**alpha)
 
         if left_delta < right_delta:
-            offset = int(left_value / a - 10 ** alpha)
+            offset = int(left_value / a - 10**alpha)
 
         else:
-            offset = int(left_value / a - 10 ** alpha) + 1
+            offset = int(left_value / a - 10**alpha) + 1
 
         print("left value=", left_value)
         print("right value=", right_value)
@@ -1272,7 +1272,7 @@ class Table:
         print("right_index=", right_index)
 
         # compute grid index that is closest to the given value
-        ind = 9 * 10 ** alpha * (exponent - start) + offset
+        ind = 9 * 10**alpha * (exponent - start) + offset
         return ind
 
     def get_indices(self, x, alpha, start, order=2):
@@ -1310,7 +1310,7 @@ class Table:
         left_delta = abs(x - left_value)
         right_delta = abs(x - right_value)
 
-        left_index = int(left_value / a - 10 ** alpha)
+        left_index = int(left_value / a - 10**alpha)
         right_index = left_index + 1  # int(right_value/a+10**alpha)
 
         # NOTE: if the given value coincides with a existing grid point, the
@@ -1320,12 +1320,12 @@ class Table:
         # the precise result for this point
 
         # take left grid point as core
-        offset = int(left_value / a - 10 ** alpha)
+        offset = int(left_value / a - 10**alpha)
 
         # gather indices of all required neighbouring grid points around the
         # core point for n'th order interpolation
         ind = [
-            9 * 10 ** alpha * (exponent - start) + offset + r
+            9 * 10**alpha * (exponent - start) + offset + r
             for r in relative_coordinates[order - 1]
         ]
 
@@ -1354,7 +1354,7 @@ class Table:
         r = []
         for i in range(order + 1):
             for j in range(order + 1):
-                r.append(x ** i * y ** j)
+                r.append(x**i * y**j)
 
         return r
 
@@ -1363,7 +1363,7 @@ class Table:
         x, y = pnt
         r = []
         for i in range(order + 1):
-            r.append(x ** i)
+            r.append(x**i)
         return r
 
     def deriv_x_row(self, pnt, order=2):

@@ -5,32 +5,22 @@ Created on Thu Apr  4 16:03:10 2019
 
 @author: oshah
 """
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+# from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-import Material
-import Planet
-import PlanetTest
-import PlanetFort
-import functionTools as ftool
+# from pics.utils import functionTools as ftool
 from matplotlib import pyplot as plt
-import matplotlib.patches as patches
+# import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
-import matrix_generator as mgen
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter, AutoMinorLocator
-import os
-import shutil
-import copy
-import sys
+from pics.utils import matrix_generator as mgen
+
 import numpy as np
 import pandas as pd
 import astropy.table
 from astropy.io import ascii
 import time
-import readPREM
-import logTrans
+# from pics.utils import readPREM, logTrans, plotTools
 import random
-import plotTools
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     m_earth,
     r_earth,
     Mg_number_solar,
@@ -61,10 +51,8 @@ from PIMPphysicalparams import (
     sigmaSB,
 )
 
-import phase_transitions_water_Wagner2002 as waterPhase
-from PIMPrunparams import suffix, plot_params
-from PIMPrunparams import grid_color, background_color, color_list
-import fortplanet
+from pics.runparams import suffix, plot_params
+from pics.runparams import grid_color, background_color, color_list
 
 image_loc = "/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/"
 
@@ -295,12 +283,12 @@ class Toolkit:
 
             elif w == "E_tot":
                 planet.initials[w + "_should"] = val_should[i] / (
-                    G * m_earth ** 2 / r_earth * 3 / 5
+                    G * m_earth**2 / r_earth * 3 / 5
                 )
 
             elif w == "L_int":
                 planet.initials[w + "_should"] = val_should[i] / (
-                    4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4
+                    4 * np.pi * r_earth**2 * sigmaSB * 300**4
                 )
 
             else:

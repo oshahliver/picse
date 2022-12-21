@@ -15,14 +15,9 @@ import matplotlib.transforms as transforms
 
 import numpy as np
 from scipy.interpolate import interp1d
-import time
-import itertools
-import functionTools as ftool
-import sys, os
+from pics.utils import functionTools as ftool
 import iapws
-from contextlib import contextmanager
-import warnings
-from PIMPrunparams import eos_pres_trans, plot_params, color_list
+from pics.runparams import eos_pres_trans, plot_params, color_list
 import matplotlib
 import seafreeze
 
@@ -264,19 +259,19 @@ def iceI(t):
 def iceIII(t):
     # pressure in MPa
     theta = t / 251.165
-    return (1.0 - 0.299948 * (1.0 - theta ** 60)) * 208.566
+    return (1.0 - 0.299948 * (1.0 - theta**60)) * 208.566
 
 
 def iceV(t):
     # pressure in MPa
     theta = t / 256.164
-    return (1.0 - 1.18721 * (1.0 - theta ** 8)) * 350.1
+    return (1.0 - 1.18721 * (1.0 - theta**8)) * 350.1
 
 
 def iceVI(t):
     # pressure in MPa
     theta = t / 273.31
-    return (1.0 - 1.07476 * (1.0 - theta ** 4.6)) * 632.4
+    return (1.0 - 1.07476 * (1.0 - theta**4.6)) * 632.4
 
 
 def iceVII(t):
@@ -343,11 +338,11 @@ def evapPres(t):
         / t
         * (
             a1 * theta
-            + a2 * theta ** 1.5
-            + a3 * theta ** 3
-            + a4 * theta ** 3.5
-            + a5 * theta ** 4
-            + a6 * theta ** 7.5
+            + a2 * theta**1.5
+            + a3 * theta**3
+            + a4 * theta**3.5
+            + a5 * theta**4
+            + a6 * theta**7.5
         )
     )
     return res
@@ -374,13 +369,13 @@ def solidusTempHigh(P=None):
         a, b, c = LtoVII_coeffs_Dunaeva2010
         P = P * 1.0e-9
 
-        return c + P * b + P ** 2 * a
+        return c + P * b + P**2 * a
 
     else:
         a, b, c, d, e = coeffs_French2016
         P = P * 1.0e-9
 
-        return e + d * P + c * P ** 2 + b * P ** 3 + a * P ** 4
+        return e + d * P + c * P**2 + b * P**3 + a * P**4
     """
     elif P < 7.0e10:
         #Pressure input to fit is in bar and outbput in K

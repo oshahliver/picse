@@ -6,24 +6,18 @@ Created on Fri Dec 25 18:54:45 2020
 @author: os18o068
 """
 
-import PlanetFactory as plfac
+from pics.interiors import PlanetFactory as plfac
 import numpy as np
 import pandas as pd
-import io
 from decimal import Decimal
-import pickle
-import MOI_model
-import matplotlib as mpl
-import matplotlib.colors as mcolors
+from pics.interiors import MOI_model
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 import sys
-from scipy.optimize import least_squares
-from scipy.optimize import minimize
 import time
-import fortfunctions
+from pics.utils import fortfunctions
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     m_earth,
     r_earth,
     MoI_solar,
@@ -59,19 +53,19 @@ from PIMPphysicalparams import (
     sigmaSB,
     V_ocean_earth,
 )
-import Material
-import readPREM
-import PlanetFort
-from PIMPrunparams import color_list, xi_Fe_mantle_max
+from pics.materials import Material
+from pics.utils import readPREM
+from pics.interiors import PlanetFort
+from pics.runparams import color_list, xi_Fe_mantle_max
 from matplotlib import pyplot as plt
 from matplotlib import pylab
 import matplotlib
-import functionTools as ftool
+from pics.utils import functionTools as ftool
 from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import random
 from matplotlib.ticker import MaxNLocator
-import read_exoplanets
+from pics.utils import read_exoplanets
 
 matplotlib.rc("text", usetex=True)
 matplotlib.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]

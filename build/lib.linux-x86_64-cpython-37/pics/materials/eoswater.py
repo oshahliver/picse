@@ -2,21 +2,21 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib as mpl
-import Mazevet2018EOS
-import Wagner2002EOS
-import French2015EOS
-import Feistel2006EOS
-import phase_transitions_water_Wagner2002 as phaseTrans
+from pics.materials import Mazevet2018EOS
+from pics.materials import Wagner2002EOS
+from pics.materials import French2015EOS
+from pics.materials import Feistel2006EOS
+from pics.materials import phase_transitions_water_Wagner2002 as phaseTrans
 import iapws
 import seafreeze
 import time
-import functionTools as ftool
+from pics.utils import functionTools as ftool
 import sys
-import analytical_functions as anfct
+from pics.utils import analytical_functions as anfct
 import matplotlib.ticker
 from scipy.ndimage.filters import gaussian_filter
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T_triple,
     T_critical,
     P_triple,
@@ -28,8 +28,8 @@ from PIMPphysicalparams import (
     Rgas,
 )
 
-from PIMPrunparams import eos_pres_trans
-from phase_transitions_water_Wagner2002 import data_schwager
+from pics.runparams import eos_pres_trans
+from pics.materials.phase_transitions_water_Wagner2002 import data_schwager
 
 T_triple = 273.16  # triple point temperature
 P_triple = 611.657  # triple point pressure in Pa

@@ -21,7 +21,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 from matplotlib.colors import LinearSegmentedColormap
 
-from PIMPrunparams import plot_params
+from pics.runparams import plot_params
 
 
 colors = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1]]

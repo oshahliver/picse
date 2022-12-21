@@ -9,7 +9,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 import pics.materials.Material as Material
 import pics.interiors.Planet as Planet
-import PlanetTest
+from pics.interiors import PlanetTest
 import pics.interiors.PlanetFort as PlanetFort
 import pics.utils.functionTools as ftool
 from matplotlib import pyplot as plt
@@ -27,11 +27,11 @@ from sklearn.linear_model import LinearRegression
 import astropy.table
 from astropy.io import ascii
 import time
-import readPREM
+from pics.utils import readPREM
 import pics.utils.logTrans as logTrans
 import random
 import pics.utils.plotTools as plotTools
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     m_earth,
     r_earth,
     Mg_number_solar,
@@ -62,13 +62,13 @@ from PIMPphysicalparams import (
     sigmaSB,
 )
 
-import phase_transitions_water_Wagner2002 as waterPhase
-from PIMPrunparams import suffix, plot_params, external_temp_profiles
-from PIMPrunparams import grid_color, background_color, color_list
-import fortplanet
+from pics.materials import phase_transitions_water_Wagner2002 as waterPhase
+from pics.runparams import suffix, plot_params, external_temp_profiles
+from pics.runparams import grid_color, background_color, color_list
+from pics.utils import fortplanet
 import pics.interiors.planet_iterator as planet_iterator
 import pics.interiors.kit_planet as kit_planet
-from utils import PlanetaryParams, RunParams
+from pics import physicalparams, runparams
 
 tk = planet_iterator.Toolkit()
 

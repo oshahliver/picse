@@ -7,7 +7,7 @@ Created on Tue Nov 27 19:59:16 2018
 
 import matplotlib.ticker
 from matplotlib import pyplot as plt
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -33,7 +33,7 @@ from PIMPphysicalparams import (
     gamma0_list,
     thetaD0_list,
 )
-from PIMPrunparams import (
+from pics.runparams import (
     dens_min,
     dens_max,
     eps_P,

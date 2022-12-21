@@ -5,7 +5,7 @@ Created on Tue Dec  4 14:05:05 2018
 @author: os18o068
 """
 
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -57,7 +57,7 @@ from PIMPphysicalparams import (
     P_FeO_Fe_trans,
 )
 
-from PIMPrunparams import (
+from pics.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -73,27 +73,20 @@ import random
 import matplotlib as mpl
 import matplotlib.transforms as transforms
 import time
-import phaseCheck
-import functionTools as ftool
-import eos
+from pics.materials import phaseCheck
+from pics.utils import functionTools as ftool
+from pics.materials import eos
 from matplotlib import pyplot as plt
 
-# import eosTablesUse as eosTab
-# import time
-# import functionTools as ftool
-import sys
-import brucite_phase
-import hydration
+from pics.materials import brucite_phase
+from pics.materials import hydration
 from decimal import Decimal
-import plotTools
-
-# from IPython.display import clear_output, display
+from pics.utils import plotTools
 import warnings
-import brucite_phase as bruce
-import matplotlib
+from pics.materials import brucite_phase as bruce
 
-matplotlib.rc("text", usetex=True)
-matplotlib.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
+mpl.rc("text", usetex=True)
+mpl.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
 warnings.filterwarnings("ignore")
 plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 
@@ -520,7 +513,7 @@ def probe_mantle_comps(N=100):
             if j == 0:
                 diff = np.log10(ranges[j][1]) - np.log10(ranges[j][0])
                 val = np.log10(ranges[j][0]) + p * diff
-                val = 10 ** val
+                val = 10**val
 
             else:
                 diff = ranges[j][1] - ranges[j][0]
@@ -623,7 +616,7 @@ def partition_coefficient_i(T, P, i, xi):
             KD -= delta
 
     # print ('KD =', KD)
-    return 10 ** KD
+    return 10**KD
 
 
 def partition_coefficient(T, P, ll):
@@ -675,7 +668,7 @@ def KD_S(T, P, xi, which="suer"):
             + 14 * np.log(1.0 - xiO)
         )
 
-    return 10 ** KD
+    return 10**KD
 
 
 def Margules_eq(P, T, A, B, C):
@@ -749,7 +742,7 @@ def coefs_Fe_FeO(P, xiFe):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans ** 2)
+        / (Rgas * T_trans**2)
         * T_prime_trans
         * (1.0 - xiFe) ** 2
         * (W2 + 2.0 * (W1 - W2) * xiFe)
@@ -781,7 +774,7 @@ def coefs_FeO_Fe(P, xiFeO):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans ** 2)
+        / (Rgas * T_trans**2)
         * T_prime_trans
         * (1.0 - xiFeO) ** 2
         * (W1 + 2.0 * (W2 - W1) * xiFeO)
@@ -1032,7 +1025,7 @@ def P_CS(M, a=1.5, P0=40e9):
     """
     Estimate pressure of core segregation using a simple scaling law.
     """
-    return P0 * M ** a
+    return P0 * M**a
 
 
 def xSievert(
@@ -1062,7 +1055,7 @@ def xSievert(
     # Use van der waasl EoS to compute partial pressure of solvent in substrate
     partialP = (
         rhoSolv * Rgas * T / (mSolv - rhoSolv * 26.61e-6)
-        - rhoSolv ** 2 * 24.76e-3 / (mSolv) ** 2
+        - rhoSolv**2 * 24.76e-3 / (mSolv) ** 2
     )
 
     # print ('partial pressure VDW (MPa) =', partialP * 1e-6)
@@ -1075,10 +1068,10 @@ def plotSievert(res=3, xlims=[1e-3, 1e-1], ylims=[0, 1]):
     bulkDensities = [2000, 3000]
     subsDensities = [4000, 5000]
     temps = np.linspace(1000, 5000, 5)
-    moleFractions = np.logspace(-3, -1, 2 ** res)
+    moleFractions = np.logspace(-3, -1, 2**res)
     cols = ["r", "g", "b", "k", "gray"]
 
-    data = np.empty([len(bulkDensities), len(subsDensities), len(temps), 2 ** res])
+    data = np.empty([len(bulkDensities), len(subsDensities), len(temps), 2**res])
     for i in range(len(bulkDensities)):
         for j in range(len(subsDensities)):
             for k in range(len(temps)):
@@ -1186,11 +1179,11 @@ def taylorN_Mg(X_H2O):
     k2 = b1 * (a2 + b2 * x) ** (-1) - (a1 + b1 * x) * (a2 + b2 * x) ** (-2) * b2
     k3 = -b1 * (a2 + b2 * x) ** (-2) * b2 - (
         b1 * (a2 + b2 * x) ** (-2) * b2
-        + (a1 + b1 * x) * (-2) * (a2 + b2 * x) ** (-3) * b2 ** 2
+        + (a1 + b1 * x) * (-2) * (a2 + b2 * x) ** (-3) * b2**2
     )
 
     k2 *= x
-    k3 *= 0.5 * x ** 2
+    k3 *= 0.5 * x**2
 
     print(k1, k2, k3)
 
@@ -2091,8 +2084,8 @@ def gradients(
     # K3 = sum([1./derivatives[i] for i in range(len(densities))])
     # dPdrho2 = K1/K2*1./K3
     # compute the radial gradients of the structure parameters
-    dPdr = -G * m * d / r ** 2
-    dmdr = 4.0 * np.pi * r ** 2 * d
+    dPdr = -G * m * d / r**2
+    dmdr = 4.0 * np.pi * r**2 * d
 
     if tempType == 0:
         dTdr = 0.0
@@ -2659,7 +2652,7 @@ class Mixture:
 
             self.dens = 1.0 / self.dens
 
-            self.dPdrho *= self.dens ** 2
+            self.dPdrho *= self.dens**2
             self.dPdrho = 1.0 / self.dPdrho
 
             # compute mean isothermal bulk modulus
@@ -2695,7 +2688,7 @@ class Mixture:
                 self.fractions[m] / self.mix[m].dPdrho / self.densities[m] ** 2
             )
 
-        self.dPdrho *= self.dens ** 2
+        self.dPdrho *= self.dens**2
         self.dPdrho = 1.0 / self.dPdrho
 
         # compute mean isothermal bulk modulus
@@ -2755,7 +2748,7 @@ class Mixture:
                     self.fractions[m] / self.mix[m].dPdrho / self.densities[m] ** 2
                 )
 
-            self.dPdrho *= self.dens ** 2
+            self.dPdrho *= self.dens**2
             self.dPdrho = 1.0 / self.dPdrho
 
             # compute mean isothermal bulk modulus

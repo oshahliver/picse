@@ -8,7 +8,7 @@ Created on Wed May 22 18:06:11 2019
 
 from matplotlib import pyplot as plt
 import numpy as np
-from PIMPrunparams import color_list, grid_color, gridalpha
+from pics.runparams import color_list, grid_color, gridalpha
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 
 

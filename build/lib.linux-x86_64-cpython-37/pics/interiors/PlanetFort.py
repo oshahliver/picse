@@ -5,7 +5,7 @@ Created on Tue Dec  4 14:05:05 2018
 @author: os18o068
 """
 
-import regression as regr
+from pics.utils import regression as regr
 import matplotlib.ticker
 from matplotlib import pyplot as plt
 from matplotlib.ticker import (
@@ -16,8 +16,8 @@ from matplotlib.ticker import (
     FixedLocator,
 )
 
-import phase_transitions_water_Wagner2002 as phase
-from PIMPphysicalparams import (
+from pics.materials import phase_transitions_water_Wagner2002 as phase
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -59,7 +59,7 @@ from PIMPphysicalparams import (
     sigmaSB,
 )
 
-from PIMPrunparams import (
+from pics.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -72,24 +72,24 @@ from PIMPrunparams import (
     color_list,
     layerCodes,
 )
+
 import numpy as np
 import time
-import functionTools as ftool
+from pics.utils import functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
 import astropy.table
 from astropy.io import ascii
 import warnings
-import plotTools
-import fortplanet
-import fortfunctions
-import Material
-import readPREM
-from utils import get_project_root
+from pics.utils import plotTools
+from pics.utils import fortplanet
+from pics.utils import fortfunctions
+from pics.materials import Material
+from pics.utils import readPREM
 
 fortplanet.wrapper.load_eos_tables(
-    table_dir="{}/data/EoS_tables/".format(get_project_root())
+    table_dir="{}/data/EoS_tables/".format(".")
 )
 warnings.filterwarnings("ignore")
 

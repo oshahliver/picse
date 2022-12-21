@@ -8,9 +8,9 @@ Created on Thu Dec 17 20:11:41 2020
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib
-from PIMPphysicalparams import m_earth, r_earth, G, R_solar, M_solar, MoI_solar
+from pics.physicalparams import m_earth, r_earth, G, R_solar, M_solar, MoI_solar
 import random
-import functionTools as ftool
+from pics.utils import functionTools as ftool
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 import pandas as pd
 import plotly.express as px

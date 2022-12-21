@@ -18,7 +18,8 @@ import pandas as pd
 import matplotlib as mpl
 from sklearn.linear_model import LinearRegression
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIMPrunparams import color_list
+from pics import physicalparams
+from pics.runparams import color_list
 import pickle
 
 

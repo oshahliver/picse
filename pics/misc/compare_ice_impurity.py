@@ -283,7 +283,7 @@ def filter_data_match(data, obj="titan", filter_type=0, acc_R=1.0e-2, acc_MoI=2.
         total Radius
 
     """
-    acc = np.sqrt(acc_R ** 2 + acc_MoI ** 2)
+    acc = np.sqrt(acc_R**2 + acc_MoI**2)
 
     # Extract the values of the real object
     data_is = [MoI_solar[obj], J2_solar[obj], R_solar[obj]]
@@ -306,7 +306,7 @@ def filter_data_match(data, obj="titan", filter_type=0, acc_R=1.0e-2, acc_MoI=2.
 
         # The total radius and MoI factor are combined to determine a match
         if filter_type == 0:
-            reldev = np.sqrt(reldev_R ** 2 + reldev_MoI ** 2)
+            reldev = np.sqrt(reldev_R**2 + reldev_MoI**2)
 
             # If the data point does not match the real values, eject it
             if reldev > acc:
@@ -350,7 +350,7 @@ def run1(Mg_number_should=0.5, eps_H2O=0.0, obj="titan"):
                 ocean_frac_should=of,
                 temp_jumps=[
                     0.0,
-                    0.0 * 1400.0 * M_surface_should ** 0.75,
+                    0.0 * 1400.0 * M_surface_should**0.75,
                     0.0,
                     0.0,
                     0.0,
@@ -424,7 +424,7 @@ def run2(
     None.
 
     """
-    N = 2 ** res
+    N = 2**res
 
     eps_H2O = 0.0
 
@@ -457,7 +457,7 @@ def run2(
                         ocean_frac_should=of,
                         temp_jumps=[
                             0.0,
-                            0.0 * 1400.0 * M_surface_should ** 0.75,
+                            0.0 * 1400.0 * M_surface_should**0.75,
                             0.0,
                             0.0,
                             0.0,
@@ -557,7 +557,7 @@ def draw(ranges=None):
 
 def run3(obj="titan", res=3, iterations=2, sampler=0, ranges=hard_ranges):
 
-    N = 2 ** res
+    N = 2**res
     eps_H2O = 0.0
     M_surface_should = M_solar[obj]
     data = np.empty([N, 15])
@@ -655,7 +655,7 @@ def run3(obj="titan", res=3, iterations=2, sampler=0, ranges=hard_ranges):
                 ocean_frac_should=np.log10(random_vals[2]),
                 temp_jumps=[
                     0.0,
-                    0.0 * 1400.0 * M_surface_should ** 0.75,
+                    0.0 * 1400.0 * M_surface_should**0.75,
                     0.0,
                     0.0,
                     0.0,
@@ -767,7 +767,7 @@ def run_sampler(
     **kwargs
 ):
 
-    N = 2 ** res
+    N = 2**res
 
     M_surface_should = M_solar[obj]
 
@@ -811,7 +811,7 @@ def run_sampler(
             predictor_T="none",
             ocean=True,
             ocean_frac_should=np.log10(random_vals[2]),
-            temp_jumps=[0.0, 0.0 * 1400.0 * M_surface_should ** 0.75, 0.0, 0.0, 0.0],
+            temp_jumps=[0.0, 0.0 * 1400.0 * M_surface_should**0.75, 0.0, 0.0, 0.0],
             Si_number_should=random_vals[1],
             P_surface_should=1.0e5,
             T_surface_should=max(T_solar[obj], 100),
@@ -1426,7 +1426,7 @@ def analyze3(obj):
         except TypeError:
             reldev_J2 = None
 
-        reldev = np.sqrt(reldev_R ** 2 + reldev_MoI ** 2)
+        reldev = np.sqrt(reldev_R**2 + reldev_MoI**2)
 
         if (
             abs(reldev_R) < 1.0e-2

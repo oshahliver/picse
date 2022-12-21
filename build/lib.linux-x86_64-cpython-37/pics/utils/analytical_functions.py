@@ -8,11 +8,11 @@ Created on Fri Jan 18 14:26:56 2019
 
 import time
 import sys
-import PIMPtools
+from pics.utils import PIMPtools
 import numpy as np
 from matplotlib import pyplot as plt
-import functionTools as ftool
-from PIMPphysicalparams import (
+from pics.utils import functionTools as ftool
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,

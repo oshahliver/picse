@@ -1,12 +1,13 @@
 README.md
 setup.py
 lib/fortran/eosfort_wrapper.f95
-pics/PIMPphysicalparams.py
-pics/PIMPrunparams.py
 pics/__init__.py
+pics/physicalparams.py
+pics/runparams.py
 pics.egg-info/PKG-INFO
 pics.egg-info/SOURCES.txt
 pics.egg-info/dependency_links.txt
+pics.egg-info/requires.txt
 pics.egg-info/top_level.txt
 pics/interiors/Cammarano_2006.py
 pics/interiors/MOI_model.py
@@ -14,6 +15,7 @@ pics/interiors/Planet.py
 pics/interiors/PlanetFactory.py
 pics/interiors/PlanetFort.py
 pics/interiors/PlanetInvestigator.py
+pics/interiors/PlanetTest.py
 pics/interiors/__init__.py
 pics/interiors/kit_planet.py
 pics/interiors/planet_iterator.py
@@ -39,6 +41,7 @@ pics/utils/PIMPtools.py
 pics/utils/PlotComparison.py
 pics/utils/__init__.py
 pics/utils/analytical_functions.py
+pics/utils/fpy_interface.py
 pics/utils/functionTools.py
 pics/utils/grid_example.py
 pics/utils/grid_interpolation.py
@@ -47,6 +50,8 @@ pics/utils/matrix_generator.py
 pics/utils/multiDimensionalGrid.py
 pics/utils/my_fit.py
 pics/utils/plotTools.py
+pics/utils/projects.py
+pics/utils/readPREM.py
 pics/utils/readPerplex.py
 pics/utils/readPlanet.py
 pics/utils/read_exoplanets.py

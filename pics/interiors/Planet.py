@@ -7,7 +7,7 @@ Created on Tue Dec  4 14:05:05 2018
 
 import matplotlib.ticker
 from matplotlib import pyplot as plt
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -37,7 +37,7 @@ from PIMPphysicalparams import (
     Mg_number_solar,
 )
 
-from PIMPrunparams import (
+from pics.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -54,7 +54,7 @@ import pics.utils.functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
-import pics.interiors.Atmosphere as Atmosphere
+import pics.atmos.Atmosphere as Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings
@@ -171,7 +171,7 @@ class Shell:
 
         # compute gravitanional acceleration
         try:
-            self.gravity = G * self.mass / self.radius ** 2
+            self.gravity = G * self.mass / self.radius**2
 
         except TypeError:
             self.gravity = None
@@ -244,7 +244,7 @@ class Shell:
         self.tempType = tempType
         self.rhoType = rhoType
 
-        self.dPdr = -G * self.mass * self.dens / self.radius ** 2
+        self.dPdr = -G * self.mass * self.dens / self.radius**2
 
         if self.rhoType == "constant":
             self.drhodr = 0.0
@@ -260,7 +260,7 @@ class Shell:
             print("dens=", self.dens, "\ndPdrho=", self.dPdrho)
 
         self.dTdr = self.dPdr * self.dTdP
-        self.dmdr = 4.0 * np.pi * self.radius ** 2 * self.dens
+        self.dmdr = 4.0 * np.pi * self.radius**2 * self.dens
 
         if self.tempType == 0:
             self.dTdr = 0.0
@@ -330,7 +330,7 @@ class Shell:
         if not self.mix.dPdrho == 0.0:
             self.dPdrho = self.mix.dPdrho
 
-        self.dPdr = -G * self.mass * self.dens / self.radius ** 2
+        self.dPdr = -G * self.mass * self.dens / self.radius**2
 
         try:
             if self.rhoType == "constant":
@@ -354,7 +354,7 @@ class Shell:
 
         self.dTdP = self.gamma * self.temp / (self.dens * self.dPdrho)
         self.dTdr = self.dPdr * self.dTdP
-        self.dmdr = 4.0 * np.pi * self.radius ** 2 * self.dens
+        self.dmdr = 4.0 * np.pi * self.radius**2 * self.dens
 
         # if isothermal set all temperature derivatives to zero
         if self.tempType == 0:
@@ -369,7 +369,7 @@ class Shell:
             self.force_bisection = True
 
         # update gravity and escape velocity
-        self.gravity = G * self.mass / self.radius ** 2
+        self.gravity = G * self.mass / self.radius**2
         self.v_esc = np.sqrt(2.0 * G * self.mass / self.radius)
 
         # update thermal velocity of water vapor at these conditions assuming
@@ -483,7 +483,7 @@ class Shell:
                 self.force_bisection = True
 
         # update gravity and escape velocity
-        self.gravity = G * self.mass / self.radius ** 2
+        self.gravity = G * self.mass / self.radius**2
         self.v_esc = np.sqrt(2.0 * G * self.mass / self.radius)
 
         # update thermal velocity of water vapor at these conditions assuming
@@ -1062,7 +1062,7 @@ class Planet:
         )
         self.seed_material.Compute()
         self.rho_center = self.seed_material.dens
-        self.M_seed = 4.0 / 3.0 * np.pi * self.rho_center * R_seed ** 3
+        self.M_seed = 4.0 / 3.0 * np.pi * self.rho_center * R_seed**3
         self.seed = Layer(
             m=self.M_seed,
             T=self.T_center,

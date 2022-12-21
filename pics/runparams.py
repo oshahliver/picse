@@ -4,7 +4,7 @@ Created on Mon Dec  3 15:07:45 2018
 
 @author: os18o068
 """
-from PIMPphysicalparams import m_earth, r_earth
+from pics.physicalparams import m_earth, r_earth
 
 dur = 0.0
 time_round = 3
@@ -21,6 +21,120 @@ pressureiteration_limit = 0
 bisectionstep_limit = 15
 bisection_counter_list = []
 bisectionstep_counter_list = []
+
+initial_predictor_keys = [
+    "M_surface_should",
+    "Mg_number_should",
+    "ocean_fraction_should",
+    "Si_number_mantle",
+    "T_surface_should",
+    "Fe_number_mantle",
+    "fractions",
+]
+
+
+fortplanet_keys_translator = [
+    "t_center",
+    "p_center",
+    "contents",
+    "fractions",
+    "layer_dims",
+    "layer_masses",
+    "layer_pres",
+    "layer_radii",
+    "layer_constraints",
+    "temp_jumps",
+    "q_layers",
+    "gammag0_layers",
+    "si_number_layers",
+    "fe_number_layers",
+    "r_seed",
+    "adiabattype",
+    "rhotype",
+    "layertype",
+    "temptype",
+    "eps_r",
+    "p_surface_should",
+    "t_surface_should",
+    "spin",
+    "subphase_res",
+    "xi_all_core",
+    "x_all_core",
+    "pres_core_segregation",
+    "core_segregation_type",
+    "m_ocean_should",
+    "m_surface_should",
+    "mg_number_should",
+    "inner_core_segregation_type",
+    "r_surface_should",
+    "m_core_should",
+]
+
+fortplanet_output_keys = ["M_surface_is",
+            "R_surface_is",
+            "P_surface_is",
+            "T_surface_is",
+            "Mg_number_is",
+            "Si_number_is",
+            "Fe_count",
+            "Si_count",
+            "Mg_count",
+            "O_count",
+            "H2O_count",
+            "H_count",
+            "S_count",
+            "ocean_fraction_is",
+            "moment_of_inertia_is",
+            "layer_properties_dummy",
+            "profiles",
+            "shell_count",
+            "shell_count_layers",
+            "fractions_out",
+            "x_Fe_mantle",
+            "Si_number_mantle",
+            "mantle_exists",
+            "inner_core_exists",
+            "outer_core_exists",
+            "gravitational_energy",
+            "internal_energy"]
+
+
+fortplanet_input_keys = [
+    "T_center",
+    "P_center",
+    "contents",
+    "fractions",
+    "layer_dims",
+    "layer_masses",
+    "layer_pressures",
+    "layer_radii",
+    "layer_constraints",
+    "temperature_jumps",
+    "debye_exponents_layers",
+    "grueneisen_gammas_layers",
+    "Si_number_layers",
+    "Fe_number_layers",
+    "seed_radius",
+    "adiabat_type",
+    "density_type",
+    "layer_type",
+    "temperature_type",
+    "eps_r",
+    "P_surface_should",
+    "T_surface_should",
+    "spin",
+    "subphase_resolution",
+    "x_all_core",
+    "eta_all_core",
+    "core_segregation_pressure",
+    "core_segregation_type",
+    "M_ocean_should",
+    "M_surface_should",
+    "Mg_number_should",
+    "inner_core_segregation_type",
+    "R_surface_should",
+    "M_core_should",
+]
 
 parameter_mask = [
     "Mg_number",

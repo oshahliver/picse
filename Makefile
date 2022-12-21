@@ -29,7 +29,7 @@ static:
 
 #Create python wrapper from static library using f2py
 wrapper:
-	python3 -m numpy.f2py -c -I${TARGETDIR} ${SRCDIR}/eosfort_wrapper.f95 ${OBJ} -m ${OUTFILE}
+	python3 -m numpy.f2py --debug-capi -c -I${TARGETDIR} ${SRCDIR}/eosfort_wrapper.f95 ${OBJ} -m ${OUTFILE}
 	f2py -c -I${TARGETDIR} ${SRCDIR}/functionsPy.f95 ${OBJ} -m fortfunctions
 	@mkdir -p ${TARGETDIR}
 	@mv ./*.so ${TARGETDIR}

@@ -18,7 +18,8 @@ import pandas as pd
 import matplotlib as mpl
 from sklearn.linear_model import LinearRegression
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIMPrunparams import color_list
+from pics import physicalparams
+from pics.runparams import color_list
 import pickle
 
 
@@ -97,7 +98,7 @@ def my_cmap(res=3, start=0, reverse=False):
     if reverse:
         border_colors = list(reversed(border_colors))
 
-    n_additional_bins = 2 ** res
+    n_additional_bins = 2**res
 
     colors = []
 
@@ -427,7 +428,7 @@ def row(pnt, order=2):
     r = []
     for i in range(order + 1):
         for j in range(order + 1):
-            r.append(x ** i * y ** j)
+            r.append(x**i * y**j)
 
     return r
 
@@ -575,7 +576,7 @@ def fancyround(num, digits=2):
 
     dummy_num = round(dummy_num, digits - 1)
 
-    return dummy_num * 10 ** exponent
+    return dummy_num * 10**exponent
 
 
 def scinot(num, digits=2):
@@ -593,7 +594,7 @@ def scinot(num, digits=2):
     except OverflowError:
         exponent = 0
 
-    return str(round(num / 10 ** exponent, digits - 1)) + "e" + str(exponent)
+    return str(round(num / 10**exponent, digits - 1)) + "e" + str(exponent)
 
 
 def print_table(data, cols, wide):
@@ -1272,7 +1273,7 @@ def row1d(x, order=2):
     """Compute row of coefficient matrix 'M' for 2nd order 2d interpolation"""
     r = []
     for i in range(order + 1):
-        r.append(x ** i)
+        r.append(x**i)
     return r
 
 
@@ -1434,7 +1435,7 @@ def interpolate_deriv1d(grid=[], data=[], order=2, plot=False, which="left", **k
         a_vector_ = np.linalg.solve(matrix, b_vector)
 
     def func(x, a, order):
-        return sum([x ** i * a[i] for i in range(order + 1)])
+        return sum([x**i * a[i] for i in range(order + 1)])
 
     if plot:
         xx = np.linspace(min(x_list), max(x_list), 25)
@@ -1541,7 +1542,7 @@ def interpolate(grid=[], data=[], dim=1, order=2, **kwargs):
 # fig, ax = plt.subplots()
 # w = 5.
 # number = .5/np.sqrt(w)*np.sin(w) + np.sqrt(w)*np.cos(w)
-# print (round((deriv(x0 = w, f = f4, whicharg = 'x1', type = 'poly', 
+# print (round((deriv(x0 = w, f = f4, whicharg = 'x1', type = 'poly',
 #                     acc = 1.0e-3, order = 2) - \
 #                     number)/number*100, 8),'%')
 
@@ -1551,16 +1552,16 @@ def interpolate(grid=[], data=[], dim=1, order=2, **kwargs):
 #                  b = 10., noisy = True, plot = True, axis = ax, identity = '1'))
 
 # #id = 2
-# number2 = bisec(whicharg = 'x3', f = f2, x1 = 5., x2 = 3, y = 3., a = 0., 
+# number2 = bisec(whicharg = 'x3', f = f2, x1 = 5., x2 = 3, y = 3., a = 0.,
 #                 b = 10., eps = 1.0e-6, noisy = True, identity = '2')
 
 # #id = 3
-# number3 = bisec(whicharg = 'x2', f = f3, x1 = 1., y = 3., a = 0., 
-#                 identity = '3', b = 10., eps = 1.0e-6, plot = True, axis = ax, 
+# number3 = bisec(whicharg = 'x2', f = f3, x1 = 1., y = 3., a = 0.,
+#                 identity = '3', b = 10., eps = 1.0e-6, plot = True, axis = ax,
 #                 noisy = True)
 
 # #id = 4
-# number4 = deriv(f = f4, x0 = 2., x1 = 0., x2 = 1., whicharg = 'x1', 
+# number4 = deriv(f = f4, x0 = 2., x1 = 0., x2 = 1., whicharg = 'x1',
 #                 noisy = True, eps = 1.0e-8, identity = '4')
 
 
@@ -1576,4 +1577,3 @@ def interpolate(grid=[], data=[], dim=1, order=2, **kwargs):
 # print ('number 2 =', number2)
 # print ('number 3 =', number3)
 # print ('number 4 =', number4)
-
