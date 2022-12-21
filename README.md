@@ -47,6 +47,8 @@ planetary_specs = {
     "M_surface_should":1., # desired total mass
     "T_surface_should":300., # desired surface temperature
     "Mg_number_should":0.5, # desired bulk magnesium number
+    "Fe_number_mantle":0.1, # iron number of the silicates
+    "Si_number_mantle":0.4, # silicon number of the silicates
     }
 
 # set up specifications for the iterator
