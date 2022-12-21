@@ -118,6 +118,9 @@ print("desired surface temperature (K):", pl.T_surface_should)
 print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
 print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
 
+# Plot the radial P, T, M, and rho profiles
+pl.plot(save=True, file_name="structure_profiles", format="png")
+
 ```
 
 #### Example 1: Water-Worlds
