@@ -253,9 +253,11 @@ class Toolkit:
         inefficient and can only  find approximate solutions (i.e. reldev >~
         10%)
         """
-        
+
         if not planet.status == "very much alive":
-            print ("WARNING: You have passed an unconstructed planet object to the iterator")
+            print(
+                "WARNING: You have passed an unconstructed planet object to the iterator"
+            )
 
         else:
             pass

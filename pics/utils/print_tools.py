@@ -11,9 +11,7 @@ def print_planet(self, style=0, digits=3):
     if style == 0:
         print("=======================================")
         print("Planet properties:")
-        print("\n--------------------------------")
-        print("Layer details:")
-        print("--------------------------------")
+
 
         try:
             print("\n--------------------------------")

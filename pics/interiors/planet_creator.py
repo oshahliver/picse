@@ -559,6 +559,10 @@ class Planet:
         except IndexError:
             self.M_ocean_is = 0.0
 
+    def check_convergence(self):
+        self.converged = False
+        pass
+
     def construct(self, echo=False):
         # Gather layer dims for fortplanet routine
         layer_dims = [len(item) for item in self.contents]
