@@ -16,32 +16,20 @@ pl.construct()
 
 print("Starting iteration to match boundary conditions.")
 
-whats = ["M_surface", "T_surface"]
-hows = ["P_center", "T_center"]
-vals_should = [m_earth, 300.0]
-predictors = [
-    "linear",
-    "linear",
+iterator_specs = {
+    "whats": ["M_surface", "T_surface"],
+    "hows": ["P_center", "T_center"],
+    "vals_should": [1.0, 300.0],
+    "predictors": ["linear", "linear"],  # --> no effect at this point
+    "should_weights": ["log", "log"],
+    "how_weights": ["exp", "exp"],
+    "accs": [1e-3, 1e-2],
+    "iterationLimit": 20,
+    "deltaType": 0,
+    "unpredictable": False,
+}
 
-]  # Only linear predictors possible anyways, this parameter has no effect at this point
-should_weights = ["log", "lin"]
-how_weights = ["exp", "exp"]
-accs = [1e-3, 1e-2]
-
-iterator.iterate(
-    planet=pl,
-    what=whats,
-    how=hows,
-    val_should=vals_should,
-    acc=accs,
-    all_val_should_weights=should_weights,
-    all_howval_weights=how_weights,
-    unpredictable=True,
-    deltaType=0,
-    iterationLimit=20,
-    update_val_should=False,
-    write_learning_set=False,
-)
+iterator.iterate(planet=pl, **iterator_specs)
 
 pl.show()
 print("Exit Code 0")

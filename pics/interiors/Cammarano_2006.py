@@ -37,8 +37,8 @@ def temp(
         Qi_list[layer],
     )
     H = Qi / M
-    res = T0 + rho * H / (6 * k) * (aa ** 2 - r ** 2)
-    res += (rho * H * rb ** 3 / (3 * k) - qb * rb ** 2 / k) * (1 / aa - 1 / r)
+    res = T0 + rho * H / (6 * k) * (aa**2 - r**2)
+    res += (rho * H * rb**3 / (3 * k) - qb * rb**2 / k) * (1 / aa - 1 / r)
     return res
 
 

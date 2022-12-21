@@ -14,7 +14,8 @@ import copy
 from pics.runparams import (
     fortplanet_input_keys,
     initial_predictor_keys,
-    fortplanet_keys_translator, fortplanet_output_keys
+    fortplanet_keys_translator,
+    fortplanet_output_keys,
 )
 
 from pics.utils.initial_conditions import predict_initials
@@ -33,12 +34,18 @@ from pics.physicalparams import (
     mO,
     mH,
     mFe,
-    mMg, r_earth, m_earth, sigmaSB, G, mH2O,
-    material_list
+    mMg,
+    r_earth,
+    m_earth,
+    sigmaSB,
+    G,
+    mH2O,
+    material_list,
 )
 
 # Load eos tables
 fortplanet.wrapper.load_eos_tables(table_dir="{}/data/EoS_tables/".format("."))
+
 
 class Parameters:
     def __init__(self, default_values):
@@ -91,32 +98,32 @@ class PlanetaryOutputParams(Parameters):
 class RunOutputParams(Parameters):
     def __init__(self, **kwargs):
         self.default_values = {
-            "M_surface_is":None,
-            "R_surface_is":None,
-            "T_surface_is":None,
-            "Mg_number_is":None,
-            "Si_number_is":None,
-            "Fe_count":None,
-            "Si_count":None,
-            "Mg_count":None,
-            "O_count":None,
-            "H2O_count":None,
-            "H_count":None,
-            "S_count":None,
-            "ocean_fraction_is":None,
-            "moment_of_inertia_is":None,
-            "layer_properties":[],
-            "profiles":[],
-            "shell_count":0,
-            "layer_count":0,
-            "fractions_out":[],
-            "x_Fe_mantle":None,
-            "Si_number_mantle":None,
-            "mantle_exists":False,
-            "inner_core_exists":False,
-            "outer_core_exists":False,
-            "gravitational_energy":None,
-            "internal_energy":None
+            "M_surface_is": None,
+            "R_surface_is": None,
+            "T_surface_is": None,
+            "Mg_number_is": None,
+            "Si_number_is": None,
+            "Fe_count": None,
+            "Si_count": None,
+            "Mg_count": None,
+            "O_count": None,
+            "H2O_count": None,
+            "H_count": None,
+            "S_count": None,
+            "ocean_fraction_is": None,
+            "moment_of_inertia_is": None,
+            "layer_properties": [],
+            "profiles": [],
+            "shell_count": 0,
+            "layer_count": 0,
+            "fractions_out": [],
+            "x_Fe_mantle": None,
+            "Si_number_mantle": None,
+            "mantle_exists": False,
+            "inner_core_exists": False,
+            "outer_core_exists": False,
+            "gravitational_energy": None,
+            "internal_energy": None,
         }
 
 
@@ -267,14 +274,13 @@ class Planet:
         self.default_values = {}
         self.label = label
         self.status = "shadow of the future"
-        
 
     def set_values(self, default=False, **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
         out_params = PlanetaryOutputParams()
 
         # initialize output parameters
-        for key, value in out_params.default_values.items():            
+        for key, value in out_params.default_values.items():
             setattr(self, key, value)
 
         # initialize input parameters
@@ -512,15 +518,13 @@ class Planet:
         if default:
             self.default_values = copy.deepcopy(self.__dict__)
 
-
     def reset(self):
         """Resets all planetary parameters to the values stored in default_values"""
         for key, value in self.__dict__.items():
             if not key == "default_values":
                 setattr(self, key, self.default_values[key])
 
-
-    def show(self, style=0, digits = 3):
+    def show(self, style=0, digits=3):
         """Prints out a simple overview of all relevant planetary parameters."""
         show_parameters = self.__dict__
         print("\n####################\nPlanet Label: {}\n".format(self.label))
@@ -618,14 +622,19 @@ class Planet:
                     )
                     print(
                         "M_H2O core [wt%]:",
-                        round(self.H_count / 2.0 * mH2O / self.M_surface_is * 100, digits),
+                        round(
+                            self.H_count / 2.0 * mH2O / self.M_surface_is * 100, digits
+                        ),
                     )
                     print(
                         "M_H2O mantle [wt%]:",
                         round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
                     )
                     print("Ocean frac is:", round(10**self.ocean_fraction_is, digits))
-                    print("Ocean frac should:", round(10**self.ocean_fraction_should, digits))
+                    print(
+                        "Ocean frac should:",
+                        round(10**self.ocean_fraction_should, digits),
+                    )
                     print(
                         "Core mass frac:",
                         round(self.M_core_is / self.M_surface_is * m_earth, digits),
@@ -716,7 +725,9 @@ class Planet:
         for key, value in zip(fortplanet_output_keys, output):
             setattr(self, key, value)
 
-        self.mean_density = self.M_surface_is / (4. / 3. * np.pi * self.R_surface_is**3)
+        self.mean_density = self.M_surface_is / (
+            4.0 / 3.0 * np.pi * self.R_surface_is**3
+        )
 
         self.status = "very much alive"
         for i in range(len(self.layer_properties_dummy)):
@@ -725,7 +736,9 @@ class Planet:
             self.layer_properties[i]["T_outer"] = self.layer_properties_dummy[i][1]
             self.layer_properties[i]["rho_outer"] = self.layer_properties_dummy[i][2]
             self.layer_properties[i]["rho_inner"] = self.layer_properties_dummy[i][3]
-            self.layer_properties[i]["indigenous_mass"] = self.layer_properties_dummy[i][4]
+            self.layer_properties[i]["indigenous_mass"] = self.layer_properties_dummy[
+                i
+            ][4]
             self.layer_properties[i]["mass_fraction"] = (
                 self.layer_properties_dummy[i][4] / self.M_surface_is
             )

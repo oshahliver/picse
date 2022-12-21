@@ -9,6 +9,7 @@ Created on Thu Apr  4 16:03:10 2019
 
 # from pics.utils import functionTools as ftool
 from matplotlib import pyplot as plt
+
 # import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
 from pics.utils import matrix_generator as mgen
@@ -18,6 +19,7 @@ import pandas as pd
 import astropy.table
 from astropy.io import ascii
 import time
+
 # from pics.utils import readPREM, logTrans, plotTools
 import random
 from pics.physicalparams import (

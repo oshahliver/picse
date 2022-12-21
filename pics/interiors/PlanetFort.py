@@ -1421,7 +1421,7 @@ class Planet:
         """Resets all planetary properties to the initial state. This allows
         to use the exact same specifications for re-constructing the planet.
         """
-        
+
         # delete old properties to release memory
         for lay in self.layers:
             del lay.shells
@@ -1436,7 +1436,6 @@ class Planet:
 
         if self.M_surface_should == float("inf"):
             print("HERE infinity in Planet.reset() after")
-
 
     def Construct(self, print_time=False, fortran=True, echo=False, **kwargs):
         """N sets the number of shells in the case that no surface constrain

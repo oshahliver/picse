@@ -43,7 +43,6 @@ vals_should = [m_earth, 300.0]
 predictors = [
     "linear",
     "linear",
-
 ]  # Only linear predictors possible anyways, this parameter has no effect at this point
 should_weights = ["log", "lin"]
 how_weights = ["exp", "exp"]
@@ -65,6 +64,6 @@ iterator.iterate(
 )
 
 pl.prt()
-print ("layers =", pl.layers)
+print("layers =", pl.layers)
 # return pl
 print("Exit Code 0")
