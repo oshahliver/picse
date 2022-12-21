@@ -5,11 +5,12 @@ Spyder Editor
 This is a temporary script file.
 """
 
-from pics.utils import test_interface
 import itertools
 from pics.utils.print_tools import print_planet
+from pics.utils.plot_tools import plot_structure
 from tabulate import tabulate
-from pics.utils import functionTools as ftool
+
+# from pics.utils import functionTools as ftool
 import numpy as np
 import copy
 from pics.runparams import (
@@ -289,10 +290,14 @@ class Planet:
         # initialize input parameters
         if "planetary_params" in kwargs:
             # set attributes
-            for key, value in kwargs["planetary_params"].__dict__.items():
+            # print ("kwargs =", kwargs["planetary_params"].default_values.items())
+            for key, value in kwargs["planetary_params"].default_values.items():
                 if not key in omit_keys:
+                    # print (key, value)
                     setattr(self, key, value)
 
+        # print ("contents in set values =", self.contents)
+        # print ("temp in set values =", self.T_surface_should)
         # initialize run parameters
         if "run_params" in kwargs:
             for key, value in kwargs["run_params"].__dict__.items():
@@ -365,11 +370,10 @@ class Planet:
         # Use more sophisticated multilinear regression models to predict the
         # core mass, central pressure, and central temperature.
         elif self.initial_predictor == 1:
-            M_core = self.M_surface_should * mc
             M_inner_core = self.M_core * self.inner_core_frac
             M_outer_core = self.M_core - self.M_inner_core
-            self.layer_masses[0] = self.M_outer_core + self.M_inner_core
-            self.layer_masses[1] = self.M_outer_core + self.M_inner_core
+            self.layer_masses[0] = M_outer_core + M_inner_core
+            self.layer_masses[1] = M_outer_core + M_inner_core
 
         self.M_core_should = self.layer_masses[1]
         print("the initial values are:", tc, pc, self.layer_masses)
@@ -566,6 +570,7 @@ class Planet:
     def construct(self, echo=False):
         # Gather layer dims for fortplanet routine
         layer_dims = [len(item) for item in self.contents]
+        # print ("contents =", self.contents)
         conts = list(itertools.chain.from_iterable(self.contents))
         fracs = list(itertools.chain.from_iterable(self.fractions))
 
@@ -596,6 +601,47 @@ class Planet:
 
         self.update_layers(self.layer_properties_dummy)
         self.status = "very much alive"
+
+    def trim_profiles(self):
+        """The profiles output from the Fortran routine contains a sequence
+        of zeros at the end. These elements are being removed here. The
+        convention of the profiles is:
+
+            Radius (m), Temperature (K), Pressure (Pa), Density (kg/m3),
+            Mass (kg), Gravity (m/s2), Gravitational energy (J)
+        """
+        off = len(self.contents) - 1
+        prof = np.empty([len(self.profiles), self.shell_count + off])
+
+        i = 0
+        while True:
+            for p in range(len(self.profiles)):
+                prof[p][i] = self.profiles[p][i]
+
+            i += 1
+
+            if i == self.shell_count + off:
+                break
+
+        self.profiles = prof
+
+    def plot(
+        self,
+        scatter=False,
+        layerColoring=False,
+        axis=[],
+        x_axis="radius",
+        save=True,
+        file_name="planet_structure",
+        format="pdf",
+        spec="",
+        file_dir="./",
+        prem=False,
+        **kwargs,
+    ):
+
+        self.trim_profiles()
+        plot_structure(self.profiles)
 
 
 class TelluricPlanet(Planet):

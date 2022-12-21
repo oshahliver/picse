@@ -347,14 +347,14 @@ material_plot_list_fort = [
 ]
 
 # define colors for parameters
-pres_color = (0.4, 0.5, 0.7)
-dens_color = (0.8, 0.4, 0.0)
+pres_color = (0.4, 0.5, 1.)
+dens_color = (0.8, 0.75, 0.0)
 mass_color = (0.2, 0.8, 0.2)
-temp_color = (0.8, 0.2, 0.2)
+temp_color = (1., 0.2, 0.2)
 vesc_color = (0.5, 0.5, 0.5)
 grav_color = (0.5, 0.5, 0.0)
 
-param_colors = [pres_color, mass_color, dens_color, temp_color, grav_color, vesc_color]
+param_colors = [temp_color, dens_color, pres_color, mass_color, grav_color, vesc_color]
 
 pure_curves_color_list = [
     (0.5, 0.5, 1),  # water

@@ -12,7 +12,6 @@ def print_planet(self, style=0, digits=3):
         print("=======================================")
         print("Planet properties:")
 
-
         try:
             print("\n--------------------------------")
             print("Major parameters:")
@@ -32,6 +31,8 @@ def print_planet(self, style=0, digits=3):
                 round(self.T_center, digits),
                 "\nP_surface_is [bar]:",
                 round(self.P_surface_is * 1.0e-5, digits),
+                "\nP_surface_should [bar]:",
+                round(self.P_surface_should * 1.0e-5, digits),
                 "\nP_center [GPa]:",
                 round(self.P_center * 1.0e-9, digits),
                 "\nMOI factor:",
