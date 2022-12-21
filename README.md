@@ -33,7 +33,6 @@ python3 -m pip install .
 #### Example 1: Telluric planets
 
 ```python
-
 from pics.interiors import planet_iterator
 from pics.interiors import planet_creator
 from pics.physicalparams import m_earth
@@ -60,7 +59,7 @@ planetary_params = {
 # set up specifications for the iterator
 iterator_specs = {
     "what": ["M_surface", "T_surface"],  # --> target properties
-    "how": ["P_center", "T_center"],  # --> adjustable initials
+    "how": ["P_center", "T_center"],  # --> adjustable properties
     "val_should": [
         planetary_params["M_surface_should"],
         planetary_params["T_surface_should"],
@@ -70,10 +69,10 @@ iterator_specs = {
         "log",
         "log",
     ],  # --> log or lin extrapolation for targets
-    "all_howval_weights": ["exp", "exp"],  # --> exp or lin prediction for initials
+    "all_howval_weights": ["exp", "exp"],  # --> exp or lin prediction for adjustables
     "acc": [1e-3, 1e-2],  # --> desired relative accuracies
     "iterationLimit": 20,  # --> max. number of iterations
-    "deltaType": 0,  # --> mode for initial adjustment of initials
+    "deltaType": 0,  # --> mode for initial adjustment of adjustables
     "unpredictable": False,  # --> no effect at this point
 }
 
@@ -85,15 +84,31 @@ iterator_specs = {
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
 
 # Perform initial structure integration
-# NOTE. planetary objects passed to the iterator must be constructed!
 pl.construct()
 
 # Pass planet instance to iterator to match boundary conditions
+# NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, **iterator_specs)
+
+#######################################################################
+# Model inspection
+#######################################################################
+
+# Check if convergence was reached
+pl.check_convergence()
+print ("converged:", pl.converged)
 
 # print fundamental planeatary properties to standard output
 pl.print()
 print("contents =", pl.contents)
+
+# You can also access individual parameters as attributes
+print ("total mass:", pl.M_surface_is)
+print ("desired total mass:", pl.M_surface_should)
+print ("surface pressure:", pl.P_surface_is)
+print ("desired surface pressure:", pl.P_surface_should)
+print ("surface temperature:", pl.T_surface_is)
+print ("desired surface temperature:", pl.T_surface_should)
 ```
 
 #### Example 1: Water-Worlds
