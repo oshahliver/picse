@@ -120,7 +120,8 @@ class Toolkit:
                 "M_core": planet.layer_masses[1] + planet.layer_masses[0],
                 "T_center": planet.T_center,
                 "P_center": planet.P_center,
-                "M_outer_mantle": planet.layer_properties[3]["indigenous_mass"] / m_earth,
+                "M_outer_mantle": planet.layer_properties[3]["indigenous_mass"]
+                / m_earth,
             }
 
         except IndexError:
@@ -195,7 +196,6 @@ class Toolkit:
 
     #     else:
     #         self.iteration = True
-
 
     def iterate(
         self,
@@ -491,7 +491,7 @@ class Toolkit:
             print ('initial reldev =', reldev)
             print ('initial deltas =', self.delta)
             """
-            
+
             if sum(self.delta) == 0.0:
                 print("All parameters already satisfied")
                 self.iteration = False

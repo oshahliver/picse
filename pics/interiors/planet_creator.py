@@ -374,10 +374,8 @@ class Planet:
         self.M_core_should = self.layer_masses[1]
         print("the initial values are:", tc, pc, self.layer_masses)
 
-
     def update_initials(self):
-        """ Updates the initial planetary parameters from the current values
-        """
+        """Updates the initial planetary parameters from the current values"""
         self.intials = None
 
     def update_values(self):
@@ -507,7 +505,6 @@ class Planet:
         if default:
             self.default_values = copy.deepcopy(self.__dict__)
 
-
     def reset(self):
         """Resets all planetary parameters to the initial values"""
         for key in fortplanet_input_keys:
@@ -515,8 +512,7 @@ class Planet:
 
     def print(self, style=0, digits=3):
         """Prints out a simple overview of all relevant planetary parameters."""
-        print_planet(self, style = style, digits = digits)
-
+        print_planet(self, style=style, digits=digits)
 
     def update_layers(self, props):
         for i in range(len(props)):
@@ -525,9 +521,7 @@ class Planet:
             self.layer_properties[i]["T_outer"] = props[i][1]
             self.layer_properties[i]["rho_outer"] = props[i][2]
             self.layer_properties[i]["rho_inner"] = props[i][3]
-            self.layer_properties[i]["indigenous_mass"] = props[
-                i
-            ][4]
+            self.layer_properties[i]["indigenous_mass"] = props[i][4]
             self.layer_properties[i]["mass_fraction"] = (
                 self.layer_properties_dummy[i][4] / self.M_surface_is
             )
@@ -561,12 +555,11 @@ class Planet:
 
         try:
             self.M_ocean_is = self.layer_properties[4]["indigenous_mass"] / m_earth
-        
+
         except IndexError:
-            self.M_ocean_is = 0.
+            self.M_ocean_is = 0.0
 
-
-    def construct(self, echo = False):
+    def construct(self, echo=False):
         # Gather layer dims for fortplanet routine
         layer_dims = [len(item) for item in self.contents]
         conts = list(itertools.chain.from_iterable(self.contents))
@@ -584,7 +577,7 @@ class Planet:
 
         # store initial values for subsequent use by the planet_iterator
         self.initials = dict([key, self.__dict__[key]] for key in fortplanet_input_keys)
-        
+
         # fortran wrapper is called here
         # output = test_interface.interface.do_some_science_stuff(**kwargs)
         output = fortplanet.wrapper.create_planet(**kwargs)
@@ -597,29 +590,28 @@ class Planet:
             4.0 / 3.0 * np.pi * self.R_surface_is**3
         )
 
-
         self.update_layers(self.layer_properties_dummy)
         self.status = "very much alive"
 
 
 class TelluricPlanet(Planet):
-    def __init__(self, planetary_params = {}, run_params = {}):
-                
+    def __init__(self, planetary_params={}, run_params={}):
+
         Planet.__init__(self, label="telluric")
 
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
-        
+
         pp.set_default_values()
         rp.set_default_values()
-        
+
         # update planetary parameters if passed by user
         for key, val in planetary_params.items():
-            pp.default_values.update({key:val})
+            pp.default_values.update({key: val})
 
         # update run parameters if passed by user
         for key, val in run_params.items():
-            rp.default_values.update({key:val})
+            rp.default_values.update({key: val})
 
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
