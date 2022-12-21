@@ -79,12 +79,12 @@ class Toolkit:
                 "T_surface_is": planet.T_surface_is,
                 "P_surface_is": planet.P_surface_is,
                 "M_surface_is": planet.M_surface_is,
-                "M_ocean_is": planet.layers[4].indigenous_mass / m_earth,
-                "ocean_frac_is": planet.ocean_frac_is,
-                "xi_H_core": planet.xi_H_core,
-                "xi_FeO_mantle": planet.xi_FeS_core,
-                "E_tot_is": planet.E_tot_is,
-                "L_int_is": planet.L_int_is,
+                "M_ocean_is": planet.M_ocean_is,
+                "ocean_fraction_is": planet.ocean_fraction_is,
+                # "xi_H_core": planet.xi_H_core,
+                # "xi_FeO_mantle": planet.xi_FeS_core,
+                # "E_tot_is": planet.E_tot_is,
+                # "L_int_is": planet.L_int_is,
             }
 
         # If layer 4 does not exist, no ocean is there
@@ -95,11 +95,11 @@ class Toolkit:
                 "P_surface_is": planet.P_surface_is,
                 "M_surface_is": planet.M_surface_is,
                 "M_ocean_is": 0.0,
-                "ocean_frac_is": -10,
-                "xi_H_core": planet.xi_H_core,
-                "xi_FeO_mantle": planet.xi_S_core,
-                "E_tot_is": planet.E_tot_is,
-                "L_int_is": planet.L_int_is,
+                "ocean_fraction_is": -10,
+                # "x_H_core": planet.xi_H_core,
+                # "xi_FeO_mantle": planet.xi_S_core,
+                # "E_tot_is": planet.E_tot_is,
+                # "L_int_is": planet.L_int_is,
             }
 
         except ValueError:
@@ -108,25 +108,25 @@ class Toolkit:
                 "T_surface_is": planet.T_surface_is,
                 "P_surface_is": planet.P_surface_is,
                 "M_surface_is": planet.M_surface_is,
-                "M_ocean_is": planet.layers[4].indigenous_mass / m_earth,
-                "ocean_frac_is": -10,
-                "xi_H_core": planet.xi_H_core,
-                "xi_FeO_mantle": planet.xi_S_core,
-                "E_tot_is": planet.E_tot_is,
-                "L_int_is": planet.L_int_is,
+                "M_ocean_is": planet.M_ocean_is,
+                "ocean_fraction_is": -10,
+                # "xi_H_core": planet.xi_H_core,
+                # "xi_FeO_mantle": planet.xi_S_core,
+                # "E_tot_is": planet.E_tot_is,
+                # "L_int_is": planet.L_int_is,
             }
         try:
             all_how = {
-                "M_core": planet.layermasses[1] + planet.layermasses[0],
+                "M_core": planet.layer_masses[1] + planet.layer_masses[0],
                 "T_center": planet.T_center,
                 "P_center": planet.P_center,
-                "M_outer_mantle": planet.layers[3].indigenous_mass / m_earth,
+                "M_outer_mantle": planet.layer_properties[3]["indigenous_mass"] / m_earth,
             }
 
         except IndexError:
             try:
                 all_how = {
-                    "M_core": planet.layermasses[1] + planet.layermasses[0],
+                    "M_core": planet.layer_masses[1] + planet.layer_masses[0],
                     "T_center": planet.T_center,
                     "P_center": planet.P_center,
                     "M_outer_mantle": 0.0,
@@ -134,7 +134,7 @@ class Toolkit:
 
             except IndexError:
                 all_how = {
-                    "M_core": planet.layermasses[0],
+                    "M_core": planet.layer_masses[0],
                     "T_center": planet.T_center,
                     "P_center": planet.P_center,
                     "M_outer_mantle": 0.0,
@@ -378,14 +378,14 @@ class Toolkit:
                         if direction[i][0] * reldev[i] < -acc[i]:
                             direction[i][1] = -1
                             self.delta[i] = -initial_deltas[how[i]] * (
-                                planet.layermasses[1] + planet.layermasses[0]
+                                planet.layer_masses[1] + planet.layer_masses[0]
                             )
 
                         # initial core mass guess too small -> iteration direction up
                         elif direction[i][0] * reldev[i] > acc[i]:
                             direction[i][1] = 1
                             self.delta[i] = initial_deltas[how[i]] * (
-                                planet.layermasses[1] + planet.layermasses[0]
+                                planet.layer_masses[1] + planet.layer_masses[0]
                             )
 
                         # accuracy already met
@@ -402,14 +402,14 @@ class Toolkit:
                         if direction[i][0] * reldev[i] < -acc[i]:
                             direction[i][1] = -1
                             self.delta[i] = (
-                                initial_deltas[how[i]] * planet.layermasses[1]
+                                initial_deltas[how[i]] * planet.layer_masses[1]
                             )
 
                         # initial outer mantle mass guess too large -> iteration direction down
                         elif direction[i][0] * reldev[i] > acc[i]:
                             direction[i][1] = 1
                             self.delta[i] = (
-                                -initial_deltas[how[i]] * planet.layermasses[1]
+                                -initial_deltas[how[i]] * planet.layer_masses[1]
                             )
 
                         # accuracy already met
@@ -488,17 +488,17 @@ class Toolkit:
                     print("Desired precission for ", what[i], " reached.")
 
                 # M_core has to be treated seperately here as it is not an attribute
-                # of the Planet class but rather the first entry of layermasses of a
+                # of the Planet class but rather the first entry of layer_masses of a
                 # Planet.Planet object. Also the planets properties only need to be
                 # updated if the condition is NOT already met
                 if how[i] == "M_core":
-                    planet.initials["layermasses"][0] = newval[i]
-                    planet.initials["layermasses"][1] = newval[
+                    planet.initials["layer_masses"][0] = newval[i]
+                    planet.initials["layer_masses"][1] = newval[
                         i
                     ]  # * (1. - planet.initials['inner_core_frac'])
 
                 elif how[i] == "M_outer_mantle":
-                    planet.initials["layermasses"][3] = newval[i]
+                    planet.initials["layer_masses"][3] = newval[i]
 
                 else:
                     planet.initials[how[i]] = newval[i]
@@ -519,9 +519,9 @@ class Toolkit:
             # iteration below.
             if p + 1 < 2 ** (len(how)) - 1:
                 print("\n creating additional grid point {}".format(p + 1))
-                planet.Reset()
-                planet.Update_initials()
-                planet.Construct(echo=echo)
+                planet.reset()
+                planet.update_initials()
+                planet.construct(echo=echo)
 
                 all_what, all_how = self.all_params(planet)
                 val_is = [all_what[w + "_is"] for w in what]
@@ -542,13 +542,13 @@ class Toolkit:
         while self.iteration:
             count += 1
             print("\n iteration", count)
-            # print ('layermasses =', planet.layermasses)
-            planet.Reset()
-            # print ('layermasses =', planet.layermasses)
-            planet.Update_initials()
-            # print ('layermasses =', planet.layermasses)
-            planet.Construct(echo=echo)
-            # print ('layermasses =', planet.layermasses)
+            # print ('layer_masses =', planet.layer_masses)
+            planet.reset()
+            # print ('layer_masses =', planet.layer_masses)
+            planet.update_initials()
+            # print ('layer_masses =', planet.layer_masses)
+            planet.construct(echo=echo)
+            # print ('layer_masses =', planet.layer_masses)
             all_what, all_how = self.all_params(planet)
             val_is = [all_what[w + "_is"] for w in what]
             reldev = [
@@ -855,13 +855,13 @@ class Toolkit:
 
             for i in range(len(how)):
                 if how[i] == "M_core":
-                    planet.initials["layermasses"][0] = newval[i]
-                    planet.initials["layermasses"][1] = newval[
+                    planet.initials["layer_masses"][0] = newval[i]
+                    planet.initials["layer_masses"][1] = newval[
                         i
                     ]  # * (1. - planet.initials['inner_core_frac'])
                     print("setting IC mass to:", newval[i])
                 elif how[i] == "M_outer_mantle":
-                    planet.initials["layermasses"][3] = newval[i]
+                    planet.initials["layer_masses"][3] = newval[i]
 
                 else:
                     planet.initials[how[i]] = newval[i]

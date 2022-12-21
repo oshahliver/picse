@@ -3,27 +3,27 @@
 In this test we will create a planet using the new input parameter handler.
 """
 
-import numpy as np
 from pics.physicalparams import m_earth
 from pics.interiors import planet_iterator
-from pics.interiors import creator
+from pics.interiors import planet_creator
+from pics.physicalparams import m_earth
 
 iterator = planet_iterator.Toolkit()
 
-pl = creator.TelluricPlanet()
+pl = planet_creator.TelluricPlanet()
 
 pl.construct()
 
 print("Starting iteration to match boundary conditions.")
 
 iterator_specs = {
-    "whats": ["M_surface", "T_surface"],
-    "hows": ["P_center", "T_center"],
-    "vals_should": [1.0, 300.0],
-    "predictors": ["linear", "linear"],  # --> no effect at this point
-    "should_weights": ["log", "log"],
-    "how_weights": ["exp", "exp"],
-    "accs": [1e-3, 1e-2],
+    "what": ["M_surface", "T_surface"],
+    "how": ["P_center", "T_center"],
+    "val_should": [m_earth, 300.0],
+    "predictor": ["linear", "linear"],  # --> no effect at this point
+    "all_val_should_weights": ["log", "log"],
+    "all_howval_weights": ["exp", "exp"],
+    "acc": [1e-3, 1e-2],
     "iterationLimit": 20,
     "deltaType": 0,
     "unpredictable": False,

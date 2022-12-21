@@ -272,7 +272,9 @@ class Planet:
         # self.default_values.update(planetary_params.default_values)
         # self.default_values.update(run_params.default_values)
         self.default_values = {}
+        self.initials = {}
         self.label = label
+        self.vapor_reached = False
         self.status = "shadow of the future"
 
     def set_values(self, default=False, **kwargs):
@@ -285,6 +287,7 @@ class Planet:
 
         # initialize input parameters
         if "planetary_params" in kwargs:
+            # set attributes
             for key, value in kwargs["planetary_params"].__dict__.items():
                 if not key in omit_keys:
                     setattr(self, key, value)
@@ -369,6 +372,12 @@ class Planet:
 
         self.M_core_should = self.layer_masses[1]
         print("the initial values are:", tc, pc, self.layer_masses)
+
+
+    def update_initials(self):
+        """ Updates the initial planetary parameters from the current values
+        """
+        self.intials = None
 
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
@@ -518,11 +527,11 @@ class Planet:
         if default:
             self.default_values = copy.deepcopy(self.__dict__)
 
+
     def reset(self):
-        """Resets all planetary parameters to the values stored in default_values"""
-        for key, value in self.__dict__.items():
-            if not key == "default_values":
-                setattr(self, key, self.default_values[key])
+        """Resets all planetary parameters to the initial values"""
+        for key in fortplanet_input_keys:
+            setattr(self, key, self.initials[key])
 
     def show(self, style=0, digits=3):
         """Prints out a simple overview of all relevant planetary parameters."""
@@ -701,7 +710,7 @@ class Planet:
     def load(self, file):
         pass
 
-    def construct(self):
+    def construct(self, echo = False):
         # Gather layer dims for fortplanet routine
         layer_dims = [len(item) for item in self.contents]
         conts = list(itertools.chain.from_iterable(self.contents))
@@ -717,6 +726,9 @@ class Planet:
         kwargs["fractions"] = fracs
         kwargs["contents"] = conts
 
+        # store initial values for subsequent use by the planet_iterator
+        self.initials = dict([key, self.__dict__[key]] for key in fortplanet_input_keys)
+        
         # fortran wrapper is called here
         # output = test_interface.interface.do_some_science_stuff(**kwargs)
         output = fortplanet.wrapper.create_planet(**kwargs)
@@ -770,6 +782,11 @@ class Planet:
             + self.layer_properties[3]["indigenous_mass"]
         ) / m_earth
 
+        try:
+            self.M_ocean_is = self.layer_properties[4]["indigenous_mass"] / m_earth
+        
+        except IndexError:
+            self.M_ocean_is = 0.
 
 class TelluricPlanet(Planet):
     def __init__(self):

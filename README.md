@@ -105,13 +105,13 @@ planetary_specs = {
     "Mg_number_should":0.5, # desired bulk magnesium number
     "Fe_number_mantle":0.1, # iron number of the silicates
     "Si_number_mantle":0.4, # silicon number of the silicates
-    "ocean_fraction_should":np.log10(0.25) # log of desired ocean mass fraction
+    "ocean_fraction_should":np.log10(0.25), # log of desired ocean mass fraction
     "contents":[[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]], # composition of each layer. NOTE. additional ocean layer
     }
 
 # set up specifications for the iterator
 iterator_specs = {
-    "whats": ["M_surface", "T_surface"], # --> target properties
+    "whats": ["M_surface", "T_surface", ""], # --> target properties
     "hows": ["P_center", "T_center"], # --> adjustable initials
     "vals_should": [1.0, 300.0], # --> target values
     "predictors": ["linear", "linear"],  # --> no effect at this point
@@ -139,3 +139,7 @@ planet.show()
 ## Advanced usage
 
 Coming soon (I hope!)
+
+## Data visualization tools
+
+Patience is the key to a happy life!

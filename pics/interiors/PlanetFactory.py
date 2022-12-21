@@ -67,7 +67,7 @@ from pics.runparams import suffix, plot_params, external_temp_profiles
 from pics.runparams import grid_color, background_color, color_list
 from pics.utils import fortplanet
 import pics.interiors.planet_iterator as planet_iterator
-from pics.interiors import creator
+from pics.interiors import planet_creator
 from pics import physicalparams, runparams
 
 tk = planet_iterator.Toolkit()
