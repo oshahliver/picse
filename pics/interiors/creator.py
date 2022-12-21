@@ -269,7 +269,6 @@ class Planet:
         self.status = "shadow of the future"
         
 
-
     def set_values(self, default=False, **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
         out_params = PlanetaryOutputParams()
