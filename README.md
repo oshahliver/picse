@@ -4,7 +4,7 @@
 
 The PICS project (Planetary Interior Compositions and Structures) is based on the planetary structure code I developed during my joint PhD program at the University of Bern and the University of Zürich. The general objective of the project is to provide ready-to-use tools for generating interior models of planets or moons. These tools can help us to bridge persisting gaps between observations and theory when it comes to the classification and characterization of exoplanets and solar system bodies.
 
-PICS generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. Each layer is described as a multi-component chemical system for which adequate thermal equations of states were implemented. For more information about the physics of the model see [[1],[2]](#1).
+PICS generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. Each layer is described as a multi-component chemical system that is modelled using adequate thermal equations of state and simple mixing laws. For more information about the physics of the model see [[1],[2]](#1).
 
 ## Installation
 
@@ -64,6 +64,14 @@ If the iterator reached convergence you can inspect the planets properties:
 pl.print()
 pl.plot()
 ```
+
+## Known issues
+
+...
+
+## Features under development
+
+...
 
 ## References
 <a id="1">[1]</a> 
