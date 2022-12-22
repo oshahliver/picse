@@ -6,25 +6,12 @@ The PICS code (Planetary Interior Composition and Structure code) was developed 
 
 ## Installation
 
-### Manual Installation
-
-For manual installation type:
-
-``` 
-make install
-```
-
-To permanently add the package path to an anaconda environment activate the corresponding environment and enter the command:
-
-```
-conda develop <path_to_so_file>
-```
-
-Alternatively:
+To install the package from the ```setup.py``` file simply type:
 
 ```
 python3 -m pip install .
 ```
+
 
 ## Basic usage
 
@@ -47,7 +34,7 @@ Create an instance of the iterator toolkit that takes care of matching the bound
 iterator = planet_iterator.Toolkit()
 ```
 
-Initialize a planetary object of a certain base type (only ```TelluricPlanet``` supported so far). If no planetary properties are passed, default values will be used.
+Initialize a planetary object of a certain base type (only ```TelluricPlanet``` supported so far). If no planetary properties are passed via the ```planetary_params``` argument, default values will be used.
 
 ```python
 planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)
