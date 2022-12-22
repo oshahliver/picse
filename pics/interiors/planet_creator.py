@@ -637,6 +637,9 @@ class Planet:
 
         plot_structure(self.profiles, **kwargs)
 
+    def set_iterator_specs(self):
+        pass
+
 
 class TelluricPlanet(Planet):
     def __init__(self, planetary_params={}, run_params={}):
