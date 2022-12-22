@@ -42,16 +42,16 @@ Initialize a planetary object of base type "telluric". If no planetary propertie
 planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)
 pl = planet_creator.TelluricPlanet(planetary_parameters = planet_specs)
 ```
-Perform initial structure integration
+Perform initial structure integration.
 
 ```python
 pl.construct()
 ```
-Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following creates a one Earth-mass planet with 300 K surface temperature with relative accuracies of 1%:
+Pass the planet instance to the iterator to match the boundary conditions with the desired precision. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following will iteratively adjust the central values of the pressure and temperature to match the boundary conditions with relative accuracies of 1%:
 
 ```python
-specs = dict(acc=[0.01, 0.01])
-iterator.iterate(planet=pl, iterator_specs = specs)
+iterator_specs = dict(acc=[0.01, 0.01])
+iterator.iterate(planet=pl, iterator_specs = iterator_specs)
 ```
 
 If the iterator reached convergence you can inspect the planets properties:
