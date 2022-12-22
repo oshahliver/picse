@@ -49,7 +49,7 @@ pl.construct()
 Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed. If now iterator specifications are passed, a default strategy for matching the boundary conditions will be employed for the corresponding base type.
 
 ```python
-iterator.iterate(planet=pl, **iterator_specs)
+iterator.iterate(planet=pl)
 ```
 
 If the iterator reached convergence you can inspect the planets properties:
