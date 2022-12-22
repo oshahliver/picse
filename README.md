@@ -30,32 +30,30 @@ python3 -m pip install .
 
 
 ```python
-from pics.interiors import planet_iterator
-from pics.interiors import planet_creator
-from pics.physicalparams import m_earth
+from pics.interiors import planet_iterator, planet_creator
 
 iterator = planet_iterator.Toolkit()
 
 ```
 
-Initialize a telluric planet instance with the specified properties
+Initialize a telluric planet instance. If no planetary properties are passed default values will be used.
 
 ```python
-pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
+pl = planet_creator.TelluricPlanet()
 ```
 Perform initial structure integration
 
 ```python
 pl.construct()
 ```
-Pass planet instance to iterator to match boundary conditions.
-Planetary objects passed to the iterator must be constructed!
+Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed!
 
 ```python
 iterator.iterate(planet=pl, **iterator_specs)
 ```
 
-Print fundamental planeatary properties to standard output
+If the iterator reached convergence you can inspect the planets properties:
+
 ```python
 pl.print()
 pl.plot(save=True, file_name="structure_profiles", format="png")
