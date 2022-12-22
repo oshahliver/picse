@@ -36,7 +36,7 @@ iterator = planet_iterator.Toolkit()
 
 ```
 
-Initialize a telluric planet instance. If no planetary properties are passed default values will be used.
+Initialize a telluric planet instance. If no planetary properties are passed, default values will be used.
 
 ```python
 pl = planet_creator.TelluricPlanet()
@@ -46,7 +46,7 @@ Perform initial structure integration
 ```python
 pl.construct()
 ```
-Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed!
+Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed. If now iterator specifications are passed, a default strategy for matching the boundary conditions will be employed for the corresponding base type.
 
 ```python
 iterator.iterate(planet=pl, **iterator_specs)
