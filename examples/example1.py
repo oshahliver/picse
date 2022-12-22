@@ -70,31 +70,31 @@ iterator.iterate(planet=pl, iterator_specs = iterator_specs)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-# pl.print()
+pl.print()
 
-# # You can also access individual parameters as attributes. for instance:
-# print("total radius (km):", pl.R_surface_is * 1e-3)
-# print("mean density (gcc):", pl.mean_density * 1e-3)
-# print(
-#     "norm. moment of inertia:",
-#     pl.moment_of_inertia_is / (pl.R_surface_is**2 * pl.M_surface_is),
-# )
-# print("total mass (m_earth):", pl.M_surface_is / m_earth)
-# print("desired total mass (m_earth):", pl.M_surface_should)
-# print("surface pressure (bar):", pl.P_surface_is * 1e-5)
-# print("desired surface pressure (bar):", pl.P_surface_should * 1e-5)
-# print("surface temperature (K):", pl.T_surface_is)
-# print("desired surface temperature (K):", pl.T_surface_should)
-# print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
-# print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
+# You can also access individual parameters as attributes. for instance:
+print("total radius (km):", pl.R_surface_is * 1e-3)
+print("mean density (gcc):", pl.mean_density * 1e-3)
+print(
+    "norm. moment of inertia:",
+    pl.moment_of_inertia_is / (pl.R_surface_is**2 * pl.M_surface_is),
+)
+print("total mass (m_earth):", pl.M_surface_is / m_earth)
+print("desired total mass (m_earth):", pl.M_surface_should)
+print("surface pressure (bar):", pl.P_surface_is * 1e-5)
+print("desired surface pressure (bar):", pl.P_surface_should * 1e-5)
+print("surface temperature (K):", pl.T_surface_is)
+print("desired surface temperature (K):", pl.T_surface_should)
+print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
+print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
 
-# # # Plot the radial P, T, M, and rho profiles
-# file_path = os.getcwd()
-# pl.plot(
-#     file_name="structure_profiles",
-#     file_path=file_path,
-#     write_html=True,
-#     display=True,
-#     write_image=True,
-#     image_extension="pdf",
-# )
+# # Plot the radial P, T, M, and rho profiles
+file_path = os.getcwd()
+pl.plot(
+    file_name="structure_profiles",
+    file_path=file_path,
+    write_html=True,
+    display=True,
+    write_image=True,
+    image_extension="pdf",
+)

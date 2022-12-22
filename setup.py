@@ -1,8 +1,6 @@
 from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
-import site
-import os
-import shutil
+
 
 PACKAGE_NAME = "pics"
 LIB_DIR = "lib"
