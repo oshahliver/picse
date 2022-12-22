@@ -2,7 +2,7 @@
 
 ## General Information
 
-The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the University of Bern and the University of Zürich. It generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. 
+The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the University of Bern and the University of Zürich. It generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. For more information about the physics of the model see [[1]](#1).
 
 ## Installation
 
@@ -63,5 +63,9 @@ pl.print()
 pl.plot()
 ```
 
-
+## References
+<a id="1">[1]</a> 
+Dijkstra, E. W. (1968). 
+Go to statement considered harmful. 
+Communications of the ACM, 11(3), 147-148.
 
