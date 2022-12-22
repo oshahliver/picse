@@ -45,8 +45,9 @@ from pics.physicalparams import (
     material_list,
 )
 
-# Load eos tables
-fortplanet.wrapper.load_eos_tables(table_dir="{}/data/EoS_tables/".format("."))
+def load_eos_tables():
+    # Load eos tables
+    fortplanet.wrapper.load_eos_tables(table_dir="{}/data/EoS_tables/".format("."))
 
 
 class Parameters:

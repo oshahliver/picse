@@ -29,18 +29,29 @@ python3 -m pip install .
 ## Basic usage
 
 
+To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
+
 ```python
 from pics.interiors import planet_iterator, planet_creator
-
-iterator = planet_iterator.Toolkit()
-
 ```
 
-Initialize a planetary object of base type "telluric". If no planetary properties are passed, default values will be used.
+Next, load the EoS tables into memory for subsequent use during the structure integration. If you forget this step, you'll most likely encounter a segmentation fault.
+
+```python
+planet_creator.load_eos_tables() 
+```
+
+Create an instance of the iterator toolkit that takes care of matching the boundary conditions of your planets.
+
+```python
+iterator = planet_iterator.Toolkit()
+```
+
+Initialize a planetary object of a certain base type (only ```TelluricPlanet``` supported so far). If no planetary properties are passed, default values will be used.
 
 ```python
 planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)
-pl = planet_creator.TelluricPlanet(planetary_parameters = planet_specs)
+pl = planet_creator.TelluricPlanet(planetary_params = planet_specs)
 ```
 Perform initial structure integration.
 

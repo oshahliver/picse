@@ -8,6 +8,10 @@ from pics.interiors import planet_creator
 from pics.physicalparams import m_earth
 import os
 
+# Load the EoS tables
+planet_creator.load_eos_tables()
+
+# Create an instance of the iterator toolkit
 iterator = planet_iterator.Toolkit()
 
 #######################################################################
