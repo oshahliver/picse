@@ -9,6 +9,7 @@ import itertools
 from pics.utils.print_tools import print_planet
 from pics.utils.plot_tools import plot_structure
 from tabulate import tabulate
+from pics.utils.internal_data import get_eos_dir
 
 # from pics.utils import functionTools as ftool
 import numpy as np
@@ -45,9 +46,8 @@ from pics.physicalparams import (
     material_list,
 )
 
-def load_eos_tables():
-    # Load eos tables
-    fortplanet.wrapper.load_eos_tables(table_dir="{}/data/EoS_tables/".format("."))
+def load_eos_tables(**kwargs):
+    fortplanet.wrapper.load_eos_tables(table_dir=get_eos_dir())
 
 
 class Parameters:

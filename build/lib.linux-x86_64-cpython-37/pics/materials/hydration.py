@@ -1128,7 +1128,7 @@ def X_H2O_sat(P=None, T=None, Fe_number=0.0, phase=None):
     for i in range(2):
         for j in range(2):
             for k in range(2):
-                XH2O += T ** i * P ** j * (Fe_number / 100) ** k * c[i][j][k]
+                XH2O += T**i * P**j * (Fe_number / 100) ** k * c[i][j][k]
 
     return np.maximum(XH2O * 100, 0.001)
 
@@ -1144,7 +1144,7 @@ def XH2O_Stv(P=None, T=None, AlSi=0.0):
         + c[5] * AlSi * T
     )
 
-    return 10.0 ** XH2O
+    return 10.0**XH2O
 
 
 def fit_MgO(pi=9, pf=12, N=10, temps=[300], deg=3, log=True):
@@ -1198,13 +1198,13 @@ def fit_MgO(pi=9, pf=12, N=10, temps=[300], deg=3, log=True):
 
         return (
             p * coefs[0]
-            + p ** 2 * coefs[1]
-            + p ** 3 * coefs[2]
-            + p ** 4 * coefs[3]
+            + p**2 * coefs[1]
+            + p**3 * coefs[2]
+            + p**4 * coefs[3]
             + y * coefs[4]
             + p * y * coefs[5]
-            + p ** 2 * y * coefs[6]
-            + p ** 3 * y * coefs[7]
+            + p**2 * y * coefs[6]
+            + p**3 * y * coefs[7]
             + inter
         )
 
@@ -1215,13 +1215,13 @@ def fit_MgO(pi=9, pf=12, N=10, temps=[300], deg=3, log=True):
 
     data = {
         "x": x,
-        "x2": x ** 2,
-        "x3": x ** 3,
-        "x4": x ** 4,
+        "x2": x**2,
+        "x3": x**3,
+        "x4": x**4,
         "y": y,
         "xy": x * y,
-        "x2y": x ** 2 * y,
-        "x3y": x ** 3 * y,
+        "x2y": x**2 * y,
+        "x3y": x**3 * y,
         "z": z,
     }
     dataf = pd.DataFrame(data)
@@ -1264,7 +1264,7 @@ def fit_MgO(pi=9, pf=12, N=10, temps=[300], deg=3, log=True):
     )
     ax.tick_params(which="both", direction="in")
     ax.add_artist(legend)
-    ax.set_xlim(10 ** pi, 10 ** pf)
+    ax.set_xlim(10**pi, 10**pf)
     ax.set_ylim(0, 60)
     ax.set_xlabel(r"$Pressure \ [Pa]$")
     ax.set_ylabel(r"$ \Delta_{max} \ [ $" + "%" + r"$]$")
@@ -1287,13 +1287,13 @@ def delta_rho_max_MgO(P=None, T=None):
 
     return (
         x * coefs[0]
-        + x ** 2 * coefs[1]
-        + x ** 3 * coefs[2]
-        + x ** 4 * coefs[3]
+        + x**2 * coefs[1]
+        + x**3 * coefs[2]
+        + x**4 * coefs[3]
         + y * coefs[4]
         + x * y * coefs[5]
-        + x ** 2 * y * coefs[6]
-        + x ** 3 * y * coefs[7]
+        + x**2 * y * coefs[6]
+        + x**3 * y * coefs[7]
         + coefs[8]
     ) * 100
 
@@ -1376,7 +1376,7 @@ def PlotWaterContent(
     **kwargs
 ):
 
-    N = 2 ** res
+    N = 2**res
     x = np.linspace(Tmin, Tmax, N)
     y = np.linspace(Pmin, Pmax, N)
 

@@ -52,10 +52,10 @@ contains
       type(table), intent(inout) :: self
       character(len=*), intent(in) :: file_name
       character(len=30) :: str
-      integer :: n, u, i, j, ipos
+      integer :: u, i, j, ipos
       integer :: n_input_params
-      integer :: a, n_data_points, n_output_params
-      character(len=2) :: c
+      integer :: n_data_points, n_output_params
+   
 
 !By default the phase is set to 1. If a table interpolation is performed
 !at a set of input parameters, the corrsponding phase will be comptued

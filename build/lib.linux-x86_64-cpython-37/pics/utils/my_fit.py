@@ -271,64 +271,64 @@ for i in range(len(predict)):
     # plt.scatter(x_data[0], x_data[1], c = np.log10(dev))
     # plt.colorbar()
 
-ax.legend()
-ax.set_xscale("log")
-ax.set_yscale("log")
-ax.set_xlabel(r"$M/M_\oplus$")
-ax.set_ylabel(r"$\rm Error \ of \ prediction \ [\%]$")
+# ax.legend()
+# ax.set_xscale("log")
+# ax.set_yscale("log")
+# ax.set_xlabel(r"$M/M_\oplus$")
+# ax.set_ylabel(r"$\rm Error \ of \ prediction \ [\%]$")
 
-fig.savefig(
-    path + "accuracy_prediction.png", format="png", bbox_inches="tight", dpi=240
-)
-plt.close(fig)
+# fig.savefig(
+#     path + "accuracy_prediction.png", format="png", bbox_inches="tight", dpi=240
+# )
+# plt.close(fig)
 
-# Save models to file for later use
-filename = path + "models_calibration_mars.pkl"
-pickle.dump(models, open(filename, "wb"))
+# # Save models to file for later use
+# filename = path + "models_calibration_mars.pkl"
+# pickle.dump(models, open(filename, "wb"))
 
-test_x = np.array([[0], [0.52], [0.99], [0.1], [0.4], [np.log10(450e9)], [40.0]])
-models[2].evaluate(test_x)
-print(models[2].result[0])
-"""
-"""
-x1 = np.linspace(-1, 1.0)
-x2 = np.linspace(0.25, 0.75, 3)
-fig, ax = plt.subplots(1, 3, figsize=(12, 3))
-plt.subplots_adjust(wspace=0.5)
+# test_x = np.array([[0], [0.52], [0.99], [0.1], [0.4], [np.log10(450e9)], [40.0]])
+# models[2].evaluate(test_x)
+# print(models[2].result[0])
+# """
+# """
+# x1 = np.linspace(-1, 1.0)
+# x2 = np.linspace(0.25, 0.75, 3)
+# fig, ax = plt.subplots(1, 3, figsize=(12, 3))
+# plt.subplots_adjust(wspace=0.5)
 
-x3 = [[1.0, 0.8], [1.0, 0.8], [0.0, 0.5]]
-linestyles = ["-", "--", ":"]
-colors = ["r", "g", "b"]
-y_labels = [
-    r"$\rm Central \ temperature \ [K]$",
-    r"$\rm Central \ pressure \ [GPa]$",
-    r"$\rm Core \ mass \ fraction$",
-]
+# x3 = [[1.0, 0.8], [1.0, 0.8], [0.0, 0.5]]
+# linestyles = ["-", "--", ":"]
+# colors = ["r", "g", "b"]
+# y_labels = [
+#     r"$\rm Central \ temperature \ [K]$",
+#     r"$\rm Central \ pressure \ [GPa]$",
+#     r"$\rm Core \ mass \ fraction$",
+# ]
 
-for axx in range(len(ax)):
-    ax[axx].set_xlabel(r"$M/M_\oplus$")
-    ax[axx].set_ylabel(y_labels[axx])
+# for axx in range(len(ax)):
+#     ax[axx].set_xlabel(r"$M/M_\oplus$")
+#     ax[axx].set_ylabel(y_labels[axx])
 
-    for k in range(len(x3[axx])):
-        x = np.empty([len(x1), len(x2)])
+#     for k in range(len(x3[axx])):
+#         x = np.empty([len(x1), len(x2)])
 
-        for i in range(len(x1)):
-            for j in range(len(x2)):
-                dat = np.array([[x1[i]], [x2[j]], [x3[axx][k]]])
+#         for i in range(len(x1)):
+#             for j in range(len(x2)):
+#                 dat = np.array([[x1[i]], [x2[j]], [x3[axx][k]]])
 
-                models[axx].evaluate(dat)
-                x[i][j] = models[axx].result[0]
+#                 models[axx].evaluate(dat)
+#                 x[i][j] = models[axx].result[0]
 
-        for j in range(len(x2)):
-            if scale[axx] == "log":
-                xx = 10 ** x.T[j]
-            else:
-                xx = x.T[j]
+#         for j in range(len(x2)):
+#             if scale[axx] == "log":
+#                 xx = 10 ** x.T[j]
+#             else:
+#                 xx = x.T[j]
 
-            ax[axx].semilogx(10**x1, xx, color=colors[j], linestyle=linestyles[k])
+#             ax[axx].semilogx(10**x1, xx, color=colors[j], linestyle=linestyles[k])
 
-            if axx == 1:
-                ax[axx].set_yscale("log")
+#             if axx == 1:
+#                 ax[axx].set_yscale("log")
 
-fig.savefig("fig.png", format="png", bbox_inches="tight")
-plt.close(fig)
+# fig.savefig("fig.png", format="png", bbox_inches="tight")
+# plt.close(fig)

@@ -19,6 +19,8 @@ Navigate to the project root ```pics``` and from there install the package from 
 python3 -m pip install .
 ```
 
+NOTE: This was only tested on a Linux Ubuntu system.
+
 ## Basic usage
 
 
@@ -51,7 +53,8 @@ Perform initial structure integration.
 ```python
 pl.construct()
 ```
-Pass the planet instance to the iterator to match the boundary conditions with the desired precision. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following will iteratively adjust the central values of the pressure and temperature to match the boundary conditions with relative accuracies of 1%:
+
+Pass the planet instance to the iterator to match the boundary conditions with the desired precision. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following will iteratively adjust the central values of the pressure and temperature using a simple multi-linear predictor to match the boundary conditions with relative accuracies of 1%:
 
 ```python
 iterator_specs = dict(acc=[0.01, 0.01])

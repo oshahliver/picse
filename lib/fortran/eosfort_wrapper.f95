@@ -22,24 +22,18 @@ contains
 
 !#######################################################################
 !Load all EoS table files for subsequent table interpolations.
-   SUBROUTINE load_eos_tables(verbose, table_dir)
+   SUBROUTINE load_eos_tables(table_dir)
 
       implicit none
 
-      logical, intent(inout), optional :: verbose
       character(*), intent(in) :: table_dir
       integer :: n_tables = 10
       integer:: n_tables_hyd = 4
-      integer :: o = 1
 
-      if (.not. present(verbose)) then
-         verbose = .false.
-      end if
-
-      if (verbose) then
-         print *, "Loading EoS tables..."
-         print *, "table directory:", table_dir
-      end if
+      ! if (verbose) then
+      !    print *, "Loading EoS tables..."
+      !    print *, "table directory:", table_dir
+      ! end if
 
       call initiate(n_tables=n_tables, n_tables_hyd=n_tables_hyd, table_dir=table_dir)
 

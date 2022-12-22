@@ -2,6 +2,7 @@ from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
 import site
 import os
+import shutil
 
 PACKAGE_NAME = "pics"
 LIB_DIR = "lib"
@@ -12,30 +13,37 @@ SRC_DIR = "lib"
 
 # Specify the object files for static linking
 # Must be pre-compiled at this point
-extra_objects = [
-    "{}/fortran/my_types.o".format(LIB_DIR),
-    "{}/fortran/run_params.o".format(LIB_DIR),
-    "{}/fortran/constants.o".format(LIB_DIR),
-    "{}/fortran/LinAlg.o".format(LIB_DIR),
-    "{}/fortran/class_table_new.o".format(LIB_DIR),
-    "{}/fortran/phase.o".format(LIB_DIR),
-    "{}/fortran/eosfort.o".format(LIB_DIR),
-    "{}/fortran/functions.o".format(LIB_DIR),
-    "{}/fortran/eosmat.o".format(LIB_DIR),
-    "{}/fortran/fortshell.o".format(LIB_DIR),
-    "{}/fortran/fortlayer.o".format(LIB_DIR),
-    "{}/fortran/fortplanet.o".format(LIB_DIR),
+fort_objects = [
+    "my_types",
+    "run_params",
+    "constants",
+    "LinAlg",
+    "class_table_new",
+    "phase",
+    "eosfort",
+    "functions",
+    "eosmat",
+    "fortshell",
+    "fortlayer",
+    "fortplanet",
 ]
 
 
-ext = Extension(
-    name="{}.utils.wrapper".format(PACKAGE_NAME),
+ext1 = Extension(
+    name="{}.utils.fortplanet".format(PACKAGE_NAME),
     sources=["{}/fortran/eosfort_wrapper.f95".format(SRC_DIR)],
-    extra_objects=extra_objects,
+    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in fort_objects],
     # libraries=['three'], # --> does not work!
     f2py_options=["--quiet"],
 )
 
+ext2 = Extension(
+    name="{}.utils.fortfunctions".format(PACKAGE_NAME),
+    sources=["{}/fortran/functionsPy.f95".format(SRC_DIR)],
+    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["LinAlg"]],
+    # libraries=['three'], # --> does not work!
+    f2py_options=["--quiet"],
+)
 
 setup(
     name=PACKAGE_NAME,
@@ -55,7 +63,11 @@ setup(
         "matplotlib",
     ],
     packages=find_packages(),
-    ext_modules=[ext],
+    ext_modules=[ext1, ext2],
+    # include_package_data=True,
+    package_dir = {"pics":"pics"},
+    package_data={'':['*.tab', '*.pkl']},
     #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
+

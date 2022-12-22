@@ -73,17 +73,17 @@ import random
 import matplotlib as mpl
 import matplotlib.transforms as transforms
 import time
-from pics.materials import phaseCheck
+# from pics.materials import phaseCheck
 from pics.utils import functionTools as ftool
-from pics.materials import eos
+# from pics.materials import eos
 from matplotlib import pyplot as plt
 
-from pics.materials import brucite_phase
-from pics.materials import hydration
+# from pics.materials import brucite_phase
+# from pics.materials import hydration
 from decimal import Decimal
 from pics.utils import plotTools
 import warnings
-from pics.materials import brucite_phase as bruce
+# from pics.materials import brucite_phase as bruce
 
 mpl.rc("text", usetex=True)
 mpl.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
@@ -1542,25 +1542,25 @@ def xi_En(SiMg=None, FeMg=0.0, xi_H2O_Ol=0.0, lay=1):
             )
 
 
-def m_Br(T=None, P=None, ph=None):
-    """Computes mole mass of a periclase molecule according to the phase at
-    given P and T (in the hydrated case it would then be brucite). The phase
-    can also be specified as input in which case P and T will not be used to
-    evaluate the phase. This is useful since in a structure shell, the overall
-    phase is defined for the entire shell even if it crosses a phase transition.
-    """
+# def m_Br(T=None, P=None, ph=None):
+#     """Computes mole mass of a periclase molecule according to the phase at
+#     given P and T (in the hydrated case it would then be brucite). The phase
+#     can also be specified as input in which case P and T will not be used to
+#     evaluate the phase. This is useful since in a structure shell, the overall
+#     phase is defined for the entire shell even if it crosses a phase transition.
+#     """
 
-    # compute phase region at given PT-point if no phase is given
-    if ph == None:
-        ph = brucite_phase.phaseCheck(T=T, P=P)
+#     # compute phase region at given PT-point if no phase is given
+#     if ph == None:
+#         ph = brucite_phase.phaseCheck(T=T, P=P)
 
-    # dissociated phase
-    if ph == 2:
-        return mMg + mO
+#     # dissociated phase
+#     if ph == 2:
+#         return mMg + mO
 
-    # hydrated phase
-    else:
-        return mMg + 2 * mO + 2 * mH
+#     # hydrated phase
+#     else:
+#         return mMg + 2 * mO + 2 * mH
 
 
 def m_Ol(xi_Fe=0.0, **kwargs):
@@ -1935,76 +1935,76 @@ def brucite_dissoc(layer, what="out"):
             return mass_out
 
 
-def Mg_number(contents=None, layers=None, X_H2O=None):
-    """Compute Mg# for a constructed planet. Inputs are planet.contents,
-    planet.layers and planet.X_H2O of a constructed Planet.Planet object.
-    """
-    Fe_list = []
-    Mg_list = []
+# def Mg_number(contents=None, layers=None, X_H2O=None):
+#     """Compute Mg# for a constructed planet. Inputs are planet.contents,
+#     planet.layers and planet.X_H2O of a constructed Planet.Planet object.
+#     """
+#     Fe_list = []
+#     Mg_list = []
 
-    X_H2O = X_H2O
+#     X_H2O = X_H2O
 
-    # gather all layers containing Fe or FeO
-    for l in range(len(layers)):
-        Fe = 0.0
-        Mg = 0.0
+#     # gather all layers containing Fe or FeO
+#     for l in range(len(layers)):
+#         Fe = 0.0
+#         Mg = 0.0
 
-        for s in range(len(layers[l].shells)):
-            # print ('-------------\nprocessing layer', l,':')
-            ll = contents[l][0]
-            xH2O = X_H2O[l][0]
+#         for s in range(len(layers[l].shells)):
+#             # print ('-------------\nprocessing layer', l,':')
+#             ll = contents[l][0]
+#             xH2O = X_H2O[l][0]
 
-            xiH2O = xi(xH2O / 100, mMg + mO, mMg + 2 * mO + 2 * mH)
+#             xiH2O = xi(xH2O / 100, mMg + mO, mMg + 2 * mO + 2 * mH)
 
-            # extract total shell mass
-            shellmass = layers[l].shells[s].indigenous_mass
+#             # extract total shell mass
+#             shellmass = layers[l].shells[s].indigenous_mass
 
-            # compute number of mol of Fe in this layer
-            if ll == 9:
-                Fe += shellmass / mFe
+#             # compute number of mol of Fe in this layer
+#             if ll == 9:
+#                 Fe += shellmass / mFe
 
-            elif ll == 7:
-                Fe += shellmass / (mFe + mO)
+#             elif ll == 7:
+#                 Fe += shellmass / (mFe + mO)
 
-            else:
-                Fe += 0.0
+#             else:
+#                 Fe += 0.0
 
-            # compute number of mol of Mg in this layer
-            if ll == 5:
-                Mg += shellmass / (mMg + mO + xiH2O * (mO + mH * 2))
+#             # compute number of mol of Mg in this layer
+#             if ll == 5:
+#                 Mg += shellmass / (mMg + mO + xiH2O * (mO + mH * 2))
 
-            elif ll == 1:
-                Mg += shellmass / (mMg * 2 + mSi + mO * 4)
+#             elif ll == 1:
+#                 Mg += shellmass / (mMg * 2 + mSi + mO * 4)
 
-            elif ll == 11:
-                T = layers[l].shells[s].temp
-                P = layers[l].shells[s].pres
+#             elif ll == 11:
+#                 T = layers[l].shells[s].temp
+#                 P = layers[l].shells[s].pres
 
-                phase = bruce.phaseCheck(T=T, P=P)
+#                 phase = bruce.phaseCheck(T=T, P=P)
 
-                # if Mg(OH)2 is in phase 2 it is MgO by the assumption that
-                # all H2O is transported to the top if Mg(OH)2 is dissociated
-                # to MgO + H2O
-                if phase == 2:
-                    Mg += shellmass / (mMg + mO)
+#                 # if Mg(OH)2 is in phase 2 it is MgO by the assumption that
+#                 # all H2O is transported to the top if Mg(OH)2 is dissociated
+#                 # to MgO + H2O
+#                 if phase == 2:
+#                     Mg += shellmass / (mMg + mO)
 
-                else:
-                    Mg += shellmass / (mMg + mO * 2 + mH * 2)
+#                 else:
+#                     Mg += shellmass / (mMg + mO * 2 + mH * 2)
 
-            else:
-                Mg += 0.0
+#             else:
+#                 Mg += 0.0
 
-        Fe_list.append(Fe)
-        Mg_list.append(Mg)
+#         Fe_list.append(Fe)
+#         Mg_list.append(Mg)
 
-        # print ('layer contains', Fe,' mol of Fe')
-        # print ('layer contains', Mg,' mol of Mg')
+#         # print ('layer contains', Fe,' mol of Fe')
+#         # print ('layer contains', Mg,' mol of Mg')
 
-    try:
-        return sum(Mg_list) / (sum(Mg_list) + sum(Fe_list))
+#     try:
+#         return sum(Mg_list) / (sum(Mg_list) + sum(Fe_list))
 
-    except ZeroDivisionError:
-        return 0.0
+#     except ZeroDivisionError:
+#         return 0.0
 
 
 def estimate_Mcore(
@@ -2024,82 +2024,82 @@ def estimate_Mcore(
         pass
 
 
-def reconstructDensities(T=None, P=None, materials=[], **kwargs):
-    """Compute density contributions of each individual component in <materials>
-    by inversing the mixing law
-    """
-    densities = []
-    for l in range(len(materials)):
-        densities.append(eos.Compute(what="dens", ll=materials[l], P=P, T=T)[0])
-    return densities
+# def reconstructDensities(T=None, P=None, materials=[], **kwargs):
+#     """Compute density contributions of each individual component in <materials>
+#     by inversing the mixing law
+#     """
+#     densities = []
+#     for l in range(len(materials)):
+#         densities.append(eos.Compute(what="dens", ll=materials[l], P=P, T=T)[0])
+#     return densities
 
 
-def reconstructdPdrho(T=None, P=None, densities=[], materials=[], **kwargs):
-    """Compute dPdrho contributions of each individual component in <materials>
-    by inversing the mixing law
-    """
-    derivatives = []
-    for l in range(len(materials)):
-        derivatives.append(eos.dPdrho(ll=materials[l], P=P, T=T, d=densities[l]))
-    return derivatives
+# def reconstructdPdrho(T=None, P=None, densities=[], materials=[], **kwargs):
+#     """Compute dPdrho contributions of each individual component in <materials>
+#     by inversing the mixing law
+#     """
+#     derivatives = []
+#     for l in range(len(materials)):
+#         derivatives.append(eos.dPdrho(ll=materials[l], P=P, T=T, d=densities[l]))
+#     return derivatives
 
 
-def gradients(
-    r=None,
-    y=[],
-    gamma=1.0,
-    tempType=0,
-    fractions=[],
-    materials=[],
-    oldgrad=[],
-    rhoType="integrate",
-    **kwargs,
-):
-    """This function computes all the relevant gradients for the RK solver"""
-    P, m, T, d = y
+# def gradients(
+#     r=None,
+#     y=[],
+#     gamma=1.0,
+#     tempType=0,
+#     fractions=[],
+#     materials=[],
+#     oldgrad=[],
+#     rhoType="integrate",
+#     **kwargs,
+# ):
+#     """This function computes all the relevant gradients for the RK solver"""
+#     P, m, T, d = y
 
-    # normally the pressure derivative is updated in each RK substep
-    # this induces an enormeous amount of computational costs but is
-    # crucial as keeping it constant over the RK step induces non-negligible
-    # errors on the P, T, m and rho evolution of the planet
+#     # normally the pressure derivative is updated in each RK substep
+#     # this induces an enormeous amount of computational costs but is
+#     # crucial as keeping it constant over the RK step induces non-negligible
+#     # errors on the P, T, m and rho evolution of the planet
 
-    # compute densities and pressure derivatives of all materials
-    # densities = reconstructDensities(T=T, P=P, materials=materials)
-    # derivatives = reconstructdPdrho(T=T, P=P, densities=densities,\
-    #                              materials = materials)
-    # print ('T/P/d=', T, P, d)
-    derivatives = [
-        eos.dPdrho(T=T, P=P, ll=materials[i], table=False)
-        for i in range(len(materials))
-    ]
-    # derivatives = [eosfort.interpolate(x=T, y=P, ll=materials[i], params=[5],
-    #                                  nparams=1)
-    # for i in range(len(materials))]
-    # derivatives = [tab.interpolate(param=4, x=T, y=P, ll=0)]
-    # print ('dPdrho individual=', derivatives)
-    # compute mean pressure derivative of the mixture
-    dPdrho = sum(derivatives[i] * fractions[i] for i in range(len(materials)))
-    # K1 = sum([fractions[i]/densities[i] for i in range(len(densities))])**2
-    # K2 = sum([fractions[i]/densities[i]**2 for i in range(len(densities))])
-    # K3 = sum([1./derivatives[i] for i in range(len(densities))])
-    # dPdrho2 = K1/K2*1./K3
-    # compute the radial gradients of the structure parameters
-    dPdr = -G * m * d / r**2
-    dmdr = 4.0 * np.pi * r**2 * d
+#     # compute densities and pressure derivatives of all materials
+#     # densities = reconstructDensities(T=T, P=P, materials=materials)
+#     # derivatives = reconstructdPdrho(T=T, P=P, densities=densities,\
+#     #                              materials = materials)
+#     # print ('T/P/d=', T, P, d)
+#     derivatives = [
+#         eos.dPdrho(T=T, P=P, ll=materials[i], table=False)
+#         for i in range(len(materials))
+#     ]
+#     # derivatives = [eosfort.interpolate(x=T, y=P, ll=materials[i], params=[5],
+#     #                                  nparams=1)
+#     # for i in range(len(materials))]
+#     # derivatives = [tab.interpolate(param=4, x=T, y=P, ll=0)]
+#     # print ('dPdrho individual=', derivatives)
+#     # compute mean pressure derivative of the mixture
+#     dPdrho = sum(derivatives[i] * fractions[i] for i in range(len(materials)))
+#     # K1 = sum([fractions[i]/densities[i] for i in range(len(densities))])**2
+#     # K2 = sum([fractions[i]/densities[i]**2 for i in range(len(densities))])
+#     # K3 = sum([1./derivatives[i] for i in range(len(densities))])
+#     # dPdrho2 = K1/K2*1./K3
+#     # compute the radial gradients of the structure parameters
+#     dPdr = -G * m * d / r**2
+#     dmdr = 4.0 * np.pi * r**2 * d
 
-    if tempType == 0:
-        dTdr = 0.0
+#     if tempType == 0:
+#         dTdr = 0.0
 
-    elif tempType == 1:
-        dTdr = dPdr * gamma * T / (d * dPdrho)
+#     elif tempType == 1:
+#         dTdr = dPdr * gamma * T / (d * dPdrho)
 
-    if rhoType == "constant":
-        drhodr = 0.0
+#     if rhoType == "constant":
+#         drhodr = 0.0
 
-    else:
-        drhodr = dPdr / dPdrho
+#     else:
+#         drhodr = dPdr / dPdrho
 
-    return [dPdr, dmdr, dTdr, drhodr]
+#     return [dPdr, dmdr, dTdr, drhodr]
 
 
 class Unit:
@@ -2222,116 +2222,116 @@ class Unit:
                 dT0,
             )
 
-    def Compute(self, d=None, T=None, P=None, phase=None, **kwargs):
-        """Here the material paremeters are computed. Normally values for P
-        and T are passed and the density and pressure derivative are computed.
-        Note: no argument for <what> should be passed if possible as only the
-        passed parameter will be updated. This option is mainly for testing
-        and debugging purposes"""
+    # def Compute(self, d=None, T=None, P=None, phase=None, **kwargs):
+    #     """Here the material paremeters are computed. Normally values for P
+    #     and T are passed and the density and pressure derivative are computed.
+    #     Note: no argument for <what> should be passed if possible as only the
+    #     passed parameter will be updated. This option is mainly for testing
+    #     and debugging purposes"""
 
-        if d == None:
-            dens = self.dens
-        else:
-            dens = d
+    #     if d == None:
+    #         dens = self.dens
+    #     else:
+    #         dens = d
 
-        if P == None:
-            pres = self.pres
-        else:
-            pres = P
-            self.pres = P
+    #     if P == None:
+    #         pres = self.pres
+    #     else:
+    #         pres = P
+    #         self.pres = P
 
-        if T == None:
-            temp = self.temp
-        else:
-            temp = T
-            self.temp = T
+    #     if T == None:
+    #         temp = self.temp
+    #     else:
+    #         temp = T
+    #         self.temp = T
 
-        dPdrho = self.dPdrho
-        K_isoth = self.K_isoth
+    #     dPdrho = self.dPdrho
+    #     K_isoth = self.K_isoth
 
-        if not phase == None:
-            self.phase = phase
+    #     if not phase == None:
+    #         self.phase = phase
 
-        X_H2O = self.X_H2O
+    #     X_H2O = self.X_H2O
 
-        # check if temperature and pressure are given, then compute
-        # corresponding density and pressure derivative in one go
+    #     # check if temperature and pressure are given, then compute
+    #     # corresponding density and pressure derivative in one go
 
-        if self.eos_table:
-            dens, dPdrho, alpha, phase = eosfort.interpolate(
-                x=temp, y=pres, params=[3, 5, 6, 10], ll=self.ll, nparams=4
-            )
+    #     if self.eos_table:
+    #         dens, dPdrho, alpha, phase = eosfort.interpolate(
+    #             x=temp, y=pres, params=[3, 5, 6, 10], ll=self.ll, nparams=4
+    #         )
 
-            # The phases are characterized by integer numbers. In the tables
-            # they are however stored as floats and are interpolated as all
-            # the other parameters. If the interpolation points spread
-            # across a phase boundary, the point at which the interpolation
-            # is carried out is allocated to phase region which is closer
-            # to it in the PT-plane. This is approximately achieved by
-            # interpolating the phase as a float and then convert it to int
-            phase = int(phase)
+    #         # The phases are characterized by integer numbers. In the tables
+    #         # they are however stored as floats and are interpolated as all
+    #         # the other parameters. If the interpolation points spread
+    #         # across a phase boundary, the point at which the interpolation
+    #         # is carried out is allocated to phase region which is closer
+    #         # to it in the PT-plane. This is approximately achieved by
+    #         # interpolating the phase as a float and then convert it to int
+    #         phase = int(phase)
 
-        else:
-            # print ('in =', self.ll, self.Fe_number, self.saturation, self.phase, temp, pres)
-            dens, T, P, dTdP_S, dPdrho, phase, X_H2O, alpha, xi_Al = eos.Compute(
-                what="all",
-                ll=self.ll,
-                T=temp,
-                P=pres,
-                Fe_number=self.Fe_number,
-                saturation=self.saturation,
-                phase=self.phase,
-            )
+    #     else:
+    #         # print ('in =', self.ll, self.Fe_number, self.saturation, self.phase, temp, pres)
+    #         dens, T, P, dTdP_S, dPdrho, phase, X_H2O, alpha, xi_Al = eos.Compute(
+    #             what="all",
+    #             ll=self.ll,
+    #             T=temp,
+    #             P=pres,
+    #             Fe_number=self.Fe_number,
+    #             saturation=self.saturation,
+    #             phase=self.phase,
+    #         )
 
-        # Compute water saturation content in (Mg,Fe)2SiO4
-        # NOTE: saturated Olivine is treated as a individual material with
-        # material code 12
-        if self.ll > 11:
-            if self.saturation:
-                # Convert water content into weight fraction
-                X_H2O = hydration.X_H2O_sat(P=self.pres, T=self.temp) * 0.01
+    #     # Compute water saturation content in (Mg,Fe)2SiO4
+    #     # NOTE: saturated Olivine is treated as a individual material with
+    #     # material code 12
+    #     if self.ll > 11:
+    #         if self.saturation:
+    #             # Convert water content into weight fraction
+    #             X_H2O = hydration.X_H2O_sat(P=self.pres, T=self.temp) * 0.01
 
-        # for Brucite the water content is constant
-        elif self.ll == 11:
-            phase = phaseCheck.getPhase(ll=self.ll, T=self.temp, P=self.pres)
-            if phase == 2:
-                self.saturation = False
-                X_H2O = 0.0
+    #     # for Brucite the water content is constant
+    #     elif self.ll == 11:
+    #         phase = phaseCheck.getPhase(ll=self.ll, T=self.temp, P=self.pres)
+    #         if phase == 2:
+    #             self.saturation = False
+    #             X_H2O = 0.0
 
-            else:
-                self.saturation = True
-                X_H2O = 0.3089
+    #         else:
+    #             self.saturation = True
+    #             X_H2O = 0.3089
 
-        elif self.ll == 6:
-            if phase == 0:
-                self.saturation = False
-                X_H2O = 0.0
+    #     elif self.ll == 6:
+    #         if phase == 0:
+    #             self.saturation = False
+    #             X_H2O = 0.0
 
-            elif phase == 1:
-                self.saturation = True
-                X_H2O = 0.03
+    #         elif phase == 1:
+    #             self.saturation = True
+    #             X_H2O = 0.03
 
-        # print (dens, dPdrho)
-        K_isoth = dPdrho * dens
+    #     # print (dens, dPdrho)
+    #     K_isoth = dPdrho * dens
 
-        # update material properties from eos outputs
-        self.K_isoth = K_isoth
+    #     # update material properties from eos outputs
+    #     self.K_isoth = K_isoth
 
-        try:
-            self.phase = int(phase)
+    #     try:
+    #         self.phase = int(phase)
 
-        except TypeError:
-            self.phase = phase
+    #     except TypeError:
+    #         self.phase = phase
 
-        except ValueError:
-            self.phase = phase
+    #     except ValueError:
+    #         self.phase = phase
 
-        self.dens = dens
-        self.pres = pres
-        self.temp = temp
-        self.alpha = alpha
-        self.dPdrho = dPdrho
-        self.X_H2O = X_H2O
+    #     self.dens = dens
+    #     self.pres = pres
+    #     self.temp = temp
+    #     self.alpha = alpha
+    #     self.dPdrho = dPdrho
+    #     self.X_H2O = X_H2O
 
 
 class Mixture:

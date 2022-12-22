@@ -156,7 +156,7 @@ def dydx(
                     * G
                     * y[1]
                     * y[3]
-                    / x ** 2
+                    / x**2
                 )
             elif lay == 2:
                 gamma_bulk = (
@@ -181,7 +181,7 @@ def dydx(
                     * G
                     * y[1]
                     * y[3]
-                    / x ** 2
+                    / x**2
                 )
             elif lay == 1:
                 gamma_bulk = (
@@ -206,7 +206,7 @@ def dydx(
                     * G
                     * y[1]
                     * y[3]
-                    / x ** 2
+                    / x**2
                 )
             elif lay == 0:
                 Tgrad = 0.0
@@ -215,7 +215,7 @@ def dydx(
                 print("WARNING: invalid layer identification!\nlayer =", lay)
         try:
             return (
-                [-G * y[1] * y[3] / x ** 2, 4.0 * np.pi * x ** 2 * y[3], Tgrad, dgrad],
+                [-G * y[1] * y[3] / x**2, 4.0 * np.pi * x**2 * y[3], Tgrad, dgrad],
                 Tgrad,
                 dgrad,
             )
@@ -226,7 +226,7 @@ def dydx(
             sys.exit()
 
     elif derivative_type == "Eth":
-        return [x ** 3 / (np.exp(x) - 1.0)], None, None
+        return [x**3 / (np.exp(x) - 1.0)], None, None
 
     elif derivative_type == "something else":
         # pass a coupled derivative vector you want to be integrated numerically
@@ -323,7 +323,7 @@ def RungeKutta(
 
 def alphaT(T, aT, bT, cT):
     """Compute thermal expansion coefficient at zero pressure"""
-    return aT + bT * T - cT / T ** 2
+    return aT + bT * T - cT / T**2
 
 
 def rho0T(T, T0, d0, ll, aT, bT, cT):
@@ -331,11 +331,11 @@ def rho0T(T, T0, d0, ll, aT, bT, cT):
     try:
         result = d0 / np.exp(
             aT * T
-            + 0.5 * bT * T ** 2
-            + 2.0 * cT / T ** 3
+            + 0.5 * bT * T**2
+            + 2.0 * cT / T**3
             - aT * T0
-            - 0.5 * bT * T0 ** 2
-            - 2.0 * cT / T0 ** 3
+            - 0.5 * bT * T0**2
+            - 2.0 * cT / T0**3
         )
 
         return result
@@ -367,12 +367,12 @@ def thetaD(thetaD0, rho0, gamma, d):
 
 def Debye_integral(z):
     def integrand(x):
-        return x ** 3 / (np.exp(x) - 1.0)
+        return x**3 / (np.exp(x) - 1.0)
 
     def expint(a, b):
         return quad(integrand, a, b)[0]
 
-    return 3 / z ** 3 * expint(0.0, z)
+    return 3 / z**3 * expint(0.0, z)
 
 
 def Eth(d, T, thetaD0, rho0, gamma0, q, molmass, nparticles, ll, **kwargs):
@@ -385,7 +385,7 @@ def Eth(d, T, thetaD0, rho0, gamma0, q, molmass, nparticles, ll, **kwargs):
     # scipy result agreed well within << 0.01 % relative error, so my stuff
     # was accurate and robust, but very slow
     def integrand(t):
-        return t ** 3 / (np.exp(t) - 1.0)
+        return t**3 / (np.exp(t) - 1.0)
 
     def expint(a, b):
         """integrate given integrand between a and b using the scipy library"""
@@ -620,7 +620,7 @@ def mean_dens(md, lay, ll, laymatfrac_list):
 
 
 def dens_grad(r, y, md, EOS, ll, Ttype="isothermal ambient"):
-    return -G * y[1] * y[3] / (r ** 2 * PIMPeos.dEOSdrho(md, y[2], EOS, ll, Ttype))
+    return -G * y[1] * y[3] / (r**2 * PIMPeos.dEOSdrho(md, y[2], EOS, ll, Ttype))
 
 
 def meandens_grad(
@@ -670,11 +670,11 @@ def mean_dEOSdrho(
 
 
 def pres_grad(r, y):
-    return -G * y[1] * y[3] / r ** 2
+    return -G * y[1] * y[3] / r**2
 
 
 def mass_grad(r, y):
-    return 4.0 * np.pi * r ** 2 * y[3]
+    return 4.0 * np.pi * r**2 * y[3]
 
 
 def temp_grad(r, y):

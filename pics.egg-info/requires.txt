@@ -1,5 +1,6 @@
 astropy
 plotly
+kaleido
 tabulate
 scipy
 scikit-learn

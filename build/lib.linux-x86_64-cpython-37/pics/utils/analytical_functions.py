@@ -218,7 +218,7 @@ def P_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     mm = gas_molar_mass_list[ll]
     a = a_VDW_list[ll]
     b = b_VDW_list[ll]
-    return d * Rgas * T / (mm - d * b) - d ** 2 * a / mm ** 2
+    return d * Rgas * T / (mm - d * b) - d**2 * a / mm**2
 
 
 def rho_VDW(P=0.0, T=0.0, ll=None, **kwargs):
@@ -233,7 +233,7 @@ def dPdrho_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     b = b_VDW_list[ll]
     return (
         Rgas * T / (mm - b * d)
-        - 2.0 * d * a / mm ** 2
+        - 2.0 * d * a / mm**2
         + b * d * Rgas * T / (mm - b * d) ** 2
     )
 

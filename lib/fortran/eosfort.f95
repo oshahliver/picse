@@ -34,9 +34,8 @@ contains
       character(34), dimension(:), allocatable :: file_names
       character(8) :: fmt
       logical :: auto_dummy
-      integer :: ord = 1
       integer :: i, j
-
+      
       if (.not. present(auto)) then
          auto_dummy = .true.
       else
@@ -59,10 +58,10 @@ contains
       do i = 1, n_tables
          fmt = str(i)
          if (eos_tables_variable_Fe(i) == 0) then
-            file_names(i) = 'eos_'//trim(fmt)//'_Fe_0_0_H2O_0_0_Al_0_0.tab'
+            file_names(i) = '/eos_'//trim(fmt)//'_Fe_0_0_H2O_0_0_Al_0_0.tab'
 
          elseif (eos_tables_variable_Fe(i) == 1) then
-            file_names(i) = 'eos_'//trim(fmt)//'_Fe_var_H2O_0_0_Al_0_0.tab'
+            file_names(i) = '/eos_'//trim(fmt)//'_Fe_var_H2O_0_0_Al_0_0.tab'
 
          end if
       end do
@@ -74,10 +73,10 @@ contains
          if (eos_tables_hydrated(i) == 1) then
             j = j + 1
             if (eos_tables_variable_Fe(i) == 0) then
-               file_names(j + n_tables) = 'eos_'//trim(fmt)//'_Fe_0_0_H2O_1_0_Al_0_0.tab'
+               file_names(j + n_tables) = '/eos_'//trim(fmt)//'_Fe_0_0_H2O_1_0_Al_0_0.tab'
 
             elseif (eos_tables_variable_Fe(i) == 1) then
-               file_names(j + n_tables) = 'eos_'//trim(fmt)//'_Fe_var_H2O_1_0_Al_0_0.tab'
+               file_names(j + n_tables) = '/eos_'//trim(fmt)//'_Fe_var_H2O_1_0_Al_0_0.tab'
             end if
          end if
       end do

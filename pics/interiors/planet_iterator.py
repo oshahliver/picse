@@ -13,12 +13,7 @@ from matplotlib import pyplot as plt
 # import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
 from pics.utils import matrix_generator as mgen
-
 import numpy as np
-import pandas as pd
-import astropy.table
-from astropy.io import ascii
-import time
 
 # from pics.utils import readPREM, logTrans, plotTools
 import random
@@ -312,7 +307,7 @@ class Toolkit:
         if "iterator_specs" in kwargs:
             for key, val in kwargs["iterator_specs"].items():
                 if key in self.iterator_specs:
-                    print ("item =", key, val)
+                   
                     specs.update({key:val})
 
                 else:
@@ -407,7 +402,7 @@ class Toolkit:
         print("initial howval =", [all_how[h] for h in specs["how"]])
         print("initial whatval =", [all_what[w + "_is"] for w in specs["what"]])
 
-        print("initial passiveval is=", self.oldpassivevals)
+        # print("initial passiveval is=", self.oldpassivevals)
 
         # Construct initial grid points for prediction
         # First grid point is input planet.
@@ -444,7 +439,7 @@ class Toolkit:
                             )
                             self.already_met[i] = 1
 
-                    elif how[i] == "M_outer_mantle":
+                    elif specs["how"][i] == "M_outer_mantle":
                         # initial outer mantle mass guess too small -> iteration direction up
                         if direction[i][0] * reldev[i] < -specs["acc"][i]:
                             direction[i][1] = -1
@@ -516,14 +511,14 @@ class Toolkit:
 
                     print("initial delta =", self.delta[i])
 
-                print("all_how = ", all_how)
-                print("how =", specs["how"])
+                # print("all_how = ", all_how)
+                # print("how =", specs["how"])
                 all_how[specs["how"][i]] += self.delta[i]
 
                 # Add random fluctuation to avoid singular matrix if the initial
                 # values of two data points are identical
                 rand = random.random()
-                print("random fluc =", rand)
+                # print("random fluc =", rand)
                 all_how[specs["how"][i]] *= 1.0 + rand * 1e-2
 
                 # force newval to stay within the defined value ranges for the
@@ -581,9 +576,9 @@ class Toolkit:
                 self.oldhowvals.append([n for n in newval])
                 self.oldwhatvals.append([v for v in val_is])
 
-                print("howvals =", self.oldhowvals)
-                print("whatvals =", self.oldwhatvals)
-                print("newvals =", newval)
+                # print("initial howvals =", self.oldhowvals)
+                # print("initial whatvals =", self.oldwhatvals)
+                # print("initial newvals =", newval)
 
         count = 0
         exitcode = 0
@@ -643,71 +638,10 @@ class Toolkit:
             # print ('howvals =', self.oldhowvals)
             # print ('whatvals =', self.oldwhatvals)
 
-            """
-            #sys.exit()
-            #x = np.log10(np.array(self.oldhowvals[-len(how)-1:]))
-            y = np.array(self.oldwhatvals[-len(how)-1:])
-            x = np.empty([len(how)+1, len(how)])
-            
-            #print ('y =', y)
-            for k in range(len(how)+1):
-                for l in range(len(how)):
-                    if all_howval_weights[l] == 'exp':
-                        x[k][l] = np.log10(self.oldhowvals[-len(how)+k-1][l])
-                    elif all_howval_weights[l] == 'lin':
-                        x[k][l] = self.oldhowvals[-len(how)+k-1][l]
-                    
-            for k in range(len(how)+1):
-                for l in range(len(y[k])):
-                    if all_val_should_weights[l] == 'log':
-                        y[k][l] = np.log10(y[k][l])
-            
-            matrix = np.empty([len(how)+1, len(how)+1])
-            
-            for k in range(len(how) + 1):
-                matrix[k][0] = 1.
-                for l in range(len(how)):
-                    matrix[k][l+1] = y[k][l]
-
-            print ('x =', x)
-            print ('matrix =', matrix)
-            """
             # Size of coefficient vector for multi-linear predictor
             n_coeffs = 2 ** len(specs["how"])
-            """
-            #Prepare vectors
-            x = np.empty([n_coeffs, len(how)])            
-            matrix = np.empty([n_coeffs, n_coeffs])
-            
-            #Prepare coefficient matrix
-            for k in range(n_coeffs):
-                #
-                for l in range(2**(len(how)-1)):
-                    for m in range(2**(len(how)-1)):
-                        # gather values for predictor parameters
-                        vals = np.empty([len(how)])
-                        #Loop over parameters
-                        for n in range(len(vals)):
-                            # the last 2**len(how) values are needed for
-                            # the next predicotr step.
-                            vals[n] = self.oldwhatvals[-2**len(how)+k][n]
-                            
-                            if all_val_should_weights[n] == 'log':
-                                vals[n] = np.log10(vals[n])
-                                
-                        matrix[k][l + 2 * m] = vals[0]**l * vals[1]**m
-            
-            #print ('oldwhatvals =', self.oldwhatvals)
-            
-            #Prepare solution vector
-            for k in range(n_coeffs):
-                for l in range(len(how)):
-                    if all_howval_weights[l] == 'exp':
-                        x[k][l] = np.log10(self.oldhowvals[-2**len(how)+k][l])
-                    elif all_howval_weights[l] == 'lin':
-                        x[k][l] = self.oldhowvals[-2**len(how)+k][l]
-            """
-            print("oldwhatvals =", self.oldwhatvals)
+     
+            # print("oldwhatvals =", self.oldwhatvals)
             linsys = mgen.LinearSystem(
                 self.oldwhatvals[-(2 ** len(specs["how"])) :],
                 self.oldhowvals[-(2 ** len(specs["how"])) :],
@@ -716,8 +650,8 @@ class Toolkit:
                 data_weights=specs["all_howval_weights"],
             )
 
-            print("body =", linsys.body)
-            print("vec =", linsys.vec)
+            # print("body =", linsys.body)
+            # print("vec =", linsys.vec)
 
             try:
                 # Solve linear system to get coefficients a_ij
@@ -729,60 +663,7 @@ class Toolkit:
                 linsys.create_model()
                 linsys.predict()
                 newval = linsys.pred
-                """
-                print ('a =', a)
-                print ('res =', linsys.res)
-                #Prepare weighted target vector
-                target = np.zeros([len(how), n_coeffs])
-                for i in range(len(how)):
-                    for k in range(2**(len(how)-1)):
-                        for l in range(2**(len(how)-1)):
-                            
-                            if all_val_should_weights[0] == 'lin':
-                                target[i][l + 2 * k] = val_should[0]**l
-                            elif all_val_should_weights[0] == 'log':
-                                target[i][l + 2 * k] = np.log10(val_should[0])**l
-                        
-                            if all_val_should_weights[1] == 'lin':
-                                target[i][l + 2 * k] *= val_should[1]**k
-                            elif all_val_should_weights[1] == 'log':
-                                target[i][l + 2 * k] *= np.log10(val_should[1])**k
-                                
-                #Predict new howvals
-                y = target * a.T
-                newval = [sum(yy) for yy in y]
-                for i in range(len(how)):
-                    if all_howval_weights[i] == 'exp':
-                        newval[i] = 10**newval[i]
-                """
-
-                """
-                a = np.linalg.solve(matrix, x)
-                print ('a = ', a)
-                
-                #Compute new value for all how-vals
-                #the_thing = A + B val1 + C val2 + D val1*val2 etc.
-                for k in range(len(how)):
-                    the_thing = a[0][k]
-                    #print ('k =', k)
-                    #print ('A = ', a[0][k])
-                    for l in range(len(how)):
-                     #   print ('val should l =', val_should[l])
-                        if all_val_should_weights[l] == 'lin':
-                      #      print ('lin')
-                            the_thing += a[l+1][k] * val_should[l]
-    
-                        elif all_val_should_weights[l] == 'log':
-                       #     print ('log')
-                            the_thing += a[l+1][k] * np.log10(val_should[l])
-                        #    print ('B * val1 =', a[l+1][k], np.log10(val_should[l]))
-                        #print ('the thing =', the_thing)
-                    if all_howval_weights[k] == 'lin':
-                        newval[k] = the_thing
-                        
-                    elif all_howval_weights[k] == 'exp':
-                        newval[k] = 10**the_thing
-                """
+           
             except np.linalg.LinAlgError as err:
                 if "Singular matrix" in str(err):
                     print("Singular matrix")
@@ -821,7 +702,7 @@ class Toolkit:
 
                             newval[i] = max(
                                 self.oldhowvals[-1][i] + self.delta[i],
-                                sanity_borders[how[i]][0],
+                                sanity_borders[specs["how"][i]][0],
                             )
 
                         else:
@@ -829,7 +710,8 @@ class Toolkit:
 
                 else:
                     pass
-            print("newvals =", newval)
+
+            # print("newvals =", newval)
             # print ('pred =', linsys.pred)
             for i in range(len(specs["how"])):
                 # newval[i] = min(newval[i], sanity_borders[how[i]][1])
@@ -896,10 +778,10 @@ class Toolkit:
                 pass
             """
 
-            print("newval computed =", newval)
-            print("new val_is =", val_is)
-            print("val should =", specs["val_should"])
-            print("new reldev =", reldev)
+            print("new how =", newval)
+            print("new what =", val_is)
+            print("val_should =", specs["val_should"])
+            print("reldev =", reldev)
 
             for i in range(len(specs["how"])):
                 if specs["how"][i] == "M_core":

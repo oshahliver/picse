@@ -491,7 +491,7 @@ def P_VR(
     e0 = 198e-6
     e = e0 * eta ** (-g)
 
-    Pe = 3.0 / 2.0 * n_list[ll] * Rgas * e * g * T ** 2 * d / molmass
+    Pe = 3.0 / 2.0 * n_list[ll] * Rgas * e * g * T**2 * d / molmass
     print("Pe =", Pe)
     return P0 + Pth + Pe
 
@@ -602,7 +602,7 @@ def P_Ichi(
     g = -0.4
 
     gamma = gamma0 * (1.0 + a * (eta ** (-b) - 1.0))
-    Eth = 3.0 * n_list[ll] * Rgas * (T + e0 * eta ** (-g) * T ** 2)
+    Eth = 3.0 * n_list[ll] * Rgas * (T + e0 * eta ** (-g) * T**2)
     Eth0 = 3.0 * n_list[ll] * Rgas * (T0_list[ll] + e0 * eta ** (-g) * T0_list[ll] ** 2)
 
     V = molmass / d / eta
@@ -692,7 +692,7 @@ def P_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     a = a_VDW_list[ll]
     b = b_VDW_list[ll]
     c1 = d * Rgas * T / (mm - d * b)
-    c2 = d ** 2 * a / mm ** 2
+    c2 = d**2 * a / mm**2
     print("c1 =", c1)
     print("c2 =", c2)
     return c1 - c2
@@ -710,7 +710,7 @@ def dPdrho_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     b = b_VDW_list[ll]
     return (
         Rgas * T / (mm - b * d)
-        - 2.0 * d * a / mm ** 2
+        - 2.0 * d * a / mm**2
         + b * d * Rgas * T / (mm - b * d) ** 2
     )
 
@@ -1844,7 +1844,7 @@ def PlotCmap(
     """
 
     # Compute grid resolution
-    N = 2 ** res
+    N = 2**res
 
     ticklabel_fontsize = 8
     label_fontsize = 10
@@ -1913,7 +1913,7 @@ def PlotCmap(
     )
 
     bin_refine_exponent = 4
-    n_additional_bins = 2 ** bin_refine_exponent
+    n_additional_bins = 2**bin_refine_exponent
     colors = []
 
     xticks = np.linspace(0, N - 1, nxticks)

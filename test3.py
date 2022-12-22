@@ -6,7 +6,7 @@ In this test we will create a planet using the new input parameter handler.
 from pics.interiors import planet_iterator
 from pics.interiors import planet_creator
 
-#planet_creator.load_eos_tables()
+planet_creator.load_eos_tables()
 
 iterator = planet_iterator.Toolkit()
 

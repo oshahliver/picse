@@ -155,7 +155,7 @@ def Plot(
 
     scales = ["lin", "log", "log", "lin", "lin", "lin", "lin"]
 
-    N = 2 ** res
+    N = 2**res
 
     if log:
         x = np.logspace(np.log10(T_min), np.log10(T_max), N)
@@ -327,8 +327,8 @@ def analyze(
                 pass
 
             else:
-                if abs(x) < 10 ** def_zero:
-                    x[...] = 10 ** def_zero * x / abs(x)
+                if abs(x) < 10**def_zero:
+                    x[...] = 10**def_zero * x / abs(x)
 
                 elif abs(x) > 1.0:
                     x[...] = x / abs(x)

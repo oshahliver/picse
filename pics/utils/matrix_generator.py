@@ -16,7 +16,7 @@ class LinearSystem:
     def __init__(
         self, params, data, target=None, param_weights=None, data_weights=None
     ):
-        print("params =", params)
+        # print("params in matrix_generator =", params)
         if param_weights == None:
             self.param_weights = ["lin" for i in range(len(params[0]))]
         else:

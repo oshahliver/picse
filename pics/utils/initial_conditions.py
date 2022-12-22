@@ -1,7 +1,8 @@
 import pickle
 import numpy as np
-import os
+import sys
 from pics.utils.context_manager import temp_path
+from pics.utils.internal_data import get_predictor_model
 
 
 def predict_initials(
@@ -16,12 +17,8 @@ def predict_initials(
 ):
 
     xi_Fe_core = fractions[1][0]
-    model_path = "./data/initial_conditions/"
-    filename = model_path + model_name
-
-    # Load pre-generated regression model
-    with temp_path("pics/utils"):
-        models = pickle.load(open(filename, "rb"))
+    
+    models = get_predictor_model(model_name)
 
     # Loop over parameters to be predicted
     for i in range(len(models)):

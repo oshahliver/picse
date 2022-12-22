@@ -65,10 +65,10 @@ contains
       self%X_impurity_0 = 0d0
       self%X_impurity_slope = 0d0
 
-print *, '-----'
-print *, 'Initiating layer ', self%lay
-print *, '-----'
-print *, "fractions in init_layer =", fractions
+! print *, '-----'
+! print *, 'Initiating layer ', self%lay
+! print *, '-----'
+! print *, "fractions in init_layer =", fractions
 
       if (present(external_temp_profile)) then
          self%external_temp_profile = external_temp_profile
