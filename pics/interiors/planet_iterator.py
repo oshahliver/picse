@@ -72,6 +72,11 @@ class Toolkit:
         self.iteration = False
         self.number = 0
 
+
+    def get_specs(planet):
+        pass
+
+
     def all_params(self, planet):
         try:
             all_what = {
@@ -253,6 +258,9 @@ class Toolkit:
         inefficient and can only  find approximate solutions (i.e. reldev >~
         10%)
         """
+
+
+
 
         if not planet.status == "very much alive":
             print(

@@ -36,7 +36,7 @@ iterator = planet_iterator.Toolkit()
 
 ```
 
-Initialize a telluric planet instance. If no planetary properties are passed, default values will be used.
+Initialize a planetary object of base type "telluric". If no planetary properties are passed, default values will be used.
 
 ```python
 pl = planet_creator.TelluricPlanet()
@@ -56,7 +56,7 @@ If the iterator reached convergence you can inspect the planets properties:
 
 ```python
 pl.print()
-pl.plot(save=True, file_name="structure_profiles", format="png")
+pl.plot()
 ```
 
 
