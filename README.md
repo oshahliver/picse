@@ -35,24 +35,30 @@ from pics.interiors import planet_creator
 from pics.physicalparams import m_earth
 
 iterator = planet_iterator.Toolkit()
-##########################################################
 
-# Initialize a telluric planet instance with the specified properties
+```
+
+Initialize a telluric planet instance with the specified properties
+
+```python
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
+```
+Perform initial structure integration
 
-# Perform initial structure integration
+```python
 pl.construct()
+```
+Pass planet instance to iterator to match boundary conditions.
+Planetary objects passed to the iterator must be constructed!
 
-# Pass planet instance to iterator to match boundary conditions
-# NOTE. planetary objects passed to the iterator must be constructed!
+```python
 iterator.iterate(planet=pl, **iterator_specs)
+```
 
-# print fundamental planeatary properties to standard output
+Print fundamental planeatary properties to standard output
+```python
 pl.print()
-
-# Plot the radial P, T, M, and rho profiles
 pl.plot(save=True, file_name="structure_profiles", format="png")
-
 ```
 
 
