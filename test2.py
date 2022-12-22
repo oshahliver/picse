@@ -6,6 +6,7 @@ In this test we will create a planet using the new input parameter handler.
 from pics.interiors import planet_iterator
 from pics.interiors import planet_creator
 from pics.physicalparams import m_earth
+import os
 
 iterator = planet_iterator.Toolkit()
 
@@ -84,4 +85,12 @@ print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
 print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
 
 # # Plot the radial P, T, M, and rho profiles
-pl.plot(save=True, file_name="structure_profiles", format="png")
+file_path = os.getcwd()
+pl.plot(
+    file_name="structure_profiles",
+    file_path=file_path,
+    write_html=True,
+    display=True,
+    write_image=True,
+    image_extension="pdf",
+)

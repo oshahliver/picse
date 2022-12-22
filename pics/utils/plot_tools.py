@@ -7,11 +7,19 @@ import pandas as pd
 import numpy as np
 
 
-def plot_structure(profiles, file_name="structure"):
+def plot_structure(
+    profiles,
+    display=True,
+    file_name="structure",
+    file_path=".",
+    image_extension="pdf",
+    write_html=False,
+    write_image=False,
+):
     """Plots the structure profils of a planetary object"""
 
     df = pd.DataFrame(
-        np.array(profiles).T,
+        profiles.T,
         columns=[
             "radius",
             "temperature",
@@ -24,41 +32,65 @@ def plot_structure(profiles, file_name="structure"):
         ],
     )
 
-    scalings = [1e-3, 1., 1e-9, 1., 1./m_earth, 1., 1., 1.]
-
+    ncol = 3
+    nrow = 2
     fig = make_subplots(
-        rows=2, cols=2, shared_xaxes=True, horizontal_spacing=0.25, vertical_spacing=0.1
+        rows=nrow,
+        cols=ncol,
+        shared_xaxes=True,
+        horizontal_spacing=0.15,
+        vertical_spacing=0.1,
     )
 
-    fig.update_layout(height=500, width=600, showlegend=False)
-    params = [["temperature", "density"], ["pressure", "mass"]]
-    units = [["K", "km \ m^{-3}"], ["GPa", "\mathit{M_\oplus}"]]
+    fig.update_layout(height=500, width=800, showlegend=False)
+    scalings = [[1.0, 1.0, 1.0], [1e-9, 1.0 / m_earth, 1.0]]
+    params = [["temperature", "density", "gravity"], ["pressure", "mass", "moi"]]
+    labels = [["Temperature", "Density", "Gravity"], ["Pressure", "Mass", "Norm. MoI"]]
+    units = [
+        ["(K)", "(km \ m^{-3})", "(m \ s^{-2})"],
+        ["(GPa)", "(\mathit{M_\oplus})", ""],
+    ]
 
     for i in range(2):
-        for j in range(2):
+        for j in range(3):
+            ind = ncol * i + j
             fig.add_trace(
                 go.Scatter(
-                    x=df["radius"]*1e-3,
-                    y=df[params[i][j]]*scalings[i+2*j+1],
-                    line=dict(color="rgb{}".format(param_colors[2*i + j])),
+                    x=df["radius"] * 1e-3,
+                    y=df[params[i][j]] * scalings[i][j],
+                    line=dict(color="rgb{}".format(param_colors[ind])),
                 ),
                 row=i + 1,
                 col=j + 1,
             )
 
             if i + 2 * j > 0:
-                a = str(2 * i + j + 1)
+                a = str(ind + 1)
             else:
                 a = ""
 
-            fig["layout"]["yaxis{}".format(a)]["title"] = r"$\rm {} \ ({})$".format(
-                params[i][j].capitalize(), units[i][j]
+            fig["layout"]["yaxis{}".format(a)]["title"] = r"$\rm {} \ {}$".format(
+                labels[i][j], units[i][j]
             )
 
-    fig["layout"]["xaxis3"]["title"] = r"$\rm {} \ ({})$".format("Radius", "km")
-    fig["layout"]["xaxis4"]["title"] = r"$\rm {} \ ({})$".format("Radius", "km")
+    for i in range(ncol):
+        a = str(i + ncol + 1)
+        fig["layout"]["xaxis{}".format(a)]["title"] = r"$\rm {} \ ({})$".format(
+            "Radius", "km"
+        )
 
-    fig.show()
+    # Write to interactive html
+    if write_html:
+        print("writing html to", "{}/{}.html".format(file_path, file_name))
+        fig.write_html("{}/{}.html".format(file_path, file_name), include_mathjax="cdn")
+
+    # Save static image
+    if write_image:
+        fig.write_image("{}/{}.{}".format(file_path, file_name, image_extension))
+
+    # Display in browser
+    if display:
+        fig.show()
 
 
 def subplot_labeler(fig, labels):

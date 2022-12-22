@@ -44,6 +44,7 @@ setup(
     install_requires=[
         "astropy",
         "plotly",
+        "kaleido",
         "tabulate",
         "scipy",
         "scikit-learn",

@@ -600,6 +600,8 @@ class Planet:
         )
 
         self.update_layers(self.layer_properties_dummy)
+        self.trim_profiles()
+
         self.status = "very much alive"
 
     def trim_profiles(self):
@@ -623,25 +625,17 @@ class Planet:
             if i == self.shell_count + off:
                 break
 
-        self.profiles = prof
+        self.profiles = np.array(prof)
+
+        # normalize moi
+        self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is**2)
 
     def plot(
         self,
-        scatter=False,
-        layerColoring=False,
-        axis=[],
-        x_axis="radius",
-        save=True,
-        file_name="planet_structure",
-        format="pdf",
-        spec="",
-        file_dir="./",
-        prem=False,
         **kwargs,
     ):
 
-        self.trim_profiles()
-        plot_structure(self.profiles)
+        plot_structure(self.profiles, **kwargs)
 
 
 class TelluricPlanet(Planet):
