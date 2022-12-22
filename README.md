@@ -2,7 +2,7 @@
 
 ## General Information
 
-The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the University of Bern and the University of Zürich. It generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. For more information about the physics of the model see [[1]](#1).
+The PICS code (Planetary Interior Composition and Structure code) was developed during my joint PhD program at the University of Bern and the University of Zürich. It generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. For more information about the physics of the model see [[1][2]](#1).
 
 ## Installation
 
@@ -66,6 +66,10 @@ pl.plot()
 ## References
 <a id="1">[1]</a> 
 O. Shah, et al. (2021).
-Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation
+Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation.
 A&A 646, A162
 
+<a id="2">[2]</a> 
+Oliver Shah, et al. (2022).
+Possible Chemical Composition And Interior Structure Models Of Venus Inferred From Numerical Modelling.
+ApJ 926 217
