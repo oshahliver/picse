@@ -1305,7 +1305,7 @@ contains
 
 !Surface reached
       elseif (abs(param_should - param_is)/param_should .lt. eps) then
-         print *, 'Surface reached'
+         print *, 'Surface reached!'
 
          !The construct method has already updated the shell count for the next
          !iteration. However, this iteration will never take place as the

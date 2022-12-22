@@ -527,7 +527,7 @@ class Toolkit:
                 newval[i] = max(newval[i], sanity_borders[specs["how"][i]][0])
 
                 if abs(reldev[i]) <= specs["acc"][i]:
-                    print("\n --> Desired precission for ", specs["what"][i], " reached.")
+                    print("\n --> Desired precission for {} reached after initial iteration.".format(specs["what"][i]))
 
                 # M_core has to be treated seperately here as it is not an attribute
                 # of the Planet class but rather the first entry of layer_masses of a
@@ -815,9 +815,11 @@ class Toolkit:
                     pass
 
             if acc_reached_count == len(specs["how"]):
-                print("\n --> Desired precission for all parameters reached!")
+                print("\n --> Desired precission for all parameters reached after {} iterations!".format(count))
+                print("---------------------")
                 print("relative deviations =", reldev)
-                print("desired accuracies =", specs["acc"])
+                print("desired accuracies = {}".format(specs["acc"]))
+                print("---------------------")
                 self.iteration = False
 
             if count >= specs["iterationLimit"]:

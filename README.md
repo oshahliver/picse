@@ -13,8 +13,12 @@ Clone the git repository to a local directory via:
 ```
 git clone https://github.com/oshahliver/PICS.git
 ```
-Navigate to the project root ```pics``` and from there install the package from the ```setup.py``` file by typing:
+Navigate to the project root. From there you first have to build the static libraries for the extension modules:
 
+```
+make static
+```
+Then the package can be installed from the ```setup.py``` file as:
 ```
 python3 -m pip install .
 ```
