@@ -46,7 +46,7 @@ Perform initial structure integration
 ```python
 pl.construct()
 ```
-Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The ```acc``` key can be used to define the desired maximum relative deviation for boundary conditions. For base type "telluric" these are, by defautl, the total planetary mass and the surface temperature.
+Pass the planet instance to the iterator to match the boundary conditions. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following creates a one Earth mass planet with 300 K surface temperature with relative accuracies of 1%:
 
 ```python
 specs = dict(val_should=[1.0, 300.], acc=[0.01, 0.01])
