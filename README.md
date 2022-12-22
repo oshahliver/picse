@@ -6,7 +6,12 @@ The PICS code (Planetary Interior Composition and Structure code) was developed 
 
 ## Installation
 
-To install the package from the ```setup.py``` file simply type:
+Clone the git repository to a local directory via:
+
+```
+git clone https://github.com/oshahliver/PICS.git
+```
+Navigate to the project root ```pics``` and from there install the package from the ```setup.py``` file by typing:
 
 ```
 python3 -m pip install .
