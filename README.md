@@ -65,7 +65,7 @@ pl.plot()
 
 ## References
 <a id="1">[1]</a> 
-Dijkstra, E. W. (1968). 
-Go to statement considered harmful. 
-Communications of the ACM, 11(3), 147-148.
+O. Shah, et al. (2021).
+Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation
+A&A 646, A162
 
