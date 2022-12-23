@@ -122,9 +122,9 @@ pop.planets[which_planet].plot()
 
 2. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
 
-3. A interactive data structure with some basic analysis and visualization features.
+3. A interactive data structure with some basic analysis and visualization capabilities.
 
-4. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. the terrestrial planet in the Solar System or the Moons of Jupiter and Saturn.
+4. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
 
 ...
 
