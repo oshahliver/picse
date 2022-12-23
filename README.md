@@ -91,6 +91,14 @@ Create a population of 100 planets with the ```create``` method and using the ``
 pop.create(100, workbench.iterator)
 ```
 
+You can inspect members of the population by accessing the individual ```Planet``` instances:
+
+```python
+which_planet = 2
+pop.planets[which_planet].print()
+pop.planets[which_planet].plot()
+```
+
 ## Known issues
 
 ...

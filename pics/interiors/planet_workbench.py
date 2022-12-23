@@ -30,8 +30,12 @@ class Toolkit:
 class Population:
     def __init__(self, label=""):
         self.label = label
+        self.planets = []
 
-    def create(self, n, iterator):
+    def create(self, n, iterator, new = True):
+        if new:
+            self.planets = []
+
         with alive_bar(
             n, title=f"Creating population {self.label}", bar="bubbles", spinner="pulse"
         ) as bar:
@@ -43,6 +47,8 @@ class Population:
                 iterator.iterate(planet=pl)
                 sys.stdout = sys.__stdout__
                 bar()
+
+                self.planets.append(pl)
 
 
 class Sample:
