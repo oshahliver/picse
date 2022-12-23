@@ -42,8 +42,8 @@ pics/data/EoS_tables/eos_8_Fe_0_0_H2O_0_0_Al_0_0.tab
 pics/data/EoS_tables/eos_8_Fe_var_H2O_0_0_Al_0_0.tab
 pics/data/EoS_tables/eos_9_Fe_0_0_H2O_0_0_Al_0_0.tab
 pics/data/initial_conditions/__init__.py
-pics/data/initial_conditions/models_no_ocean.pkl
-pics/data/initial_conditions/models_with_ocean.pkl
+pics/data/initial_conditions/predictor_aqua.pkl
+pics/data/initial_conditions/predictor_telluric.pkl
 pics/data/initial_conditions/test_data.tab
 pics/interiors/Cammarano_2006.py
 pics/interiors/MOI_model.py
@@ -81,6 +81,7 @@ pics/utils/PIMPtools.py
 pics/utils/PlotComparison.py
 pics/utils/__init__.py
 pics/utils/analytical_functions.py
+pics/utils/calibration_tools.py
 pics/utils/context_manager.py
 pics/utils/fpy_interface.py
 pics/utils/functionTools.py

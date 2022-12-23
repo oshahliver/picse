@@ -22,6 +22,8 @@ bisectionstep_limit = 15
 bisection_counter_list = []
 bisectionstep_counter_list = []
 
+supported_base_types = ["telluric", "aqua"]
+
 initial_predictor_keys = [
     "M_surface_should",
     "Mg_number_should",

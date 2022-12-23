@@ -20,9 +20,11 @@ from pics.runparams import (
     initial_predictor_keys,
     fortplanet_keys_translator,
     fortplanet_output_keys,
+    supported_base_types
 )
 
 from pics.utils.initial_conditions import predict_initials
+from pics.utils.internal_data import get_predictor_model
 from pics.utils import fortplanet, fortfunctions
 from pics.materials import Material
 from pics.physicalparams import (
@@ -47,10 +49,31 @@ from pics.physicalparams import (
     material_list,
 )
 
-
 def load_eos_tables(**kwargs):
+    """ Loads the equation of state tables into memory for subsequent use during
+    the structure integration.
+
+    TODO. Handle internally!
+    """
     fortplanet.wrapper.load_eos_tables(table_dir=get_eos_dir())
 
+
+def load_predictors(**kwargs):
+    """ Loads the pre-calibrated predictor models for the different base types for
+    predicting the initial conditions for the initial structure integration during
+    the iteration process.
+
+    TODO. Handle internally!
+    """
+
+    predictors = {}
+    for bt in supported_base_types:
+        mod = get_predictor_model("predictor_{}.pkl".format(bt))
+        predictors.update({bt:mod})
+
+    return predictors
+
+predictors = load_predictors()
 
 class Parameters:
     def __init__(self, default_values):
@@ -236,7 +259,7 @@ class AllInputParams(RunInputParams, PlanetaryInputParams):
 
 
 class Planet:
-    def __init__(self, label="A random planet", **kwargs):
+    def __init__(self, predictor, label="A random planet", **kwargs):
         # self.default_values = {}
         # self.default_values.update(planetary_params.default_values)
         # self.default_values.update(run_params.default_values)
@@ -245,6 +268,7 @@ class Planet:
         self.label = label
         self.vapor_reached = False
         self.status = "shadow of the future"
+        self.predictor = 'predictor_{}.pkl'.format(predictor) # points to the predictor model for the iterator
 
     def set_values(self, default=False, **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
@@ -293,7 +317,10 @@ class Planet:
         # prediction for core mass is not relevant for basic models as it
         # is uniquely defined from the bulk composition in this case
         kwargs_pred = dict([key, self.__dict__[key]] for key in initial_predictor_keys)
-        tc, pc, mc = predict_initials(**kwargs_pred)
+        
+        print ("\nusing predictor", predictors[self.label])
+        print ("all predictors =", predictors)
+        tc, pc, mc = predict_initials(predictors[self.label], **kwargs_pred)
         pc *= 1e9  # convert to Pa
         self.T_center = tc
         self.P_center = pc
@@ -518,10 +545,12 @@ class Planet:
         pass
 
 
-class BaseTypePlanet(Planet):
+class CustomPlanet(Planet):
+    # TODO. Create interface to customize CustomPlanet types 
     def __init__(self, label, planetary_params={}, run_params={}):
+        predictor = "{}.pkl".format(label)
 
-        Planet.__init__(self, label=label)
+        Planet.__init__(self, predictor, label=label)
 
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -539,74 +568,40 @@ class BaseTypePlanet(Planet):
 
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
+
+class BaseTypePlanet(Planet):
+    def __init__(self, label, planetary_params={}, run_params={}):
+        predictor = "predictor_{}.pkl".format(label) 
+        Planet.__init__(self, predictor, label=label)
+
+        pp = PlanetaryInputParams(type=self.label)
+        rp = RunInputParams(type=self.label)
+
+        pp.set_default_values()
+        rp.set_default_values()
+
+        # update planetary parameters if passed by user
+        for key, val in planetary_params.items():
+            pp.default_values.update({key: val})
+
+        # update run parameters if passed by user
+        for key, val in run_params.items():
+            rp.default_values.update({key: val})
+
+        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
+
+
 class TelluricPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
         BaseTypePlanet.__init__(self, label = "telluric", planetary_params=planetary_params, run_params=run_params)
-        # Planet.__init__(self, label="telluric")
-
-        # pp = PlanetaryInputParams(type=self.label)
-        # rp = RunInputParams(type=self.label)
-
-        # pp.set_default_values()
-        # rp.set_default_values()
-
-        # # update planetary parameters if passed by user
-        # for key, val in planetary_params.items():
-        #     pp.default_values.update({key: val})
-
-        # # update run parameters if passed by user
-        # for key, val in run_params.items():
-        #     rp.default_values.update({key: val})
-
-        # Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
 class AquaPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
         BaseTypePlanet.__init__(self, label = "aqua", planetary_params=planetary_params, run_params=run_params)
 
-class CustomPlanet(BaseTypePlanet):
+class YourPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
         BaseTypePlanet.__init__(self, label = "custom", planetary_params=planetary_params, run_params=run_params)
         
-        # Add here some custom planet specifications if you wish...
-
-# class AquaPlanet(Planet):
-#     def __init__(self, planetary_params={}, run_params={}):
-#         Planet.__init__(self, label="aqua")
-
-#         pp = PlanetaryInputParams(type=self.label)
-#         rp = RunInputParams(type=self.label)
-
-#         pp.set_default_values()
-#         rp.set_default_values()
-
-#         # update planetary parameters if passed by user
-#         for key, val in planetary_params.items():
-#             pp.default_values.update({key: val})
-
-#         # update run parameters if passed by user
-#         for key, val in run_params.items():
-#             rp.default_values.update({key: val})
-
-#         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
-
-
-class CustomPlanet(Planet):
-    def __init__(self, planetary_parameters={}, run_parameters={}):
-        raise NotImplementedError("Custom type planets will be available soon!")
-        default_values1 = {
-            "ocean_fraction_should": 0.25,
-            "Mg_number_should": 0.6,
-            "T_surface_should": 320,
-            "Fe_number_mantle": 0.15,
-        }
-
-        default_values2 = {"adiabat_type": 0}
-
-        default_values1.update(planetary_parameters)
-        Planet.__init__(self, label="custom")
-        pp = PlanetaryInputParams(type=self.label, default_values=default_values1)
-        rp = RunInputParams(type=self.label, default_values=default_values2)
-        pp.set_default_values()
-        rp.set_default_values()
-        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
+        # Create your own features and specifications here if you want ...
+    
