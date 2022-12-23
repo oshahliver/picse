@@ -90,7 +90,7 @@ Create a ```Population``` instance.
 pop = planet_workbench.Population()
 ```
 
-Set up a population of 20 telluric planets between 1 and 2 Earth masses.
+Set up a population of 20 telluric planets uniformely sampled between 1 and 2 Earth masses.
 
 ```python
 ppr = dict(M_surface_should = [1.0, 2.0])
@@ -115,7 +115,16 @@ pop.planets[which_planet].plot()
 
 ...
 
-## Features under development
+## Coming soon
+
+
+1. ```MassRadius``` class for super simple and straight forward creation of mass radius diagrams.
+
+2. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
+
+3. A interactive data structure with some basic analysis and visualization features.
+
+4. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. the terrestrial planet in the Solar System or the Moons of Jupiter and Saturn.
 
 ...
 

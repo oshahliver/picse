@@ -9,3 +9,4 @@ pandas
 seafreeze
 iapws
 matplotlib
+alive_progress

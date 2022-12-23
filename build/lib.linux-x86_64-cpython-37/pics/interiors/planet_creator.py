@@ -614,6 +614,13 @@ class AquaPlanet(BaseTypePlanet):
         )
 
 
+class PureSphere(BaseTypePlanet):
+    def __init__(self, planetary_params={}, run_params={}):
+        BaseTypePlanet.__init__(
+            self, label="pure", planetary_params=planetary_params, run_params=run_params
+        )
+
+
 class YourPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
         BaseTypePlanet.__init__(
@@ -624,3 +631,4 @@ class YourPlanet(BaseTypePlanet):
         )
 
         # Create your own features and specifications here if you want ...
+
