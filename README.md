@@ -97,7 +97,7 @@ ppr = dict(M_surface_should = [1.0, 2.0])
 pop.set_up(20, planetary_params_ranges = ppr)
 ```
 
-Create the members of the population with the ```create``` method and using the ```iterator``` instance automatically created by the ```planet_workbench.Toolkit``` instance
+Create the members of the population with the ```create``` method and using the ```iterator``` instance automatically created by the ```planet_workbench.Toolkit``` instance (Note. you may also pass another iterator instance. This allows you to create the same population with different iterators and can be useful for debugging or comparison of different iterator strategies).
 
 ```python
 pop.create(workbench.iterator)
