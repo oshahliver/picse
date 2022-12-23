@@ -25,7 +25,7 @@ pps = {"T_surface_should": 356.0}
 # Model creation and execution
 #######################################################################
 
-pop = planet_workbench.Population()
+pop = planet_workbench.Population(tag = "example", base_type = "telluric")
 pop.set_up(20, planetary_params_ranges=ppr, planetary_params=pps)
 pop.create(workbench.iterator)
 

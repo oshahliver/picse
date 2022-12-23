@@ -8,8 +8,7 @@ import sys
 import numpy as np
 import os
 import copy
-from progress.bar import Bar
-from progressbar import progressbar
+
 from alive_progress import alive_bar
 
 planet_creator.load_eos_tables()
@@ -36,6 +35,13 @@ class Population:
         self.ready = False
         self.base_type = base_type
 
+        if base_type == "telluric":
+            self.planet_class = planet_creator.TelluricPlanet
+        elif base_type == "aqua":
+            self.planet_class = planet_creator.AquaPlanet
+        else:
+            raise ValueError("Passed unknown base tpye <{base_type}> to Population")
+
     def set_up(
         self,
         n,
@@ -44,8 +50,10 @@ class Population:
         iterator_specs={},
         planetary_params={},
     ):
-        self.ready = True
+        
         self.n_planets = n
+
+        # perform random sampling within ranges for all specified parameters
         self.planetary_params_all = {
             key: np.random.default_rng().uniform(val[0], val[1], self.n_planets)
             for key, val in planetary_params_ranges.items()
@@ -54,6 +62,7 @@ class Population:
         self.run_params = run_params
         self.iterator_specs = iterator_specs
         self.planetary_params = planetary_params
+        self.ready = True
 
     def create(self, iterator, new=True):
         if not self.ready:
@@ -69,7 +78,7 @@ class Population:
 
             with alive_bar(
                 self.n_planets,
-                title=f"Creating population {self.tag}",
+                title=f"Creating population <{self.tag}>",
                 bar="bubbles",
                 spinner="pulse",
             ) as bar:
@@ -83,18 +92,10 @@ class Population:
                     # temporarely supress all prints
                     sys.stdout = open(os.devnull, "w")
 
-                    # TODO. bad --> let the workbench figure out the right planet class from the label
-                    if self.base_type == "telluric":
-                        pl = planet_creator.TelluricPlanet(
-                            planetary_params=planetary_params,
-                            run_params=self.run_params,
-                        )
-
-                    elif self.base_type == "aqua":
-                        pl = planet_creator.AquaPlanet(
-                            planetary_params=planetary_params,
-                            run_params=self.run_params,
-                        )
+                    pl = self.planet_class(
+                        planetary_params=planetary_params,
+                        run_params=self.run_params,
+                    )
 
                     pl.construct()
                     iterator.iterate(planet=pl, iterator_specs=self.iterator_specs)
@@ -112,5 +113,9 @@ class Sample:
 
 
 class MassRadius(Sample):
+    def __init__(self):
+        pass
+
+class SpecificObject(Sample):
     def __init__(self):
         pass
