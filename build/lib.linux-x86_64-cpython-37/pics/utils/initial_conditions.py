@@ -17,7 +17,7 @@ def predict_initials(
 ):
 
     xi_Fe_core = fractions[1][0]
-    
+
     models = get_predictor_model(model_name)
 
     # Loop over parameters to be predicted

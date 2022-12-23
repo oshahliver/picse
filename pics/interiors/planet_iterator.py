@@ -79,33 +79,35 @@ class Toolkit:
         ]
 
     def get_specs(self, planet, omit=[]):
+        iterator_specs = {
+            "what": ["M_surface", "T_surface"],  # --> target properties
+            "how": ["P_center", "T_center"],  # --> adjustable properties
+            "val_should": [
+                planet.M_surface_should * m_earth,
+                planet.T_surface_should,
+            ],  # --> target values
+            "predictor": ["linear", "linear"],  # --> no effect at this point
+            "all_val_should_weights": [
+                "log",
+                "log",
+            ],  # --> log or lin extrapolation for targets
+            "all_howval_weights": [
+                "exp",
+                "exp",
+            ],  # --> exp or lin prediction for adjustables
+            "acc": [1e-3, 1e-2],  # --> desired relative accuracies
+            "iterationLimit": 20,  # --> max. number of iterations
+            "deltaType": 0,  # --> mode for initial adjustment of adjustables
+            "unpredictable": False,  # --> no effect at this point
+        }
         if planet.label == "telluric":
-            iterator_specs = {
-                "what": ["M_surface", "T_surface"],  # --> target properties
-                "how": ["P_center", "T_center"],  # --> adjustable properties
-                "val_should": [
-                    planet.M_surface_should * m_earth,
-                    planet.T_surface_should,
-                ],  # --> target values
-                "predictor": ["linear", "linear"],  # --> no effect at this point
-                "all_val_should_weights": [
-                    "log",
-                    "log",
-                ],  # --> log or lin extrapolation for targets
-                "all_howval_weights": [
-                    "exp",
-                    "exp",
-                ],  # --> exp or lin prediction for adjustables
-                "acc": [1e-3, 1e-2],  # --> desired relative accuracies
-                "iterationLimit": 20,  # --> max. number of iterations
-                "deltaType": 0,  # --> mode for initial adjustment of adjustables
-                "unpredictable": False,  # --> no effect at this point
-            }
+            pass
 
         else:
-            raise NotImplementedError(
-                "Iterator does not support base type {} yet".format(planet.label)
-            )
+            pass
+            # raise NotImplementedError(
+            #     "Iterator does not support base type {} yet".format(planet.label)
+            # )
 
         return iterator_specs
 
@@ -238,7 +240,7 @@ class Toolkit:
         self,
         planet=None,
         **kwargs
-        # 
+        #
         # what=["M_surface"],
         # how=["P_center"],
         # val_should=[1.0 * m_earth],
@@ -300,18 +302,18 @@ class Toolkit:
 
         else:
             pass
-        
+
         specs = self.get_specs(planet)
-        
+
         # Update all specifications that are passed manually by the user
         if "iterator_specs" in kwargs:
             for key, val in kwargs["iterator_specs"].items():
                 if key in self.iterator_specs:
-                   
-                    specs.update({key:val})
+
+                    specs.update({key: val})
 
                 else:
-                    raise KeyError("Invalid iterator specification given")       
+                    raise KeyError("Invalid iterator specification given")
 
         passives = []
         passive_predictors = []
@@ -394,7 +396,10 @@ class Toolkit:
 
         val_is = [all_what[w + "_is"] for w in specs["what"]]
 
-        reldev = [(specs["val_should"][i] - val_is[i]) / specs["val_should"][i] for i in range(len(specs["what"]))]
+        reldev = [
+            (specs["val_should"][i] - val_is[i]) / specs["val_should"][i]
+            for i in range(len(specs["what"]))
+        ]
         direction = [[0, 0] for w in specs["what"]]
 
         self.already_met = [0 for i in range(len(specs["what"]))]
@@ -435,7 +440,9 @@ class Toolkit:
                             print("Condition already met")
                             print("reldev =", reldev[i])
                             self.delta[i] = (
-                                initial_deltas[specs["how"][i]] * all_how[specs["how"][i]] / 2.0
+                                initial_deltas[specs["how"][i]]
+                                * all_how[specs["how"][i]]
+                                / 2.0
                             )
                             self.already_met[i] = 1
 
@@ -451,7 +458,8 @@ class Toolkit:
                         elif direction[i][0] * reldev[i] > specs["acc"][i]:
                             direction[i][1] = 1
                             self.delta[i] = (
-                                -initial_deltas[specs["how"][i]] * planet.layer_masses[1]
+                                -initial_deltas[specs["how"][i]]
+                                * planet.layer_masses[1]
                             )
 
                         # accuracy already met
@@ -465,11 +473,15 @@ class Toolkit:
                         # initial central pressure too low -> iteration direction up
                         if direction[i][0] * reldev[i] < -specs["acc"][i]:
                             direction[i][1] = -1
-                            self.delta[i] = initial_deltas[specs["how"][i]] * planet.P_center
+                            self.delta[i] = (
+                                initial_deltas[specs["how"][i]] * planet.P_center
+                            )
 
                         elif direction[i][0] * reldev[i] > specs["acc"][i]:
                             direction[i][1] = 1
-                            self.delta[i] = -initial_deltas[specs["how"][i]] * planet.P_center
+                            self.delta[i] = (
+                                -initial_deltas[specs["how"][i]] * planet.P_center
+                            )
 
                         else:
                             self.delta[i] = 0.0
@@ -486,7 +498,10 @@ class Toolkit:
                 ):
                     # State dependency of target on probed parameter
                     # negative means target increases with increasing parameter
-                    if specs["what"][i] == "M_ocean" or specs["what"][i] == "ocean_frac":
+                    if (
+                        specs["what"][i] == "M_ocean"
+                        or specs["what"][i] == "ocean_frac"
+                    ):
                         direction[i] = [-1, None]
 
                     else:
@@ -495,18 +510,26 @@ class Toolkit:
                     # initial guess for central value too low
                     if direction[i][0] * reldev[i] < -specs["acc"][i]:
                         direction[i][1] = -1
-                        self.delta[i] = initial_deltas[specs["how"][i]] * all_how[specs["how"][i]]
+                        self.delta[i] = (
+                            initial_deltas[specs["how"][i]] * all_how[specs["how"][i]]
+                        )
 
                     # initial guess for central value too high
                     elif direction[i][0] * reldev[i] > specs["acc"][i]:
                         direction[i][1] = 1
-                        self.delta[i] = -initial_deltas[specs["how"][i]] * all_how[specs["how"][i]]
+                        self.delta[i] = (
+                            -initial_deltas[specs["how"][i]] * all_how[specs["how"][i]]
+                        )
 
                     # accuracy already met
                     else:
                         print("Condition already met")
                         print("reldev =", reldev[i])
-                        self.delta[i] = initial_deltas[specs["how"][i]] * all_how[specs["how"][i]] / 2.0
+                        self.delta[i] = (
+                            initial_deltas[specs["how"][i]]
+                            * all_how[specs["how"][i]]
+                            / 2.0
+                        )
                         self.already_met[i] = 1
 
                     print("initial delta =", self.delta[i])
@@ -523,11 +546,17 @@ class Toolkit:
 
                 # force newval to stay within the defined value ranges for the
                 # currently iterated parameter
-                newval[i] = min(all_how[specs["how"][i]], sanity_borders[specs["how"][i]][1])
+                newval[i] = min(
+                    all_how[specs["how"][i]], sanity_borders[specs["how"][i]][1]
+                )
                 newval[i] = max(newval[i], sanity_borders[specs["how"][i]][0])
 
                 if abs(reldev[i]) <= specs["acc"][i]:
-                    print("\n --> Desired precission for {} reached after initial iteration.".format(specs["what"][i]))
+                    print(
+                        "\n --> Desired precission for {} reached after initial iteration.".format(
+                            specs["what"][i]
+                        )
+                    )
 
                 # M_core has to be treated seperately here as it is not an attribute
                 # of the Planet class but rather the first entry of layer_masses of a
@@ -595,7 +624,8 @@ class Toolkit:
             all_what, all_how = self.all_params(planet)
             val_is = [all_what[w + "_is"] for w in specs["what"]]
             reldev = [
-                (specs["val_should"][i] - val_is[i]) / specs["val_should"][i] for i in range(len(specs["how"]))
+                (specs["val_should"][i] - val_is[i]) / specs["val_should"][i]
+                for i in range(len(specs["how"]))
             ]
 
             if len(self.passives) > 0:
@@ -640,7 +670,7 @@ class Toolkit:
 
             # Size of coefficient vector for multi-linear predictor
             n_coeffs = 2 ** len(specs["how"])
-     
+
             # print("oldwhatvals =", self.oldwhatvals)
             linsys = mgen.LinearSystem(
                 self.oldwhatvals[-(2 ** len(specs["how"])) :],
@@ -663,7 +693,7 @@ class Toolkit:
                 linsys.create_model()
                 linsys.predict()
                 newval = linsys.pred
-           
+
             except np.linalg.LinAlgError as err:
                 if "Singular matrix" in str(err):
                     print("Singular matrix")
@@ -722,7 +752,11 @@ class Toolkit:
                 ):
                     self.iteration = False
                     exitcode = 1
-                    print("WARNING: Ceiling for parameter " + specs["how"][i] + " reached.")
+                    print(
+                        "WARNING: Ceiling for parameter "
+                        + specs["how"][i]
+                        + " reached."
+                    )
                     print("vapor =", planet.vapor_reached)
                     print("T / P =", planet.T_surface_is, planet.P_surface_is * 1e-5)
             # print ('a =', a)
@@ -767,7 +801,9 @@ class Toolkit:
 
                 if np.isnan(newval[i]):
                     self.iteration = False
-                    print("WARNING: " + specs["how"][i] + " is NaN. Aborting iteration...")
+                    print(
+                        "WARNING: " + specs["how"][i] + " is NaN. Aborting iteration..."
+                    )
                     exitcode = 3
             """          
             try:
@@ -815,7 +851,11 @@ class Toolkit:
                     pass
 
             if acc_reached_count == len(specs["how"]):
-                print("\n --> Desired precission for all parameters reached after {} iterations!".format(count))
+                print(
+                    "\n --> Desired precission for all parameters reached after {} iterations!".format(
+                        count
+                    )
+                )
                 print("---------------------")
                 print("relative deviations =", reldev)
                 print("desired accuracies = {}".format(specs["acc"]))

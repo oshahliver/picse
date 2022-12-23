@@ -10,6 +10,7 @@ from pics.utils.print_tools import print_planet
 from pics.utils.plot_tools import plot_structure
 from tabulate import tabulate
 from pics.utils.internal_data import get_eos_dir
+from pics.interiors import core_creator
 
 # from pics.utils import functionTools as ftool
 import numpy as np
@@ -45,6 +46,7 @@ from pics.physicalparams import (
     mH2O,
     material_list,
 )
+
 
 def load_eos_tables(**kwargs):
     fortplanet.wrapper.load_eos_tables(table_dir=get_eos_dir())
@@ -132,83 +134,60 @@ class RunOutputParams(Parameters):
 
 class PlanetaryInputParams(Parameters):
     def __init__(self, type="telluric", **kwargs):
+        self.default_values = {
+            "Si_number_mantle": 0.4,
+            "Fe_number_mantle": 0.0,
+            "M_surface_should": 1.0,
+            "Mg_number_should": 0.5,
+            "T_surface_should": 300.0,
+            "P_surface_should": 1e5,
+            "R_surface_should": 1.0,
+            "ocean_fraction_should": -10,
+            "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
+            "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
+            "layer_masses": [0.25, 0.25, 0.0, 100.0],
+            "temperature_jumps": [0., 0., 0., 0.],
+            "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26],
+            "debye_exponents_layers": [0.91, 0.91, 2.5, 2.9],
+            "total_energy_should": 0,
+            "luminosity_int_should": 0,
+            "luminosity_eff_should": 0,
+            "layer_pressures": [0, 0, 25.0e9, 0],
+            "layer_radii": [0, 0, 0, 0],
+            "layer_temperatures": [0, 0, 0, 0],
+            "rotation_velocity": 0.0,
+            "core_segregation_pressure": 0.0,
+            "spin": 0.0,
+            "x_all_core": [],
+            "eta_all_core": [],
+        }
 
         if type == "telluric":
-            self.default_values = {
-                "Si_number_mantle": 0.4,
-                "Fe_number_mantle": 0.0,
-                "M_surface_should": 1.0,
-                "Mg_number_should": 0.5,
-                "T_surface_should": 300.0,
-                "P_surface_should": 1e5,
-                "R_surface_should": 1.0,
-                "ocean_fraction_should": -10,
-                "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
-                "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
-                "layer_masses": [0.25, 0.25, 0.0, 100.0],
-                "temperature_jumps": [0, 0, 0, 0],
-                "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26, 1.0],
-                "debye_exponents_layers": [0.91, 0.91, 2.5, 2.9, 1.0],
-                "total_energy_should": 0,
-                "luminosity_int_should": 0,
-                "luminosity_eff_should": 0,
-                "layer_pressures": [0, 0, 25.0e9, 0],
-                "layer_radii": [0, 0, 0, 0],
-                "layer_temperatures": [0, 0, 0, 0],
-                "rotation_velocity": 0.0,
-                "core_segregation_pressure": 0.0,
-                "spin": 0.0,
-                "x_all_core": [],
-                "eta_all_core": [],
-            }
-
+            pass
+ 
         elif type == "aqua":
-            self.default_values = {
-                "Si_number_mantle": 0.4,
-                "Fe_number_mantle": 0.0,
-                "M_surface_should": 1.0,
-                "Mg_number_should": 0.5,
-                "T_surface_should": 300.0,
-                "P_surface_should": 1e5,
-                "ocean_fraction_should": 0.1,
-                "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]],
-                "fractions": [
+            # Add additional layer for the hydrosphere
+            
+            new_specs = dict(
+                contents=[[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]],
+                fractions=[
                     [1.0],
                     [1.0, 0.0, 0.0, 0.0, 0.0],
                     [0.5, 0.5],
                     [0.5, 0.5],
                     [1.0],
                 ],
-                "layermasses": [0.5, 0.5, 0.0, 0.0, 100.0],
-            }
-
-        elif type == "inferno":
-            self.default_values = {
-                "Si_number_mantle": 0.4,
-                "Fe_number_mantle": 0.0,
-                "M_surface_should": 1.0,
-                "Mg_number_should": 0.5,
-                "T_surface_should": 1000.0,
-                "P_surface_should": 1e5,
-                "ocean_fraction_should": 0.0,
-                "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
-                "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
-                "layermasses": [0.5, 0.5, 0.0, 100.0],
-            }
-
-        elif type == "ice":
-            self.default_values = {
-                "Si_number_mantle": 0.4,
-                "Fe_number_mantle": 0.0,
-                "M_surface_should": 1.0,
-                "Mg_number_should": 0.5,
-                "T_surface_should": 200.0,
-                "P_surface_should": 1e5,
-                "ocean_fraction_should": 0.1,
-                "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
-                "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
-                "layermasses": [0.5, 0.5, 0.0, 100.0],
-            }
+                ocean_fraction_should=np.log10(0.05),
+                layer_pressures = [0., 0., 25.0e9, 0., 0.],
+                debye_exponents_layers = [0.91, 0.91, 2.5, 2.9, 1.0],
+                grueneisen_gammas_layers = [1.36, 1.36, 1.96, 1.26, 1.0],
+                temperature_jumps = [0., 0., 0., 0., 0.],
+                layer_radii = [0., 0., 0., 0., 0.],
+            )
+            mantle_mass = self.default_values["M_surface_should"] * (1. - 10**new_specs["ocean_fraction_should"])
+            new_specs.update({"layer_masses": [0.25, 0.25, mantle_mass, mantle_mass, 100.0]})
+            
+            self.default_values.update(new_specs)
 
         else:
 
@@ -218,34 +197,13 @@ class PlanetaryInputParams(Parameters):
                 )
 
             else:
-                self.default_values = {
-                    "Si_number_mantle": 0.4,
-                    "Fe_number_mantle": 0.0,
-                    "M_surface_should": 1.0,
-                    "Mg_number_should": 0.5,
-                    "T_surface_should": 300.0,
-                    "P_surface_should": 1e5,
-                    "ocean_fraction_should": 0.0,
-                    "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
-                    "fractions": [
-                        [1.0],
-                        [1.0, 0.0, 0.0, 0.0, 0.0],
-                        [0.5, 0.5],
-                        [0.5, 0.5],
-                    ],
-                    "layermasses": [0.5, 0.5, 0.0, 100.0],
-                    "temperature_jumps": [0, 0, 0, 0],
-                    "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26, 1.0],
-                    "debye_exponents": [0.91, 0.91, 2.5, 2.9, 1.0],
-                }
-
                 self.default_values.update(kwargs["default_values"])
 
         Parameters.__init__(self, self.default_values)
 
 
 class RunInputParams(Parameters):
-    def __init__(self, **kwargs):
+    def __init__(self, type="telluric", **kwargs):
         self.default_values = {
             "adiabat_type": 0,
             "layer_constraints": [1, 1, 3, 1],
@@ -260,6 +218,14 @@ class RunInputParams(Parameters):
             "seed_radius": 0.1,
             "initial_predictor": 0,
         }
+
+        if type == "telluric":
+            pass
+            
+        elif type == "aqua":
+            # Add additional layer for the hydrosphere
+            new_specs = dict(layer_constraints = [1,1,3,1,1])
+            self.default_values.update(new_specs)
 
         Parameters.__init__(self, self.default_values)
 
@@ -337,15 +303,20 @@ class Planet:
             0.0,
             self.Si_number_mantle,
             self.Si_number_mantle,
-            0.0,
+            
         ]
         self.Fe_number_layers = [
             1.0,
             1.0,
             self.Fe_number_mantle,
             self.Fe_number_mantle,
-            0.0,
+            
         ]
+
+        if self.label == "aqua":
+            self.Si_number_layers.append(0.)
+            self.Fe_number_layers.append(0.)
+
         self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
 
         print("predicted central values are:", tc, pc, mc)
@@ -386,117 +357,22 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
-    def compute_core_mass(self, n=3, M_IC=0.0, xi_all_core=[]):
+    def compute_core_mass(self, n=3, M_IC=0.0):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
 
-        # print (contents, Mg_number, M_surface, Mg_number_mantle, SiMg, M_ocean, xi_H_core)
-        Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.9999999999)
-        FeMg_mantle = (1.0 - Mg_number_mantle) / Mg_number_mantle
-        FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
-        SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
-
-        # Compute the fractions in the mantle
-        fractions = fortfunctions.functionspy.compute_abundance_vector(
-            simg=SiMg,
-            femg=FeMg_mantle,
-            n_mats=len(self.contents[n]),
-            ymgi=[material_YMg[i - 1] for i in self.contents[n]],
-            ysii=[material_YSi[i - 1] for i in self.contents[n]],
-            xih2oi=[0.0 for i in self.contents[n]],
-            xifei=[1.0 - Mg_number_mantle for i in self.contents[n]],
-            xialsii=[0.0 for i in self.contents[n]],
-            xialmgi=[0.0 for i in self.contents[n]],
-            contents=self.contents[n],
-            additional=[],
-        )
-        # print ("fractions in compute core mass =", fractions)
-
-        # Count
-        # Note that the indices are shifted by one because the original definition
-        # of the arrays comes from the fortran code.
-        Q1 = sum(
-            [
-                fractions[i] * Mg_number_mantle * material_YMg[self.contents[n][i] - 1]
-                for i in range(len(self.contents[n]))
-            ]
+        params = dict(
+            M_surface_should=self.M_surface_should,
+            Mg_number_should=self.Mg_number_should,
+            contents=self.contents,
+            Fe_number_mantle=self.Fe_number_mantle,
+            Si_number_mantle=self.Si_number_mantle,
+            ocean_fraction_should=self.ocean_fraction_should,
+            x_all_core=self.x_all_core,
         )
 
-        # Compute total normalized mass in the mantle
-        Q2 = (
-            sum(
-                [
-                    fractions[i]
-                    * Mg_number_mantle
-                    * material_YMg[self.contents[n][i] - 1]
-                    for i in range(len(self.contents[n]))
-                ]
-            )
-            * mMg
-            + sum(
-                [
-                    fractions[i]
-                    * (1.0 - Mg_number_mantle)
-                    * material_YMg[self.contents[n][i] - 1]
-                    for i in range(len(self.contents[n]))
-                ]
-            )
-            * mFe
-            + sum(
-                [
-                    fractions[i] * material_YSi[self.contents[n][i] - 1]
-                    for i in range(len(self.contents[n]))
-                ]
-            )
-            * mSi
-            + sum(
-                [
-                    fractions[i] * material_YO[self.contents[n][i] - 1]
-                    for i in range(len(self.contents[n]))
-                ]
-            )
-            * mO
-            + sum(
-                [
-                    fractions[i] * material_YH[self.contents[n][i] - 1]
-                    for i in range(len(self.contents[n]))
-                ]
-            )
-            * mH
-        )
-
-        Q3 = sum(
-            [
-                fractions[i]
-                * (1.0 - Mg_number_mantle)
-                * material_YMg[self.contents[n][i] - 1]
-                for i in range(len(self.contents[n]))
-            ]
-        )
-
-        # Q4 = 1. #- xi_H_core
-        # Q5 = (mFe + xi_S_core*mS)#*(1.-xi_H_core) + xi_H_core*mH
-        # core_frac = (1.-M_ocean/self.M_surface_should)*(Q1/Q2-self.Mg_number_should*(Q1/Q2+Q3/Q2))/\
-        #             (self.Mg_number_should*(Q4/Q5-Q1/Q2-Q3/Q2)+Q1/Q2)
-
-        Q4 = self.x_all_core[0]
-        m_core = [mFe, mH, mS, mSi, mO]
-        Q5 = sum([m_core[i] * self.x_all_core[i] for i in range(len(self.x_all_core))])
-
-        # print ('Q =', Q1, Q2, Q3, Q4, Q5)
-        # core_frac = 1.0 - 10**self.ocean_fraction_should
-        # core_frac *= Q1 / Q2 - self.Mg_number_should * (Q1 / Q2 + Q3 / Q2)
-        # core_frac /= self.Mg_number_should * (Q4 / Q5 - Q1 / Q2 - Q3 / Q2) + Q1 / Q2
-        # print ('core mass old =', core_frac * self.M_surface_should)
-
-        core_frac = 1.0 - 10**self.ocean_fraction_should
-        core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
-        core_frac += M_IC / self.M_surface_should * (1.0 / mFe - Q4 / Q5)
-        core_frac /= Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2
-        # print ('core mass new =', core_frac * self.M_surface_should)
-        # print ('')
-        return core_frac * self.M_surface_should
+        return core_creator.compute_core_mass(params, n=n, M_IC=M_IC)
 
     def update(self, default=False):
         """Computes all dependant planetary parameters"""
@@ -665,35 +541,23 @@ class TelluricPlanet(Planet):
 
 
 class AquaPlanet(Planet):
-    def __init__(self):
-        raise NotImplementedError("Aqua planets will be available soon!")
+    def __init__(self, planetary_params={}, run_params={}):
         Planet.__init__(self, label="aqua")
+
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
+
         pp.set_default_values()
         rp.set_default_values()
-        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
+        # update planetary parameters if passed by user
+        for key, val in planetary_params.items():
+            pp.default_values.update({key: val})
 
-class InfernoPlanet(Planet):
-    def __init__(self):
-        raise NotImplementedError("Inferno planets will be available soon!")
-        Planet.__init__(self, label="inferno")
-        pp = PlanetaryInputParams(type=self.label)
-        rp = RunInputParams(type=self.label)
-        pp.set_default_values()
-        rp.set_default_values()
-        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
+        # update run parameters if passed by user
+        for key, val in run_params.items():
+            rp.default_values.update({key: val})
 
-
-class IcePlanet(Planet):
-    def __init__(self):
-        raise NotImplementedError("Ice planets will be available soon!")
-        Planet.__init__(self, label="ice")
-        pp = PlanetaryInputParams(type=self.label)
-        rp = RunInputParams(type=self.label)
-        pp.set_default_values()
-        rp.set_default_values()
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
 
@@ -716,34 +580,3 @@ class CustomPlanet(Planet):
         pp.set_default_values()
         rp.set_default_values()
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
-
-
-# pp = PlanetaryParams()
-# rp = RunParams()
-
-# pp.set_values(**pp.default_values)
-# rp.set_values(**rp.default_values)
-
-# pl = Planet()
-# pl.set_values(planetary_params = pp, run_params = rp, default = True)
-
-
-# pl.Si_number_mantle = 6
-
-# #print (pl.default_values)
-# pl.reset()
-
-# pl.update(default = True)
-# pl.show()
-
-# pl1 = AquaPlanet()
-# pl2 = TelluricPlanet()
-# pl3 = InfernoPlanet()
-# pl4 = IcePlanet()
-# pl5 = CustomPlanet(planetary_parameters={"Fe_number_mantle":0.2})
-
-# pl1.show()
-# pl2.show()
-# pl3.show()
-# pl4.show()
-# pl5.show()

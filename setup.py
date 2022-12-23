@@ -63,9 +63,8 @@ setup(
     packages=find_packages(),
     ext_modules=[ext1, ext2],
     # include_package_data=True,
-    package_dir = {"pics":"pics"},
-    package_data={'':['*.tab', '*.pkl']},
+    package_dir={"pics": "pics"},
+    package_data={"": ["*.tab", "*.pkl"]},
     #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
-

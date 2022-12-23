@@ -73,8 +73,10 @@ import random
 import matplotlib as mpl
 import matplotlib.transforms as transforms
 import time
+
 # from pics.materials import phaseCheck
 from pics.utils import functionTools as ftool
+
 # from pics.materials import eos
 from matplotlib import pyplot as plt
 
@@ -83,6 +85,7 @@ from matplotlib import pyplot as plt
 from decimal import Decimal
 from pics.utils import plotTools
 import warnings
+
 # from pics.materials import brucite_phase as bruce
 
 mpl.rc("text", usetex=True)

@@ -5,18 +5,21 @@ from pics.runparams import param_colors
 from pics.physicalparams import m_earth, r_earth, G
 import pandas as pd
 import numpy as np
+import os
 
 
 def plot_structure(
     profiles,
     display=True,
     file_name="structure",
-    file_path=".",
+    file_path=None,
     image_extension="pdf",
     write_html=False,
     write_image=False,
 ):
     """Plots the structure profils of a planetary object"""
+    if file_path == None:
+        file_path = os.getcwd()
 
     df = pd.DataFrame(
         profiles.T,

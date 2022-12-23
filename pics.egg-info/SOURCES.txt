@@ -52,8 +52,12 @@ pics/interiors/PlanetFort.py
 pics/interiors/PlanetInvestigator.py
 pics/interiors/PlanetTest.py
 pics/interiors/__init__.py
+pics/interiors/core_creator.py
+pics/interiors/hydrosphere_creator.py
+pics/interiors/mantle_creator.py
 pics/interiors/planet_creator.py
 pics/interiors/planet_iterator.py
+pics/interiors/planet_workbench.py
 pics/materials/Choukround2007EOS.py
 pics/materials/Feistel2006EOS.py
 pics/materials/French2015EOS.py
