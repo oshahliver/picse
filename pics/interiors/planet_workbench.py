@@ -5,6 +5,7 @@ samples of planetary models, creating MR-relations and perform some post-process
 
 from pics.interiors import planet_creator, planet_iterator
 import sys
+import numpy as np
 import os
 from progress.bar import Bar
 from progressbar import progressbar
@@ -28,27 +29,68 @@ class Toolkit:
 
 
 class Population:
-    def __init__(self, label=""):
-        self.label = label
+    def __init__(self, tag="", base_type="telluric"):
+        self.tag = tag
         self.planets = []
+        self.ready = False
+        self.base_type = base_type
 
-    def create(self, n, iterator, new = True):
-        if new:
-            self.planets = []
+    def set_up(self, n, planetary_params_ranges = {}, run_params={}, iterator_specs={}):
+        self.ready = True
+        self.n_planets = n
+        self.planetary_params_all = {
+            key: np.linspace(val[0], val[1], self.n_planets)
+            for key, val in planetary_params_ranges.items()
+        }
+        
+        self.run_params = run_params
+        self.iterator_specs = iterator_specs
 
-        with alive_bar(
-            n, title=f"Creating population {self.label}", bar="bubbles", spinner="pulse"
-        ) as bar:
-            for i in range(n):
-                # temporarely supress all prints
-                sys.stdout = open(os.devnull, "w")
-                pl = planet_creator.TelluricPlanet()
-                pl.construct()
-                iterator.iterate(planet=pl)
-                sys.stdout = sys.__stdout__
-                bar()
+    def create(self, iterator, new=True):
+        if not self.ready:
+            raise AttributeError(
+                "The population you are trying to create is not set up"
+            )
 
-                self.planets.append(pl)
+        else:
+            if new:
+                self.planets = []
+
+            with alive_bar(
+                self.n_planets,
+                title=f"Creating population {self.tag}",
+                bar="bubbles",
+                spinner="pulse",
+            ) as bar:
+
+                for i in range(self.n_planets):
+
+                    planetary_params = {
+                        key: val[i] for key, val in self.planetary_params_all.items()
+                    }
+
+                    # temporarely supress all prints
+                    sys.stdout = open(os.devnull, "w")
+
+                    # TODO. bad --> let the workbench figure out the right planet class from the label
+                    if self.base_type == "telluric":
+                        pl = planet_creator.TelluricPlanet(
+                            planetary_params=planetary_params,
+                            run_params=self.run_params,
+                        )
+
+                    elif self.base_type == "aqua":
+                        pl = planet_creator.AquaPlanet(
+                            planetary_params=planetary_params,
+                            run_params=self.run_params,
+                        )
+
+                    pl.construct()
+                    iterator.iterate(planet=pl, iterator_specs=self.iterator_specs)
+                    self.planets.append(pl)
+
+                    sys.stdout = sys.__stdout__
+                    bar()
 
 
 class Sample:

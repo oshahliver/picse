@@ -80,15 +80,23 @@ from pics.interiors import planet_workbench
 workbench = planet_workbench.Toolkit()
 ```
 
-Set up a ```Population``` instance.
+Create a ```Population``` instance.
 
 ```python
 pop = planet_workbench.Population()
 ```
-Create a population of 100 planets with the ```create``` method and using the ```iterator``` instance invoked by the ```planet_workbench```
+
+Set up a population of 20 telluric planets between 1 and 2 Earth masses.
 
 ```python
-pop.create(100, workbench.iterator)
+ppr = dict(M_surface_should = [1.0, 2.0])
+pop.set_up(20, planetary_params_ranges = ppr)
+```
+
+Create the members of the population with the ```create``` method and using the ```iterator``` instance automatically created by the ```planet_workbench.Toolkit``` instance
+
+```python
+pop.create(workbench.iterator)
 ```
 
 You can inspect members of the population by accessing the individual ```Planet``` instances:

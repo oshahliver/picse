@@ -20,7 +20,7 @@ from pics.runparams import (
     initial_predictor_keys,
     fortplanet_keys_translator,
     fortplanet_output_keys,
-    supported_base_types
+    supported_base_types,
 )
 
 from pics.utils.initial_conditions import predict_initials
@@ -49,8 +49,9 @@ from pics.physicalparams import (
     material_list,
 )
 
+
 def load_eos_tables(**kwargs):
-    """ Loads the equation of state tables into memory for subsequent use during
+    """Loads the equation of state tables into memory for subsequent use during
     the structure integration.
 
     TODO. Handle internally!
@@ -59,7 +60,7 @@ def load_eos_tables(**kwargs):
 
 
 def load_predictors(**kwargs):
-    """ Loads the pre-calibrated predictor models for the different base types for
+    """Loads the pre-calibrated predictor models for the different base types for
     predicting the initial conditions for the initial structure integration during
     the iteration process.
 
@@ -69,11 +70,13 @@ def load_predictors(**kwargs):
     predictors = {}
     for bt in supported_base_types:
         mod = get_predictor_model("predictor_{}.pkl".format(bt))
-        predictors.update({bt:mod})
+        predictors.update({bt: mod})
 
     return predictors
 
+
 predictors = load_predictors()
+
 
 class Parameters:
     def __init__(self, default_values):
@@ -169,7 +172,7 @@ class PlanetaryInputParams(Parameters):
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
             "layer_masses": [0.25, 0.25, 0.0, 100.0],
-            "temperature_jumps": [0., 0., 0., 0.],
+            "temperature_jumps": [0.0, 0.0, 0.0, 0.0],
             "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26],
             "debye_exponents_layers": [0.91, 0.91, 2.5, 2.9],
             "total_energy_should": 0,
@@ -187,10 +190,10 @@ class PlanetaryInputParams(Parameters):
 
         if type == "telluric":
             pass
- 
+
         elif type == "aqua":
             # Add additional layer for the hydrosphere
-            
+
             new_specs = dict(
                 contents=[[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]],
                 fractions=[
@@ -201,15 +204,19 @@ class PlanetaryInputParams(Parameters):
                     [1.0],
                 ],
                 ocean_fraction_should=np.log10(0.05),
-                layer_pressures = [0., 0., 25.0e9, 0., 0.],
-                debye_exponents_layers = [0.91, 0.91, 2.5, 2.9, 1.0],
-                grueneisen_gammas_layers = [1.36, 1.36, 1.96, 1.26, 1.0],
-                temperature_jumps = [0., 0., 0., 0., 0.],
-                layer_radii = [0., 0., 0., 0., 0.],
+                layer_pressures=[0.0, 0.0, 25.0e9, 0.0, 0.0],
+                debye_exponents_layers=[0.91, 0.91, 2.5, 2.9, 1.0],
+                grueneisen_gammas_layers=[1.36, 1.36, 1.96, 1.26, 1.0],
+                temperature_jumps=[0.0, 0.0, 0.0, 0.0, 0.0],
+                layer_radii=[0.0, 0.0, 0.0, 0.0, 0.0],
             )
-            mantle_mass = self.default_values["M_surface_should"] * (1. - 10**new_specs["ocean_fraction_should"])
-            new_specs.update({"layer_masses": [0.25, 0.25, mantle_mass, mantle_mass, 100.0]})
-            
+            mantle_mass = self.default_values["M_surface_should"] * (
+                1.0 - 10 ** new_specs["ocean_fraction_should"]
+            )
+            new_specs.update(
+                {"layer_masses": [0.25, 0.25, mantle_mass, mantle_mass, 100.0]}
+            )
+
             self.default_values.update(new_specs)
 
         else:
@@ -244,10 +251,10 @@ class RunInputParams(Parameters):
 
         if type == "telluric":
             pass
-            
+
         elif type == "aqua":
             # Add additional layer for the hydrosphere
-            new_specs = dict(layer_constraints = [1,1,3,1,1])
+            new_specs = dict(layer_constraints=[1, 1, 3, 1, 1])
             self.default_values.update(new_specs)
 
         Parameters.__init__(self, self.default_values)
@@ -268,7 +275,9 @@ class Planet:
         self.label = label
         self.vapor_reached = False
         self.status = "shadow of the future"
-        self.predictor = 'predictor_{}.pkl'.format(predictor) # points to the predictor model for the iterator
+        self.predictor = "predictor_{}.pkl".format(
+            predictor
+        )  # points to the predictor model for the iterator
 
     def set_values(self, default=False, **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
@@ -313,12 +322,12 @@ class Planet:
             }
             for i in range(len(self.contents))
         ]
-        
+
         # predict central temperature, central pressure, and core mass
         # prediction for core mass is not relevant for basic models as it
         # is uniquely defined from the bulk composition in this case
         kwargs_pred = dict([key, self.__dict__[key]] for key in initial_predictor_keys)
-        
+
         tc, pc, mc = predict_initials(predictors[self.label], **kwargs_pred)
         pc *= 1e9  # convert to Pa
         self.T_center = tc
@@ -329,19 +338,17 @@ class Planet:
             0.0,
             self.Si_number_mantle,
             self.Si_number_mantle,
-            
         ]
         self.Fe_number_layers = [
             1.0,
             1.0,
             self.Fe_number_mantle,
             self.Fe_number_mantle,
-            
         ]
 
         if self.label == "aqua":
-            self.Si_number_layers.append(0.)
-            self.Fe_number_layers.append(0.)
+            self.Si_number_layers.append(0.0)
+            self.Fe_number_layers.append(0.0)
 
         self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
 
@@ -545,7 +552,7 @@ class Planet:
 
 
 class CustomPlanet(Planet):
-    # TODO. Create interface to customize CustomPlanet types 
+    # TODO. Create interface to customize CustomPlanet types
     def __init__(self, label, planetary_params={}, run_params={}):
         predictor = "{}.pkl".format(label)
 
@@ -570,7 +577,7 @@ class CustomPlanet(Planet):
 
 class BaseTypePlanet(Planet):
     def __init__(self, label, planetary_params={}, run_params={}):
-        predictor = "predictor_{}.pkl".format(label) 
+        predictor = "predictor_{}.pkl".format(label)
         Planet.__init__(self, predictor, label=label)
 
         pp = PlanetaryInputParams(type=self.label)
@@ -592,15 +599,28 @@ class BaseTypePlanet(Planet):
 
 class TelluricPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
-        BaseTypePlanet.__init__(self, label = "telluric", planetary_params=planetary_params, run_params=run_params)
+        BaseTypePlanet.__init__(
+            self,
+            label="telluric",
+            planetary_params=planetary_params,
+            run_params=run_params,
+        )
+
 
 class AquaPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
-        BaseTypePlanet.__init__(self, label = "aqua", planetary_params=planetary_params, run_params=run_params)
+        BaseTypePlanet.__init__(
+            self, label="aqua", planetary_params=planetary_params, run_params=run_params
+        )
+
 
 class YourPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
-        BaseTypePlanet.__init__(self, label = "custom", planetary_params=planetary_params, run_params=run_params)
-        
+        BaseTypePlanet.__init__(
+            self,
+            label="custom",
+            planetary_params=planetary_params,
+            run_params=run_params,
+        )
+
         # Create your own features and specifications here if you want ...
-    
