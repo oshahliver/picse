@@ -47,7 +47,7 @@ Create an instance of the iterator toolkit that takes care of matching the bound
 iterator = planet_iterator.Toolkit()
 ```
 
-Initialize a planetary object of a certain base type (only ```TelluricPlanet``` supported so far). If no planetary properties are passed via the ```planetary_params``` argument, default values will be used.
+Initialize a planetary object of a certain base type (only ```TelluricPlanet``` and ```AquaPlanet``` supported so far). If no planetary properties are passed via the ```planetary_params``` argument, default values will be used.
 
 ```python
 planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)

@@ -518,31 +518,10 @@ class Planet:
         pass
 
 
-class TelluricPlanet(Planet):
-    def __init__(self, planetary_params={}, run_params={}):
+class BaseTypePlanet(Planet):
+    def __init__(self, label, planetary_params={}, run_params={}):
 
-        Planet.__init__(self, label="telluric")
-
-        pp = PlanetaryInputParams(type=self.label)
-        rp = RunInputParams(type=self.label)
-
-        pp.set_default_values()
-        rp.set_default_values()
-
-        # update planetary parameters if passed by user
-        for key, val in planetary_params.items():
-            pp.default_values.update({key: val})
-
-        # update run parameters if passed by user
-        for key, val in run_params.items():
-            rp.default_values.update({key: val})
-
-        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
-
-
-class AquaPlanet(Planet):
-    def __init__(self, planetary_params={}, run_params={}):
-        Planet.__init__(self, label="aqua")
+        Planet.__init__(self, label=label)
 
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -560,23 +539,16 @@ class AquaPlanet(Planet):
 
         Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
 
+class TelluricPlanet(BaseTypePlanet):
+    def __init__(self, planetary_params={}, run_params={}):
+        BaseTypePlanet.__init__(self, label = "telluric", planetary_params=planetary_params, run_params=run_params)
+        
+class AquaPlanet(BaseTypePlanet):
+    def __init__(self, planetary_params={}, run_params={}):
+        BaseTypePlanet.__init__(self, label = "aqua", planetary_params=planetary_params, run_params=run_params)
 
-class CustomPlanet(Planet):
-    def __init__(self, planetary_parameters={}, run_parameters={}):
-        raise NotImplementedError("Custom type planets will be available soon!")
-        default_values1 = {
-            "ocean_fraction_should": 0.25,
-            "Mg_number_should": 0.6,
-            "T_surface_should": 320,
-            "Fe_number_mantle": 0.15,
-        }
-
-        default_values2 = {"adiabat_type": 0}
-
-        default_values1.update(planetary_parameters)
-        Planet.__init__(self, label="custom")
-        pp = PlanetaryInputParams(type=self.label, default_values=default_values1)
-        rp = RunInputParams(type=self.label, default_values=default_values2)
-        pp.set_default_values()
-        rp.set_default_values()
-        Planet.set_values(self, planetary_params=pp, run_params=rp, default=True)
+class CustomPlanet(BaseTypePlanet):
+    def __init__(self, planetary_params={}, run_params={}):
+        BaseTypePlanet.__init__(self, label = "custom", planetary_params=planetary_params, run_params=run_params)
+        
+    
