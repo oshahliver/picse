@@ -313,13 +313,12 @@ class Planet:
             }
             for i in range(len(self.contents))
         ]
+        
         # predict central temperature, central pressure, and core mass
         # prediction for core mass is not relevant for basic models as it
         # is uniquely defined from the bulk composition in this case
         kwargs_pred = dict([key, self.__dict__[key]] for key in initial_predictor_keys)
         
-        print ("\nusing predictor", predictors[self.label])
-        print ("all predictors =", predictors)
         tc, pc, mc = predict_initials(predictors[self.label], **kwargs_pred)
         pc *= 1e9  # convert to Pa
         self.T_center = tc

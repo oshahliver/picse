@@ -24,7 +24,6 @@ iterator = planet_iterator.Toolkit()
 # default value for the corresponding base type
 iterator_specs = {
     "acc": [1e-4, 1e-3],  # --> desired relative accuracies
-
 }
 
 #######################################################################
@@ -32,29 +31,31 @@ iterator_specs = {
 #######################################################################
 
 # Initialize a telluric planet instance with the specified properties
-pl = planet_creator.AquaPlanet()
 
-# Perform initial structure integration
-pl.construct()
+for i in range(10):
+    pl = planet_creator.AquaPlanet()
 
-# Pass planet instance to iterator to match boundary conditions
-# NOTE. planetary objects passed to the iterator must be constructed!
-iterator.iterate(planet=pl, iterator_specs=iterator_specs)
+    # Perform initial structure integration
+    pl.construct()
+
+    # Pass planet instance to iterator to match boundary conditions
+    # NOTE. planetary objects passed to the iterator must be constructed!
+    iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 
 #######################################################################
 # Model inspection
 #######################################################################
 
-# print fundamental planeatary properties to standard output
-pl.print()
+# # print fundamental planeatary properties to standard output
+# pl.print()
 
-# Plot the radial P, T, M, and rho profiles
-file_path = os.getcwd()
-pl.plot(
-    file_name="structure_profiles",
-    file_path=file_path,
-    write_html=True,
-    display=True,
-    write_image=True,
-    image_extension="pdf",
-)
+# # Plot the radial P, T, M, and rho profiles
+# file_path = os.getcwd()
+# pl.plot(
+#     file_name="structure_profiles",
+#     file_path=file_path,
+#     write_html=True,
+#     display=True,
+#     write_image=True,
+#     image_extension="pdf",
+# )

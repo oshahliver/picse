@@ -5,14 +5,15 @@ from pics.utils.context_manager import temp_path
 from pics.utils.internal_data import get_predictor_model
 
 
-def predict_initials(models,
+def predict_initials(
+    models,
     M_surface_should=1.0,
     Mg_number_should=0.5,
     ocean_fraction_should=0.0,
     Si_number_mantle=0.4,
     T_surface_should=300.0,
     Fe_number_mantle=0.0,
-    fractions=[]
+    fractions=[],
 ):
 
     xi_Fe_core = fractions[1][0]

@@ -294,8 +294,8 @@ class Toolkit:
         """
 
         if not planet.status == "very much alive":
-            print(
-                "WARNING: You have passed an unconstructed planet object to the iterator"
+            raise TypeError(
+                "You have passed an unconstructed planet object to the iterator"
             )
 
         else:

@@ -1305,7 +1305,7 @@ contains
 
 !Surface reached
       elseif (abs(param_should - param_is)/param_should .lt. eps) then
-         print *, 'Surface reached!'
+         ! print *, 'Surface reached!'
 
          !The construct method has already updated the shell count for the next
          !iteration. However, this iteration will never take place as the
@@ -1654,8 +1654,8 @@ contains
          end do
       end do
 
-      print *, 'Integration terminated in layer ', self%lay
-      print *, 'at shell ', self%n_shells
+      ! print *, 'Integration terminated in layer ', self%lay
+      ! print *, 'at shell ', self%n_shells
 
 !Check if individual layers exist
       if (size(self%layers(1)%shells) .eq. 0) then

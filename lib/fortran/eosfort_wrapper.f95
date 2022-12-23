@@ -310,7 +310,7 @@ contains
          layer_properties(i, 6) = pl%layers(i)%radius
       end do
 
-      print *, 'NOTE: out_frac(5) is set to 1 manually in eosfort_wrapper! (No impurities in hydrosphere)'
+      ! print *, 'NOTE: out_frac(5) is set to 1 manually in eosfort_wrapper! (No impurities in hydrosphere)'
       out_frac(5, 1) = 1d0
 
 !call print_shell(self=pl%layers(2)%shells(1))

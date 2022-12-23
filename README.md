@@ -73,6 +73,24 @@ pl.print()
 pl.plot()
 ```
 
+You can create and manipulate planetary objects on a higher level using the ```planet_workbench``` module. 
+
+```python
+from pics.interiors import planet_workbench
+workbench = planet_workbench.Toolkit()
+```
+
+Set up a ```Population``` instance.
+
+```python
+pop = planet_workbench.Population()
+```
+Create a population of 100 planets with the ```create``` method and using the ```iterator``` instance invoked by the ```planet_workbench```
+
+```python
+pop.create(100, workbench.iterator)
+```
+
 ## Known issues
 
 ...

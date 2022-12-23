@@ -9,6 +9,7 @@ Created on Thu Apr  4 16:03:10 2019
 
 # from pics.utils import functionTools as ftool
 from matplotlib import pyplot as plt
+
 # import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
 from pics.utils import matrix_generator as mgen
@@ -53,6 +54,7 @@ from pics.runparams import grid_color, background_color, color_list
 image_loc = "/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/"
 
 plt.rcParams["axes.axisbelow"] = False
+
 
 class Toolkit:
     def __init__(self, a=0, b=0):
@@ -294,8 +296,8 @@ class Toolkit:
         """
 
         if not planet.status == "very much alive":
-            print(
-                "WARNING: You have passed an unconstructed planet object to the iterator"
+            raise TypeError(
+                "You have passed an unconstructed planet object to the iterator"
             )
 
         else:
