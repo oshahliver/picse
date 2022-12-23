@@ -28,6 +28,7 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 ## Basic usage
 
+### Single planets
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
@@ -73,7 +74,10 @@ pl.print()
 pl.plot()
 ```
 
-You can create and manipulate planetary objects on a higher level using the ```planet_workbench``` module. 
+
+### Populations
+
+You can create and manipulate planetary objects on a higher level using the ```planet_workbench``` module. A useful tool is the ```Population``` class that allows you to create populations of planets based on some overall rules and parameter ranges.
 
 ```python
 from pics.interiors import planet_workbench
