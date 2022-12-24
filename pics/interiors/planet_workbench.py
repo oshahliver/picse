@@ -50,7 +50,7 @@ class Population:
         iterator_specs={},
         planetary_params={},
     ):
-        
+
         self.n_planets = n
 
         # perform random sampling within ranges for all specified parameters
@@ -115,6 +115,7 @@ class Sample:
 class MassRadius(Sample):
     def __init__(self):
         pass
+
 
 class SpecificObject(Sample):
     def __init__(self):

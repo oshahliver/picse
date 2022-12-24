@@ -59,7 +59,7 @@ setup(
         "seafreeze",
         "iapws",
         "matplotlib",
-        "alive_progress"
+        "alive_progress",
     ],
     packages=find_packages(),
     ext_modules=[ext1, ext2],

@@ -189,11 +189,43 @@ class PlanetaryInputParams(Parameters):
         }
 
         if type == "telluric":
-            pass
+            self.default_values.update(
+                dict(
+                    Fe_number_layers=[
+                        0.0,
+                        0.0,
+                        self.default_values["Fe_number_mantle"],
+                        self.default_values["Fe_number_mantle"],
+                    ],
+                    Si_number_layers=[
+                        0.0,
+                        0.0,
+                        self.default_values["Si_number_mantle"],
+                        self.default_values["Si_number_mantle"],
+                    ],
+                )
+            )
 
         elif type == "aqua":
-            # Add additional layer for the hydrosphere
-
+            #Note. Add additional layer for the hydrosphere
+            self.default_values.update(
+                dict(
+                    Fe_number_layers=[
+                        0.0,
+                        0.0,
+                        self.default_values["Fe_number_mantle"],
+                        self.default_values["Fe_number_mantle"],
+                        0.0,
+                    ],
+                    Si_number_layers=[
+                        0.0,
+                        0.0,
+                        self.default_values["Si_number_mantle"],
+                        self.default_values["Si_number_mantle"],
+                        0.0,
+                    ],
+                )
+            )
             new_specs = dict(
                 contents=[[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]],
                 fractions=[
@@ -267,9 +299,6 @@ class AllInputParams(RunInputParams, PlanetaryInputParams):
 
 class Planet:
     def __init__(self, predictor, label="A random planet", **kwargs):
-        # self.default_values = {}
-        # self.default_values.update(planetary_params.default_values)
-        # self.default_values.update(run_params.default_values)
         self.default_values = {}
         self.initials = {}
         self.label = label
@@ -290,14 +319,10 @@ class Planet:
         # initialize input parameters
         if "planetary_params" in kwargs:
             # set attributes
-            # print ("kwargs =", kwargs["planetary_params"].default_values.items())
             for key, value in kwargs["planetary_params"].default_values.items():
                 if not key in omit_keys:
-                    # print (key, value)
                     setattr(self, key, value)
 
-        # print ("contents in set values =", self.contents)
-        # print ("temp in set values =", self.T_surface_should)
         # initialize run parameters
         if "run_params" in kwargs:
             for key, value in kwargs["run_params"].__dict__.items():
@@ -631,4 +656,3 @@ class YourPlanet(BaseTypePlanet):
         )
 
         # Create your own features and specifications here if you want ...
-
