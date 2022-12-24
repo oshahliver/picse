@@ -1,3 +1,5 @@
+![](https://github.com/oshahliver/PICS/assets/chapter_hydro.png)
+
 # The PICS Project
 
 ## General Information
