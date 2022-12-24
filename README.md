@@ -1,4 +1,4 @@
-![](https://github.com/oshahliver/PICS/assets/chapter_hydro.png)
+![](https://github.com/oshahliver/PICS/tree/main/assets/chapter_hydro.png)
 
 # The PICS Project
 
