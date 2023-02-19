@@ -235,7 +235,7 @@ class PlanetaryInputParams(Parameters):
                     [0.5, 0.5],
                     [1.0],
                 ],
-                ocean_fraction_should=np.log10(0.05),
+                ocean_fraction_should=np.log10(0.1),
                 layer_pressures=[0.0, 0.0, 25.0e9, 0.0, 0.0],
                 debye_exponents_layers=[0.91, 0.91, 2.5, 2.9, 1.0],
                 grueneisen_gammas_layers=[1.36, 1.36, 1.96, 1.26, 1.0],

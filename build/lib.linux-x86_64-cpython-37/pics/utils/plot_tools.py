@@ -96,5 +96,17 @@ def plot_structure(
         fig.show()
 
 
+def plot_mr(data, specs={}):
+    fig = go.Figure()
+
+    for label, dat in data.items():
+        fig.add_trace(go.Scatter(x=dat[0] / m_earth, y=dat[1] / r_earth, name=label))
+    fig.update_layout(
+        xaxis_title=r"$\rm{Mass} \ (M_\oplus)$",
+        yaxis_title=r"$\rm {Radius} \ (R_\oplus)$",
+    )
+    fig.show()
+
+
 def subplot_labeler(fig, labels):
     pass

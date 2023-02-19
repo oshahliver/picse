@@ -4,8 +4,10 @@ samples of planetary models, creating MR-relations and perform some post-process
 """
 
 from pics.interiors import planet_creator, planet_iterator
+from pics.utils.plot_tools import plot_mr
 import sys
 import numpy as np
+import pandas as pd
 import os
 import copy
 
@@ -143,7 +145,7 @@ class MassRadius:
 
     def __init__(self, tag="mrd-1", planetary_params={}):
         self.tag = tag
-        
+        self.ready = False
 
     def set_up(
         self,
@@ -154,25 +156,56 @@ class MassRadius:
         iterator_specs=[],
         planetary_params=[],
         mass_range=[1.0, 2.0],
+        sampling="lin",
     ):
-
         self.populations = []
+
         if len(tags) == 0:
-            tags = [r"curve-{}".format(i+1) for i in range(len(planetary_params))]
+            self.tags = [
+                r"curve-{}".format(i + 1) for i in range(len(planetary_params))
+            ]
+        else:
+            self.tags = tags
 
         # Set up the individual curves as populations
-        for pps, base_type, tag in zip(planetary_params, base_types, tags):
-            print ("check")
-            ppr = {"M_surface_should":mass_range}
-            pop = Population(tag=tag, base_type=base_type)
+        for pps, base_type, tag in zip(planetary_params, base_types, self.tags):
+            ppr = {"M_surface_should": mass_range}
+            pop = Population(tag=self.tag, base_type=base_type)
             pop.set_up(
-                n, planetary_params_ranges=ppr, planetary_params=pps, sampling="lin"
+                n, planetary_params_ranges=ppr, planetary_params=pps, sampling=sampling
             )
             self.populations.append(pop)
 
+        self.ready = True
+
+    def add_population(self, **kwargs):
+        if "tag" in kwargs:
+            tag = kwargs[tag]
+        else:
+            tag = r"curve-{}".format(len(self.populations) + 1)
+
+    def remove_population(self, tag):
+        pass
+
     def create(self, iterator):
-        for pop in self.populations:
-            pop.create(iterator)
+        if not self.ready:
+            raise AttributeError(
+                "The population you are trying to create is not set up"
+            )
+
+        else:
+            for pop in self.populations:
+                pop.create(iterator)
+
+    def extract_data(self):
+        self.data = {}
+        for pop, tag in zip(self.populations, self.tags):
+            dat = np.array([[pl.M_surface_is, pl.R_surface_is] for pl in pop.planets]).T
+            self.data.update({tag: dat})
+
+    def plot(self):
+        plot_mr(self.data)
+
 
 class SpecificObject(Sample):
     def __init__(self):
