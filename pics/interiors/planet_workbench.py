@@ -29,7 +29,9 @@ class Toolkit:
 
 
 class Population:
-    def __init__(self, tag="", base_type="telluric"):
+    """Simple class for handling populations of planets of specific base type"""
+
+    def __init__(self, tag="pop-1", base_type="telluric"):
         self.tag = tag
         self.planets = []
         self.ready = False
@@ -49,15 +51,31 @@ class Population:
         run_params={},
         iterator_specs={},
         planetary_params={},
+        sampling="uni",
     ):
 
         self.n_planets = n
 
-        # perform random sampling within ranges for all specified parameters
-        self.planetary_params_all = {
-            key: np.random.default_rng().uniform(val[0], val[1], self.n_planets)
-            for key, val in planetary_params_ranges.items()
-        }
+        # perform uniform sampling within ranges for all specified parameters
+        if sampling == "uni":
+            self.planetary_params_all = {
+                key: np.random.default_rng().uniform(val[0], val[1], self.n_planets)
+                for key, val in planetary_params_ranges.items()
+            }
+
+        # chose values with uniform spacings within given ranges
+        elif sampling == "lin":
+            self.planetary_params_all = {
+                key: np.linspace(val[0], val[1], self.n_planets)
+                for key, val in planetary_params_ranges.items()
+            }
+
+        # chose values with logarithmic spacings within given ranges
+        elif sampling == "log":
+            self.planetary_params_all = {
+                key: np.logspace(np.log10(val[0]), np.log10(val[1]), self.n_planets)
+                for key, val in planetary_params_ranges.items()
+            }
 
         self.run_params = run_params
         self.iterator_specs = iterator_specs
@@ -107,15 +125,54 @@ class Population:
             del planetary_params
 
 
-class Sample:
-    def __init__(self):
+class Sample(Population):
+    """Creates populations of planets with additional constraints that cannot be
+    specified by the initial or boundary conditions for the iterator. Samples can
+    be used to create possible structure models for real objects for which e.g. ranges
+    for the size or the MoI are known.
+    """
+
+    def __init__(self, tag="samp-1"):
         pass
 
 
-class MassRadius(Sample):
-    def __init__(self):
-        pass
+class MassRadius:
+    """Creates simple mass radius diagrams from populations of objects for given
+    bulk compositions.
+    """
 
+    def __init__(self, tag="mrd-1", planetary_params={}):
+        self.tag = tag
+        
+
+    def set_up(
+        self,
+        n,
+        run_params=[],
+        tags=[],
+        base_types=[],
+        iterator_specs=[],
+        planetary_params=[],
+        mass_range=[1.0, 2.0],
+    ):
+
+        self.populations = []
+        if len(tags) == 0:
+            tags = [r"curve-{}".format(i+1) for i in range(len(planetary_params))]
+
+        # Set up the individual curves as populations
+        for pps, base_type, tag in zip(planetary_params, base_types, tags):
+            print ("check")
+            ppr = {"M_surface_should":mass_range}
+            pop = Population(tag=tag, base_type=base_type)
+            pop.set_up(
+                n, planetary_params_ranges=ppr, planetary_params=pps, sampling="lin"
+            )
+            self.populations.append(pop)
+
+    def create(self, iterator):
+        for pop in self.populations:
+            pop.create(iterator)
 
 class SpecificObject(Sample):
     def __init__(self):

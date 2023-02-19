@@ -1,5 +1,5 @@
-"""This is an example for the basic usage of the planet_workbench tools. A population of planets
-is generated from uniform sampling within specified ranges for some of the planetary parameters
+"""This is an example for the basic usage of the planet_workbench tools. A mass-radius diagram
+is generated between 1 and 2 earth masses for different types of planets.
 """
 
 from pics.interiors import planet_workbench
@@ -13,29 +13,23 @@ workbench = planet_workbench.Toolkit()
 # Model specifications
 #######################################################################
 
-# define custom ranges for the planetary parameters
-ppr = {
-    "M_surface_should": [1.0, 2.0],
-}
+# define the mass range in earth masses
+mass_range = [1., 2.]
 
 # define custom planetary parameters
-pps = {"T_surface_should": 356.0}
+types = ["telluric", "aqua"]
+pps = [{"T_surface_should": 300} for i in range(len(types))]
+
 
 #######################################################################
 # Model creation and execution
 #######################################################################
 
-pop = planet_workbench.Population(tag="example", base_type="telluric")
-pop.set_up(20, planetary_params_ranges=ppr, planetary_params=pps, sampling="lin")
-pop.create(workbench.iterator)
+mrd = planet_workbench.MassRadius(tag="example")
+mrd.set_up(10, planetary_params=pps, base_types=types)
+mrd.create(workbench.iterator)
 
 #######################################################################
 # Model inspection
 #######################################################################
 
-for pl in pop.planets:
-    print(
-        "total mass / surface temp: {} / {}".format(
-            round(pl.M_surface_is / m_earth, 3), round(pl.T_surface_is, 1)
-        )
-    )

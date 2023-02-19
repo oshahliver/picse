@@ -207,7 +207,7 @@ class PlanetaryInputParams(Parameters):
             )
 
         elif type == "aqua":
-            #Note. Add additional layer for the hydrosphere
+            # Note. Add additional layer for the hydrosphere
             self.default_values.update(
                 dict(
                     Fe_number_layers=[
@@ -499,8 +499,7 @@ class Planet:
             self.M_ocean_is = 0.0
 
     def check_convergence(self):
-        self.converged = False
-        pass
+        raise NotImplementedError("Convergence check is not available yet")
 
     def construct(self, echo=False):
         # Gather layer dims for fortplanet routine
@@ -571,9 +570,6 @@ class Planet:
     ):
 
         plot_structure(self.profiles, **kwargs)
-
-    def set_iterator_specs(self):
-        pass
 
 
 class CustomPlanet(Planet):

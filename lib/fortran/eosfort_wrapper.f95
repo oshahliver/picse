@@ -296,7 +296,7 @@ contains
          layer_properties(i, 1) = pl%layers(i)%pres
          layer_properties(i, 2) = pl%layers(i)%temp
          layer_properties(i, 3) = pl%layers(i)%dens
-         !If layer exists add bottom density else bottom and top density are
+         !If layer exists, add bottom density. Else bottom and top density are
          !just the same. Distinction needs to be made here because if layer
          !does not exist a segmentation fault occurs if the bottom density
          !is attempted to be extracted.

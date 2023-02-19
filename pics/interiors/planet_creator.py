@@ -207,7 +207,7 @@ class PlanetaryInputParams(Parameters):
             )
 
         elif type == "aqua":
-            #Note. Add additional layer for the hydrosphere
+            # Note. Add additional layer for the hydrosphere
             self.default_values.update(
                 dict(
                     Fe_number_layers=[
