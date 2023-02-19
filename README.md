@@ -134,7 +134,7 @@ pps = [
 types = ["telluric" for i in range(len(pps))]
 ```
 
-Initialize the mass-radius instance and set up the models:
+Initialize the mass-radius instance and set up the models using logarithmic spacing between five data points for each curve within the specified mass range:
 
 ```python
 mrd = planet_workbench.MassRadius(tag="example")

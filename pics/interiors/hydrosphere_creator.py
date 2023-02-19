@@ -1,2 +1,2 @@
-""" TODO. Migrate all routines needed to set up and extract the mantle properties to this file
+""" TODO. Migrate all routines needed to set up and extract the hydrosphere properties to this file
 """

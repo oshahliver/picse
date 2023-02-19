@@ -65,7 +65,7 @@ class Toolkit:
         self.oldvals = []
         self.iteration = False
         self.number = 0
-        self.iterator_specs = [
+        self.iterator_specs_keys = [
             "what",
             "how",
             "val_should",
@@ -100,6 +100,7 @@ class Toolkit:
             "deltaType": 0,  # --> mode for initial adjustment of adjustables
             "unpredictable": False,  # --> no effect at this point
         }
+
         if planet.label == "telluric":
             pass
 
@@ -109,6 +110,7 @@ class Toolkit:
             #     "Iterator does not support base type {} yet".format(planet.label)
             # )
 
+        planet.iterator_specs = iterator_specs
         return iterator_specs
 
     def all_params(self, planet):
@@ -302,13 +304,14 @@ class Toolkit:
 
         else:
             pass
-
+        
+        # Set default iterator specifications
         specs = self.get_specs(planet)
-
+        
         # Update all specifications that are passed manually by the user
         if "iterator_specs" in kwargs:
             for key, val in kwargs["iterator_specs"].items():
-                if key in self.iterator_specs:
+                if key in self.iterator_specs_keys:
 
                     specs.update({key: val})
 

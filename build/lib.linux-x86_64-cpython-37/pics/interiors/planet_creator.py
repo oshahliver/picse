@@ -114,7 +114,7 @@ class PlanetaryOutputParams(Parameters):
             "P_surface_is": None,
             "T_surface_is": None,
             "moment_of_inertia_is": None,
-            "ocean_fractions_is": None,
+            "ocean_fraction_is": None,
             "ocean_depth": None,
             "mean_density": None,
             "oxygen_fugacity_mantle": None,
@@ -304,6 +304,7 @@ class Planet:
         self.label = label
         self.vapor_reached = False
         self.status = "shadow of the future"
+        self.iterator_specs = {}
         self.predictor = "predictor_{}.pkl".format(
             predictor
         )  # points to the predictor model for the iterator
@@ -371,12 +372,14 @@ class Planet:
             self.Fe_number_mantle,
         ]
 
+        self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
         if self.label == "aqua":
             self.Si_number_layers.append(0.0)
             self.Fe_number_layers.append(0.0)
-
-        self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
-
+            self.layer_masses[2] = self.M_surface_should - self.M_ocean_should
+            self.layer_masses[3] = self.M_surface_should - self.M_ocean_should
+            self.layer_masses[4] = 100.
+            
         print("predicted central values are:", tc, pc, mc)
 
         try:
@@ -499,7 +502,42 @@ class Planet:
             self.M_ocean_is = 0.0
 
     def check_convergence(self):
-        raise NotImplementedError("Convergence check is not available yet")
+        accs = self.iterator_specs["acc"]
+        whats = self.iterator_specs["what"]
+        print ("accs =", accs, whats)
+        checks = []
+
+        # Check iterative parameters
+        for acc, what in zip(accs, whats):
+            if what == "M_surface":
+                val_is = self.M_surface_is / m_earth
+                val_should = self.M_surface_should
+
+            elif what == "T_surface":
+                val_is = self.T_surface_is
+                val_should = self.T_surface_should
+
+            reldev = abs(val_should - val_is) / val_should
+
+            if reldev > 0.01:
+                checks.append(1)
+            else:
+                checks.append(0)
+
+        # Check passive parameters
+        if self.label == "aqua":
+            reldev = abs(self.M_ocean_should - self.M_ocean_is) / self.M_ocean_should
+
+            if reldev > acc:
+                checks.append(1)
+            else:
+                checks.append(0)
+
+        if sum(checks) > 0:
+            self.converged = False
+        else:
+            self.converged = True
+
 
     def construct(self, echo=False):
         # Gather layer dims for fortplanet routine

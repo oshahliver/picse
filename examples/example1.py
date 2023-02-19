@@ -7,6 +7,7 @@ from pics.interiors import planet_iterator
 from pics.interiors import planet_creator
 from pics.physicalparams import m_earth
 import os
+import numpy as np
 
 # Load the EoS tables
 planet_creator.load_eos_tables()
@@ -26,13 +27,17 @@ iterator_specs = {
     "acc": [1e-4, 1e-3],  # --> desired relative accuracies
 }
 
+planetary_params = {
+    "ocean_fraction_should":np.log10(0.3)
+
+}
 #######################################################################
 # Model creation and execution
 #######################################################################
 
 # Initialize a telluric planet instance with the specified properties
 
-pl = planet_creator.AquaPlanet()
+pl = planet_creator.AquaPlanet(planetary_params=planetary_params)
 
 # Perform initial structure integration
 pl.construct()
@@ -41,6 +46,9 @@ pl.construct()
 # NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 
+# Check convergence
+pl.check_convergence()
+print(pl.converged)
 #######################################################################
 # Model inspection
 #######################################################################
@@ -49,12 +57,12 @@ iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 pl.print()
 
 # Plot the radial P, T, M, and rho profiles
-file_path = os.getcwd()
-pl.plot(
-    file_name="structure_profiles",
-    file_path=file_path,
-    write_html=True,
-    display=True,
-    write_image=True,
-    image_extension="pdf",
-)
+# file_path = os.getcwd()
+# pl.plot(
+#     file_name="structure_profiles",
+#     file_path=file_path,
+#     write_html=True,
+#     display=True,
+#     write_image=True,
+#     image_extension="pdf",
+# )
