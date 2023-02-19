@@ -113,20 +113,30 @@ pop.planets[which_planet].print()
 pop.planets[which_planet].plot()
 ```
 
+### Mass-Radius diagrams
+
+The ```MassRadius``` class is part of the ```planet_workbench``` module and provides a wrapper to the ```Population``` class to create somple mass-radius diagrams over a specified mass range and for adjustable bulk properties.
+
+```python
+from pics.interiors import planet_workbench
+workbench = planet_workbench.Toolkit()
+```
+
+
 ## Known issues
+
+Currently the structure integration for aqua planets does not always converge properly.
 
 ...
 
 ## Coming soon
 
 
-1. ```MassRadius``` class for super simple and straight forward creation of mass radius diagrams.
+1. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
 
-2. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
+2. A interactive data structure with some basic analysis and visualization capabilities.
 
-3. A interactive data structure with some basic analysis and visualization capabilities.
-
-4. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
+3. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
 
 ...
 
