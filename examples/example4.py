@@ -4,7 +4,6 @@ is generated between 1 and 2 earth masses for different types of planets.
 
 from pics.interiors import planet_workbench
 from pics.physicalparams import m_earth
-import numpy as np
 
 # Create an instance of the workbench toolkit
 # Note. The EoS tables are loaded internally by the workbench

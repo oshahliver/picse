@@ -115,13 +115,46 @@ pop.planets[which_planet].plot()
 
 ### Mass-Radius diagrams
 
-The ```MassRadius``` class is part of the ```planet_workbench``` module and provides a wrapper to the ```Population``` class to create somple mass-radius diagrams over a specified mass range and for adjustable bulk properties.
+The ```MassRadius``` class is part of the ```planet_workbench``` module and provides a wrapper to the ```Population``` class to create simple mass-radius diagrams over a specified mass range and for adjustable bulk properties.
 
 ```python
 from pics.interiors import planet_workbench
 workbench = planet_workbench.Toolkit()
 ```
 
+Define mass range and specify some planetary parameters for each mass-radius curve:
+
+```python
+mass_range = [0.5, 5.0]
+pps = [
+    {"T_surface_should": 300, "Mg_number_should": 0.3},
+    {"T_surface_should": 300, "Mg_number_should": 0.4},
+    {"T_surface_should": 300, "Mg_number_should": 0.5}
+]
+types = ["telluric" for i in range(len(pps))]
+```
+
+Initialize the mass-radius instance and set up the models:
+
+```python
+mrd = planet_workbench.MassRadius(tag="example")
+mrd.set_up(
+    5, planetary_params=pps, base_types=types, mass_range=mass_range, sampling="log"
+)
+```
+
+Create the curves as individual populations using the specified iterator:
+
+```python
+mrd.create(workbench.iterator)
+```
+
+Extract the mass-radius data from the populations for subsequent investigations and plot the mass-radius diagram:
+
+```python
+mrd.extract_data()
+mrd.plot()
+```
 
 ## Known issues
 
