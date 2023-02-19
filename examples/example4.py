@@ -18,20 +18,16 @@ workbench = planet_workbench.Toolkit()
 mass_range = [0.5, 5.0]
 
 # define custom planetary parameters
-types = ["aqua", "aqua", "aqua"]
+types = ["aqua", "aqua", "aqua", "aqua"]
 pps = [
-    {"T_surface_should": 250, "ocean_fraction_should": np.log10(.1)},
-    {"T_surface_should": 250, "ocean_fraction_should": np.log10(.2)},
-    {"T_surface_should": 250, "ocean_fraction_should": np.log10(.3)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.2)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.3)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.4)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.5)},
+    # {"T_surface_should": 300, "Mg_number_should": 0.5},
+    # {"T_surface_should": 300, "Mg_number_should": 0.25},
 ]
 
-# pps = [
-#     {"T_surface_should": 300, "Mg_number_should": 0.2},
-#     {"T_surface_should": 300, "Mg_number_should": 0.4},
-#     {"T_surface_should": 300, "Mg_number_should": 0.6},
-#     {"T_surface_should": 300, "Mg_number_should": 0.8}
-# ]
-# types = ["telluric" for i in range(len(pps))]
 
 #######################################################################
 # Model creation and execution
@@ -39,7 +35,7 @@ pps = [
 
 mrd = planet_workbench.MassRadius(tag="example")
 mrd.set_up(
-    10, planetary_params=pps, base_types=types, mass_range=mass_range, sampling="log"
+    20, planetary_params=pps, base_types=types, mass_range=mass_range, sampling="log"
 )
 mrd.create(workbench.iterator)
 mrd.extract_data()

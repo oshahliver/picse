@@ -376,10 +376,13 @@ class Planet:
         if self.label == "aqua":
             self.Si_number_layers.append(0.0)
             self.Fe_number_layers.append(0.0)
+
+            # The iterator will automatically match the ocean fraction if the mantle
+            # mass and core mass are reduced accordingly at a given total mass.
             self.layer_masses[2] = self.M_surface_should - self.M_ocean_should
             self.layer_masses[3] = self.M_surface_should - self.M_ocean_should
-            self.layer_masses[4] = 100.
-            
+            self.layer_masses[4] = 100. # Outermost layer is defined via surface conditions and not layer mass
+
         print("predicted central values are:", tc, pc, mc)
 
         try:
@@ -501,10 +504,10 @@ class Planet:
         except IndexError:
             self.M_ocean_is = 0.0
 
-    def check_convergence(self):
+    def check_convergence(self, ocean = .01):
         accs = self.iterator_specs["acc"]
         whats = self.iterator_specs["what"]
-        print ("accs =", accs, whats)
+   
         checks = []
 
         # Check iterative parameters
@@ -519,7 +522,7 @@ class Planet:
 
             reldev = abs(val_should - val_is) / val_should
 
-            if reldev > 0.01:
+            if reldev > acc:
                 checks.append(1)
             else:
                 checks.append(0)
@@ -528,7 +531,7 @@ class Planet:
         if self.label == "aqua":
             reldev = abs(self.M_ocean_should - self.M_ocean_is) / self.M_ocean_should
 
-            if reldev > acc:
+            if reldev > ocean:
                 checks.append(1)
             else:
                 checks.append(0)

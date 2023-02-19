@@ -158,7 +158,7 @@ mrd.plot()
 
 ## Known issues
 
-Currently the structure integration for aqua planets does not always converge properly.
+Currently the structure integration for aqua planets does not always converge properly. Convergence rate should, however, be above 90%.
 
 ...
 

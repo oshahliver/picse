@@ -84,7 +84,7 @@ class Population:
         self.planetary_params = planetary_params
         self.ready = True
 
-    def create(self, iterator, new=True):
+    def create(self, iterator, new=True, convergence_check = True):
         if not self.ready:
             raise AttributeError(
                 "The population you are trying to create is not set up"
@@ -119,12 +119,22 @@ class Population:
 
                     pl.construct()
                     iterator.iterate(planet=pl, iterator_specs=self.iterator_specs)
-                    self.planets.append(pl)
+                    
+                    # Check convergence and reject spurious models
+                    if convergence_check:
+                        pl.check_convergence()
+                        if pl.converged:
+                            self.planets.append(pl)
+
+                    else:
+                        self.planets.append(pl)
 
                     sys.stdout = sys.__stdout__
                     bar()
 
             del planetary_params
+
+
 
 
 class Sample(Population):
