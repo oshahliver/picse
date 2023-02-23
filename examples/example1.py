@@ -19,7 +19,6 @@ iterator = planet_iterator.Toolkit()
 # Model specifications
 #######################################################################
 
-
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
@@ -27,10 +26,7 @@ iterator_specs = {
     "acc": [1e-4, 1e-3],  # --> desired relative accuracies
 }
 
-planetary_params = {
-    "ocean_fraction_should":np.log10(0.3)
-
-}
+planetary_params = {"ocean_fraction_should": np.log10(0.3)}
 #######################################################################
 # Model creation and execution
 #######################################################################

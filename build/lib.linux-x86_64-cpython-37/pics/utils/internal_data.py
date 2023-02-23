@@ -1,5 +1,7 @@
 from importlib import resources
+import pkg_resources
 import pickle
+import pandas as pd
 import io
 
 
@@ -19,6 +21,12 @@ def get_predictor_dir():
         return moddir
 
 
+def get_training_dir():
+    """Get the directory containing the training data"""
+    with resources.path("pics.data", "training_data") as moddir:
+        return moddir
+
+
 def get_predictor_model(filename):
     file_path = "{}/{}".format(get_predictor_dir(), filename)
 
@@ -26,6 +34,15 @@ def get_predictor_model(filename):
         model = renamed_load(fp)
 
     return model
+
+
+def get_training_data(filename):
+    file_path = "{}/{}".format(get_training_dir(), filename)
+
+    with open(file_path, "rb") as fp:
+        df = pd.read_csv(file_path)
+
+    return df
 
 
 class RenameUnpickler(pickle.Unpickler):

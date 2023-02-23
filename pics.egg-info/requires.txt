@@ -8,5 +8,7 @@ numpy
 pandas
 seafreeze
 iapws
+keras
+tensorflow
 matplotlib
 alive_progress

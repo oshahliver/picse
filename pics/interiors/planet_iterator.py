@@ -304,10 +304,10 @@ class Toolkit:
 
         else:
             pass
-        
+
         # Set default iterator specifications
         specs = self.get_specs(planet)
-        
+
         # Update all specifications that are passed manually by the user
         if "iterator_specs" in kwargs:
             for key, val in kwargs["iterator_specs"].items():

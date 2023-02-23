@@ -20,10 +20,10 @@ mass_range = [0.5, 5.0]
 # define custom planetary parameters
 types = ["aqua", "aqua", "aqua", "aqua"]
 pps = [
-    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.2)},
-    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.3)},
-    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.4)},
-    {"T_surface_should": 300, "ocean_fraction_should": np.log10(.5)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(0.2)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(0.3)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(0.4)},
+    {"T_surface_should": 300, "ocean_fraction_should": np.log10(0.5)},
     # {"T_surface_should": 300, "Mg_number_should": 0.5},
     # {"T_surface_should": 300, "Mg_number_should": 0.25},
 ]

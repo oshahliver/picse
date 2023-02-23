@@ -1,1 +1,1 @@
-recursive-include pics/data *.tab
+recursive-include pics/data/*

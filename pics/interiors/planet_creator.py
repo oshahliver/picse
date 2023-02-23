@@ -80,6 +80,7 @@ predictors = load_predictors()
 
 class Parameters:
     def __init__(self, default_values):
+        # TODO. the default values make no sense. change the way the parameters are handled
         self.default_values = default_values
         self.allowed_keys = self.default_values.keys()
 
@@ -298,12 +299,13 @@ class AllInputParams(RunInputParams, PlanetaryInputParams):
 
 
 class Planet:
-    def __init__(self, predictor, label="A random planet", **kwargs):
+    def __init__(self, predictor, predictor_type = "reg", label="A random planet",**kwargs):
         self.default_values = {}
         self.initials = {}
         self.label = label
         self.vapor_reached = False
         self.status = "shadow of the future"
+        self.predictor_type = predictor_type # strategy for predicting initial conditions
         self.iterator_specs = {}
         self.predictor = "predictor_{}.pkl".format(
             predictor
@@ -349,15 +351,36 @@ class Planet:
             for i in range(len(self.contents))
         ]
 
-        # predict central temperature, central pressure, and core mass
-        # prediction for core mass is not relevant for basic models as it
-        # is uniquely defined from the bulk composition in this case
-        kwargs_pred = dict([key, self.__dict__[key]] for key in initial_predictor_keys)
+        # Check if initial conditions are set manually or should be predicted
+        if self.predictor_type == "reg":
+            # predict central temperature, central pressure, and core mass
+            # prediction for core mass is not relevant for basic models as it
+            # is uniquely defined from the bulk composition in this case
+            kwargs_pred = dict(
+                [key, self.__dict__[key]] for key in initial_predictor_keys
+            )
+            # Values passed for pres_center and temp_center in the planetary_params
+            # are overwritten here
+            self.T_center, self.P_center, mc = predict_initials(
+                predictors[self.label], **kwargs_pred
+            )
+            self.P_center *= 1e9  # convert to Pa
 
-        tc, pc, mc = predict_initials(predictors[self.label], **kwargs_pred)
-        pc *= 1e9  # convert to Pa
-        self.T_center = tc
-        self.P_center = pc
+        elif self.predictor_type == "man":
+            if (
+                "P_center" in kwargs["planetary_params"].default_values.keys()
+                and "T_center" in kwargs["planetary_params"].default_values.keys()
+            ):
+                # values have already been set with the rest of the planetary params
+                pass
+
+                # self.P_center = kwargs["planetary_params"]["pres_center"]
+                # self.T_center = kwargs["planetary_params"]["temp_center"]
+
+            else:
+                raise KeyError(
+                    "If the initial conditions are set manually you need to pass values for temp_center and pres_center"
+                )
 
         self.Si_number_layers = [
             0.0,
@@ -381,9 +404,9 @@ class Planet:
             # mass and core mass are reduced accordingly at a given total mass.
             self.layer_masses[2] = self.M_surface_should - self.M_ocean_should
             self.layer_masses[3] = self.M_surface_should - self.M_ocean_should
-            self.layer_masses[4] = 100. # Outermost layer is defined via surface conditions and not layer mass
-
-        print("predicted central values are:", tc, pc, mc)
+            self.layer_masses[
+                4
+            ] = 100.0  # Outermost layer is defined via surface conditions and not layer mass
 
         try:
             self.x_all_core = Material.mat2at_core(xi=self.fractions[1], xiH=0.0)
@@ -412,7 +435,9 @@ class Planet:
             self.layer_masses[1] = M_outer_core + M_inner_core
 
         self.M_core_should = self.layer_masses[1]
-        print("the initial values are:", tc, pc, self.layer_masses)
+        print(
+            "the initial values are:", self.T_center, self.P_center, self.layer_masses
+        )
 
     def update_initials(self):
         """Updates the initial planetary parameters from the current values"""
@@ -504,10 +529,10 @@ class Planet:
         except IndexError:
             self.M_ocean_is = 0.0
 
-    def check_convergence(self, ocean = .01):
+    def check_convergence(self, ocean=0.01):
         accs = self.iterator_specs["acc"]
         whats = self.iterator_specs["what"]
-   
+
         checks = []
 
         # Check iterative parameters
@@ -540,7 +565,6 @@ class Planet:
             self.converged = False
         else:
             self.converged = True
-
 
     def construct(self, echo=False):
         # Gather layer dims for fortplanet routine
@@ -638,9 +662,9 @@ class CustomPlanet(Planet):
 
 
 class BaseTypePlanet(Planet):
-    def __init__(self, label, planetary_params={}, run_params={}):
+    def __init__(self, label, planetary_params={}, run_params={}, predictor_type = "reg"):
         predictor = "predictor_{}.pkl".format(label)
-        Planet.__init__(self, predictor, label=label)
+        Planet.__init__(self, predictor, label=label, predictor_type=predictor_type)
 
         pp = PlanetaryInputParams(type=self.label)
         rp = RunInputParams(type=self.label)
@@ -660,19 +684,20 @@ class BaseTypePlanet(Planet):
 
 
 class TelluricPlanet(BaseTypePlanet):
-    def __init__(self, planetary_params={}, run_params={}):
+    def __init__(self, planetary_params={}, run_params={}, **kwargs):
         BaseTypePlanet.__init__(
             self,
             label="telluric",
             planetary_params=planetary_params,
             run_params=run_params,
+            **kwargs
         )
 
 
 class AquaPlanet(BaseTypePlanet):
-    def __init__(self, planetary_params={}, run_params={}):
+    def __init__(self, planetary_params={}, run_params={}, **kwargs):
         BaseTypePlanet.__init__(
-            self, label="aqua", planetary_params=planetary_params, run_params=run_params
+            self, label="aqua", planetary_params=planetary_params, run_params=run_params, **kwargs
         )
 
 

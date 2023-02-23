@@ -58,6 +58,8 @@ setup(
         "pandas",
         "seafreeze",
         "iapws",
+        "keras",
+        "tensorflow",
         "matplotlib",
         "alive_progress",
     ],
@@ -65,7 +67,7 @@ setup(
     ext_modules=[ext1, ext2],
     # include_package_data=True,
     package_dir={"pics": "pics"},
-    package_data={"": ["*.tab", "*.pkl"]},
+    package_data={"": ["*.tab", "*.pkl", "*.csv"]},
     #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
