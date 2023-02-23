@@ -32,7 +32,7 @@ pps = {}
 #######################################################################
 
 blind = planet_workbench.BlindSet(tag="example", base_type="telluric")
-blind.set_up(50, planetary_params_ranges=ppr, planetary_params=pps, sampling="uni")
+blind.set_up(100, planetary_params_ranges=ppr, planetary_params=pps, sampling="uni")
 blind.create()
 
 #######################################################################
@@ -41,11 +41,9 @@ blind.create()
 
 for pl in blind.planets:
     print(
-        "mass / temp surf / pres center / temp center / Mg#: {} / {} / {} / {} / {}".format(
+        "mass / temp surf / Mg#: {} /  {} / {}".format(
             round(pl.M_surface_is / m_earth, 3),
             round(pl.T_surface_is, 1),
-            round(pl.P_center * 1e-9, 1),
-            round(pl.T_center, 1),
-            round(pl.Mg_number_is, 3),
+            round(pl.Mg_number_is, 6),
         )
     )

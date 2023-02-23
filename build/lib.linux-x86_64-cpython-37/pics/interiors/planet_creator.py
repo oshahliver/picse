@@ -11,6 +11,7 @@ from pics.utils.plot_tools import plot_structure
 from tabulate import tabulate
 from pics.utils.internal_data import get_eos_dir
 from pics.interiors import core_creator
+import random
 
 # from pics.utils import functionTools as ftool
 import numpy as np
@@ -299,7 +300,7 @@ class AllInputParams(RunInputParams, PlanetaryInputParams):
 
 
 class Planet:
-    def __init__(self, predictor, predictor_type = "reg", label="A random planet",**kwargs):
+    def __init__(self, predictor, predictor_type = "reg", label="A random planet", **kwargs):
         self.default_values = {}
         self.initials = {}
         self.label = label
@@ -311,7 +312,7 @@ class Planet:
             predictor
         )  # points to the predictor model for the iterator
 
-    def set_values(self, default=False, **kwargs):
+    def set_values(self, default=False, pres_eps = [.9, 5e5], **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
         out_params = PlanetaryOutputParams()
 
@@ -372,7 +373,29 @@ class Planet:
                 and "T_center" in kwargs["planetary_params"].default_values.keys()
             ):
                 # values have already been set with the rest of the planetary params
-                pass
+                # for manual predictor the core-to-mantle transition and the mantle-to-ocean
+                # transition are defined via a pressure value selected from within the range
+                # between the central pressure and the surface pressure
+
+                # terrestrial planets
+                eps1, eps2 = pres_eps
+
+                if self.label == "telluric":
+                    self.layer_constraints[0] = 3
+                    self.layer_constraints[1] = 3
+                    self.layer_pressures[0] = random.uniform(self.P_center*eps1, self.P_surface_should*eps2)
+                    self.layer_pressures[1] = self.layer_pressures[0]
+                    print ("updated layer pressures =", self.layer_pressures)
+
+                # aqua planets
+                elif self.label == "aqua":
+                    self.layer_constraints[0] = 3
+                    self.layer_constraints[1] = 3
+                    self.layer_constraints[3] = 3
+
+                    self.layer_pressures[0] = random.uniform(self.P_center*eps1, self.P_surface_should*eps2)
+                    self.layer_pressures[1] = self.layer_pressures[0]
+                    self.layer_pressures[3] = random.uniform(self.layer_pressures[1]*eps1, self.P_surface_should*eps2)
 
                 # self.P_center = kwargs["planetary_params"]["pres_center"]
                 # self.T_center = kwargs["planetary_params"]["temp_center"]
@@ -396,6 +419,7 @@ class Planet:
         ]
 
         self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
+        
         if self.label == "aqua":
             self.Si_number_layers.append(0.0)
             self.Fe_number_layers.append(0.0)

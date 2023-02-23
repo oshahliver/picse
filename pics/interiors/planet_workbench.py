@@ -127,7 +127,7 @@ class BlindSet:
                     pl = self.planet_class(
                         planetary_params=planetary_params,
                         run_params=self.run_params,
-                        predictor_type = "reg"
+                        predictor_type = "man"
                     )
 
                     pl.construct()

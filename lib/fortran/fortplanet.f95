@@ -1019,7 +1019,7 @@ contains
 ! print *, 'layermasses =', self%layer_masses
       reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                self%constraint_value_should
-!~ print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
+! print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
 !Overshoot
       if (reldev*self%direction .lt. -eps_layer) then
 
@@ -1102,7 +1102,7 @@ contains
          !If this was the last layer, abort integration
          if (self%lay == size(self%contents%axes)) then
             self%layer_iteration = .false.
-            !print *, 'This was the last layer'
+            ! print *, 'This was the last layer'
 
          else
             !Check if the condition for the next layer(s) is also met. In this case
@@ -1450,7 +1450,7 @@ contains
       logical :: echo_dummy
       real(kind=8) :: olddens
       type(shell) :: lastshell, currentshell
-      integer :: i, j
+      integer :: i, j, old_inner_core_constraint
 
       if (.not. present(echo)) then
          echo_dummy = .false.
@@ -1563,10 +1563,15 @@ contains
                      !core mass is exceeded core integration needs to stop regardless
                      !of ICB is reached.
                      if (self%bisec .eqv. self%layers(self%lay)%bisec) then
-!~                                 print *, 'check melting'
+                        ! print *, 'check melting'
+                        old_inner_core_constraint = self%layer_constraints(1)
+                        ! Temporarely set inner core constraint to temp and
+                        ! check for layer transition
                         self%layer_constraints(1) = 4
                         call minor_bisection(self=self)
-                        self%layer_constraints(1) = 1
+
+                        ! Reset inner core constraint to original value
+                        self%layer_constraints(1) = old_inner_core_constraint
                         !self%layer_masses(1) = self%layer_masses(2)
                      end if
                   end if
