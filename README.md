@@ -103,7 +103,7 @@ sampling_scales = {
 }
 
 meta = {"base_type":"aqua",
-    "planetary_params_ranges": ppr,
+    "planetary_params_ranges": planetary_params_ranges,
     "sampling_scales": sampling_scales,
     "run_params":{}
 }
@@ -113,7 +113,7 @@ Initialize, set up, and create a blind set with 1000 planets uniformely sampled 
 
 ```python
 blindset = planet_workbench.BlindSet(tag="my_blindset")
-blindset.set_up(100, meta = meta, sampling="uni")
+blindset.set_up(1000, meta = meta, sampling="uni")
 blindset.create()
 ```
 
