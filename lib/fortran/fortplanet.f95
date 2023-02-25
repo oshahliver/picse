@@ -1009,7 +1009,7 @@ contains
    SUBROUTINE minor_bisection(self)
 
       type(planet), intent(inout) :: self
-      integer :: sh, skip, i, skip_count
+      integer :: sh, skip, i, skip_count, old_layer_constraint
       real(8) :: reldev, radius, mass, pres, temp, deltaT
       real(8) :: a, b, c, r
 
@@ -1121,7 +1121,7 @@ contains
 
                if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                   skip = skip + 1
-                 !print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
+               !   print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
                   if (self%lay + skip == size(self%contents%axes)) then
                      self%layer_iteration = .false.
                      skip = skip - 1
@@ -1132,9 +1132,10 @@ contains
                   !but only relevant if layer 3 is not already skipped.
                else
                   if (self%lay <= 2) then
+                     old_layer_constraint = self%layer_constraints(3)
                      self%layer_constraints(3) = 3
                      call get_layer_constraint(self=self, lay=self%lay, skip=i)
-                     self%layer_constraints(3) = 1
+                     self%layer_constraints(3) = old_layer_constraint
                                  ! print *, 'Next layer constraint should =', self%constraint_value_should
                                  ! print *, 'Next layer constraint is =', self%constraint_value_is
                      reldev = (self%constraint_value_should - self%constraint_value_is)/ &
@@ -1262,7 +1263,7 @@ contains
          param_should = self%P_surface_should
          !print *, "is, should = ", param_is, param_should
          eps = eps_P_surface
-         direction = (/-1.0d0, -1.0d0/)
+         direction = (/-1, -1/)
 
       elseif (self%major_constraint == 'T_surface') then
          param_is = self%layers(self%lay)%temp
@@ -1283,7 +1284,7 @@ contains
           .or. param_is .lt. 0.0d0) then
 ! print *, ''
 ! print *, 'Overshoot in major bisection in layer', self%lay
-! print *, 'Major constraint shoul =', param_should
+! print *, 'Major constraint should =', param_should
 ! print *, 'Major constraint is =', param_is
          call remove_stuff(self=self)
 
@@ -1450,7 +1451,7 @@ contains
       logical :: echo_dummy
       real(kind=8) :: olddens
       type(shell) :: lastshell, currentshell
-      integer :: i, j, old_inner_core_constraint
+      integer :: i, j, old_layer_constraint
 
       if (.not. present(echo)) then
          echo_dummy = .false.
@@ -1478,6 +1479,7 @@ contains
    !   print *, 'n shell ocean =', self%layers(5)%shell_count
    !   print *, 'n shell outer core =', self%layers(2)%shell_count
    !   print *, 'actual layermasses:', self%layer_masses(1), self%layer_masses(2)
+            
             self%layer_iteration_count = self%layer_iteration_count + 1
             self%shell_iteration = .true.
             self%change_bisec = .true.
@@ -1564,14 +1566,14 @@ contains
                      !of ICB is reached.
                      if (self%bisec .eqv. self%layers(self%lay)%bisec) then
                         ! print *, 'check melting'
-                        old_inner_core_constraint = self%layer_constraints(1)
+                        old_layer_constraint = self%layer_constraints(1)
                         ! Temporarely set inner core constraint to temp and
                         ! check for layer transition
                         self%layer_constraints(1) = 4
                         call minor_bisection(self=self)
 
                         ! Reset inner core constraint to original value
-                        self%layer_constraints(1) = old_inner_core_constraint
+                        self%layer_constraints(1) = old_layer_constraint
                         !self%layer_masses(1) = self%layer_masses(2)
                      end if
                   end if
@@ -1579,9 +1581,14 @@ contains
                   !For the lower mantle check if pressure transition is reached
                   if (self%lay == 3) then
                      if (self%bisec .eqv. self%layers(self%lay)%bisec) then
+                        old_layer_constraint = self%layer_constraints(1)
+                        ! Temporarily set lower mantle constraint to pressure
+                        ! and check for layer transition
                         self%layer_constraints(3) = 3
                         call minor_bisection(self=self)
-                        self%layer_constraints(3) = 1
+
+                        ! Reset lower mantle constraint to to original value
+                        self%layer_constraints(3) = old_layer_constraint
                         !Set LM mass to UM mass. This is important if an ocean
                         !is present. In this case the total mantle mass is used
                         !to define the mantle-ocean interface. It can happen either

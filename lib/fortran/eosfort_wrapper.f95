@@ -169,6 +169,7 @@ contains
       integer :: n_layers
       integer :: i, j, c
       
+      ! print *, "creating new planet..."
       ! TODO: Define these default values somewhere else!
 
       ! If no rotation is passed, set it to zero

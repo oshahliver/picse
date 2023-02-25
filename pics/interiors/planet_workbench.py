@@ -5,6 +5,8 @@ samples of planetary models, creating MR-relations and perform some post-process
 
 from pics.interiors import planet_creator, planet_iterator
 from pics.utils.plot_tools import plot_mr
+from pics.utils import file_manager, internal_data
+from pics.physicalparams import r_earth, m_earth
 import sys
 import numpy as np
 import pandas as pd
@@ -30,7 +32,30 @@ class Toolkit:
         pass
 
 
-class BlindSet:
+class DataSet:
+    def __init__(self, tag):
+        self.tag = tag
+        self.planets = []
+        self.data = None
+        self.meta = {
+            "base_type":"None",
+            "planetary_params": {},
+            "planetary_params_ranges": {},
+            "sampling_scales": {},
+            "run_params": {},
+        }
+
+    def export_file(self, file_location, specs={}):
+
+        if self.data == None:
+            self.data = internal_data.create_data(self.planets)
+        file_manager.write_to_csv(self.data, file_location, meta=self.meta, **specs)
+
+    def import_file(self, file_location, overwrite=False, specs={}):
+        self.data, self.meta = file_manager.read_csv(file_location, **specs)
+
+
+class BlindSet(DataSet):
     """Creates a set of planets within specified ranges for the initial conditions
     without involing an iterator. This class can be used to create large data sets
     over a wide parameter space quickly as no iterations are required. However, it
@@ -38,62 +63,83 @@ class BlindSet:
     parameter space is therefore not possible.
     """
 
-    def __init__(self, tag="blind-1", base_type="telluric"):
+    def __init__(self, tag="blind-1"):
+        DataSet.__init__(self, tag)
         self.tag = tag
-        self.planets = []
         self.ready = False
-        self.base_type = base_type
-
-        if base_type == "telluric":
-            self.planet_class = planet_creator.TelluricPlanet
-        elif base_type == "aqua":
-            self.planet_class = planet_creator.AquaPlanet
-        else:
-            raise ValueError("Passed unknown base tpye <{base_type}> to Population")
 
     def set_up(
         self,
         n,
-        planetary_params_ranges={},
-        run_params={},
-        planetary_params={},
+        meta = {},
         sampling="uni",
     ):
 
         self.n_planets = n
+        self.meta = meta
 
         # Screen for conflicts between planetary_params and planetary_params_ranges
         # A parameter must be either passed as a fixed parameter or a range, not both
-        for key in planetary_params.keys():
-            if key in planetary_params_ranges:
+        for key in self.meta["planetary_params"].keys():
+            if key in self.meta["planetary_params_ranges"]:
                 raise ValueError(
-                    f'''Key '{key}' passed to planetary_params and planetary_params_ranges
-                    simultaneously. Please resolve the conflict before proceeding.'''
+                    f"""Key '{key}' passed to planetary_params and planetary_params_ranges
+                    simultaneously. Please resolve the conflict before proceeding."""
                 )
 
-        # perform uniform sampling within ranges for all specified parameters
-        if sampling == "uni":
-            self.planetary_params_all = {
-                key: np.random.default_rng().uniform(val[0], val[1], self.n_planets)
-                for key, val in planetary_params_ranges.items()
-            }
+        # adopt same sampling strategy for all parameters
+        if len(list(self.meta["sampling_scales"].items())) == 0:
+            # perform uniform sampling within ranges for all specified parameters
+            if sampling == "uni":
+                self.planetary_params_all = {
+                    key: np.random.default_rng().uniform(val[0], val[1], self.n_planets)
+                    for key, val in self.meta["planetary_params_ranges"].items()
+                }
 
-        # chose values with uniform spacings within given ranges
-        elif sampling == "lin":
-            self.planetary_params_all = {
-                key: np.linspace(val[0], val[1], self.n_planets)
-                for key, val in planetary_params_ranges.items()
-            }
+            # chose values with uniform spacings within given ranges
+            elif sampling == "lin":
+                self.planetary_params_all = {
+                    key: np.linspace(val[0], val[1], self.n_planets)
+                    for key, val in self.meta["planetary_params_ranges"].items()
+                }
 
-        # chose values with logarithmic spacings within given ranges
-        elif sampling == "log":
-            self.planetary_params_all = {
-                key: np.logspace(np.log10(val[0]), np.log10(val[1]), self.n_planets)
-                for key, val in planetary_params_ranges.items()
-            }
+        # use parameter specific sampling strategies
+        else:
+            self.planetary_params_all = {}
+            for key, val in self.meta["planetary_params_ranges"].items():
+                if self.meta["sampling_scales"][key] == "lin":
+                    if sampling == "uni":
+                        self.planetary_params_all.update(
+                            {
+                                key: np.random.default_rng().uniform(
+                                    val[0], val[1], self.n_planets
+                                )
+                            }
+                        )
+                    elif sampling == "lin":
+                        self.planetary_params_all.update(
+                            {key: np.linspace(val[0], val[1], self.n_planets)}
+                        )
 
-        self.run_params = run_params
-        self.planetary_params = planetary_params
+                elif self.meta["sampling_scales"][key] == "log":
+                    if sampling == "uni":
+                        self.planetary_params_all.update(
+                            {
+                                key: 10
+                                ** np.random.default_rng().uniform(
+                                    np.log10(val[0]), np.log10(val[1]), self.n_planets
+                                )
+                            }
+                        )
+                    elif sampling == "lin":
+                        self.planetary_params_all.update(
+                            {
+                                key: np.logspace(
+                                    np.log10(val[0]), np.log10(val[1]), self.n_planets
+                                )
+                            }
+                        )
+
         self.ready = True
 
     def create(self, new=True, convergence_check=True):
@@ -106,8 +152,14 @@ class BlindSet:
             if new:
                 self.planets = []
 
-            planetary_params = copy.deepcopy(self.planetary_params)
+            planetary_params = copy.deepcopy(self.meta["planetary_params"])
 
+            # Set up base type
+            if self.meta["base_type"] == "telluric":
+                planet_class = planet_creator.TelluricPlanet
+            elif self.meta["base_type"] == "aqua":
+                planet_class = planet_creator.AquaPlanet
+            
             with alive_bar(
                 self.n_planets,
                 title=f"Creating population <{self.tag}>",
@@ -124,10 +176,10 @@ class BlindSet:
                     # temporarely supress all prints
                     sys.stdout = open(os.devnull, "w")
 
-                    pl = self.planet_class(
+                    pl = planet_class(
                         planetary_params=planetary_params,
-                        run_params=self.run_params,
-                        predictor_type = "man"
+                        run_params=self.meta["run_params"],
+                        predictor_type="man",
                     )
 
                     pl.construct()

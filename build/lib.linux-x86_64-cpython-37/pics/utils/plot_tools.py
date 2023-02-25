@@ -96,6 +96,77 @@ def plot_structure(
         fig.show()
 
 
+def plot_sample(data, specs={}):
+    if not "x" in specs.keys():
+        specs.update({"x": "mass"})
+
+    if not "y" in specs.keys():
+        specs.update({"y": "radius"})
+
+    if not "z" in specs.keys():
+        specs.update({"z": "mg_number"})
+
+    fig = go.Figure(
+        go.Scatter(
+            x=data[specs["x"]],
+            y=data[specs["y"]],
+            mode="markers",
+            marker=dict(
+                size=10,
+                colorscale="Viridis",
+                color=data[specs["z"]],
+                colorbar=dict(title="Z", thickness=20, tickmode="auto", nticks=10),
+            ),
+        )
+    )
+
+    # Set the layout
+    fig.update_layout(
+        coloraxis_colorbar=dict(yanchor="top", y=1, x=1.15, xanchor="left")
+    )
+
+    # Show the plot
+    fig.show()
+
+
+def plot_sample_3d(data, specs={}):
+    if not "x" in specs.keys():
+        specs.update({"x": "mass"})
+
+    if not "y" in specs.keys():
+        specs.update({"y": "radius"})
+
+    if not "z" in specs.keys():
+        specs.update({"z": "pres_center"})
+
+    if not "c" in specs.keys():
+        specs.update({"c": "mg_number"})
+
+    fig = go.Figure(
+        go.Scatter3d(
+            x=data[specs["x"]],
+            y=data[specs["y"]],
+            z=data[specs["z"]],
+            mode="markers",
+            marker=dict(
+                size=5,
+                colorscale="Viridis",
+                color=data[specs["c"]],
+                colorbar=dict(title="c", thickness=20, tickmode="auto", nticks=10),
+            ),
+        )
+    )
+
+    # Set the layout
+    fig.update_layout(
+        scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
+        coloraxis_colorbar=dict(yanchor="top", y=1, x=1.15, xanchor="left"),
+    )
+
+    # Show the plot
+    fig.show()
+
+
 def plot_mr(data, specs={}):
     fig = go.Figure()
 

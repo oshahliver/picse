@@ -2,7 +2,7 @@
 using various approaches including simple regression models and neural networks
 """
 
-from pics.utils import internal_data
+from pics.utils import internal_data as intdat
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
@@ -11,7 +11,9 @@ from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 
 
-df = internal_data.get_training_data("training_sample_test.csv")
+# df = intdat.get_training_data("training_sample_test.csv")
+filepath = "/home/os18o068/Documents/PHD/Projects/pics_external_data/training_sets/training_1.csv"
+df, meta = intdat.read_sample(filepath)
 
 print(df.head())
 
@@ -20,22 +22,24 @@ X = df[
     [
         "mass",
         "pres_surface",
-        "Si_number",
-        "Mg_number",
-        "x_FeS_outer_core",
-        "x_FeSi_outer_core",
-        "x_FeO_outer_core",
-        "x_SiO2_mantle",
-        "x_MgO_mantle",
-        "water_mass_frac",
-        "temperature_TBL",
+        # "Si_number",
+        "mg_number",
+        # "x_FeS_outer_core",
+        # "x_FeSi_outer_core",
+        # "x_FeO_outer_core",
+        # "x_SiO2_mantle",
+        "fe_number_mantle",
+        "ocean_mass_fraction",
+        "temp_surface",
     ]
 ]
-y = df[["pres_center"]]
+y = df[["pres_center", "temp_center"]]
 
 # take the log of mass and pres_center
 X["mass"] = np.log(X["mass"])
+# X["ocean_mass_fraction"] = np.log(X["ocean_mass_fraction"])
 X["pres_surface"] = np.log(X["pres_surface"])
+y["temp_center"] = np.log(y["temp_center"])
 y["pres_center"] = np.log(y["pres_center"])
 
 # split the data into training and testing sets
@@ -60,8 +64,8 @@ y_train_norm = scaler.fit_transform(y_train)
 y_test_norm = scaler.fit_transform(y_test)
 
 # set up parameter ranges
-num_layers = [6]
-layer_size = [32]
+num_layers = [1, 2, 3, 4, 5, 6]
+layer_size = [32, 64, 128, 256]
 activation = ["relu"]
 
 # iterate over all combinations of parameters
@@ -72,7 +76,7 @@ for nl in num_layers:
         for act in activation:
             # define the neural network model
             model = Sequential()
-            model.add(Dense(ls, input_shape=(11,), activation=act))
+            model.add(Dense(ls, input_shape=(6,), activation=act))
             for i in range(nl - 1):
                 model.add(Dense(ls, activation=act))
             model.add(Dense(2, activation="linear"))
@@ -81,8 +85,9 @@ for nl in num_layers:
             model.compile(optimizer="adam", loss="mape")
 
             # train the model
-            pbar2 = tqdm(total=100, leave=False, desc=f"NL={nl}, LS={ls}, ACT={act}")
-            for i in range(100):
+            n_iter = 50
+            pbar2 = tqdm(total=n_iter, leave=False, desc=f"NL={nl}, LS={ls}, ACT={act}")
+            for i in range(n_iter):
                 model.fit(X_train_norm, y_train, epochs=1, batch_size=32, verbose=0)
                 pbar2.update(1)
 

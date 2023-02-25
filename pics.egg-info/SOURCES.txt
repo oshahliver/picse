@@ -46,10 +46,6 @@ pics/data/initial_conditions/predictor_aqua.pkl
 pics/data/initial_conditions/predictor_telluric.pkl
 pics/data/initial_conditions/test_data.tab
 pics/data/training_data/__init__.py
-pics/data/training_data/data.pkl
-pics/data/training_data/training_sample_1.csv
-pics/data/training_data/training_sample_3.csv
-pics/data/training_data/training_sample_test.csv
 pics/interiors/Cammarano_2006.py
 pics/interiors/MOI_model.py
 pics/interiors/Planet.py
@@ -88,6 +84,7 @@ pics/utils/__init__.py
 pics/utils/analytical_functions.py
 pics/utils/calibration_tools.py
 pics/utils/context_manager.py
+pics/utils/file_manager.py
 pics/utils/fpy_interface.py
 pics/utils/functionTools.py
 pics/utils/grid_example.py

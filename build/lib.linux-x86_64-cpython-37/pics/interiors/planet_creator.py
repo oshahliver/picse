@@ -300,19 +300,23 @@ class AllInputParams(RunInputParams, PlanetaryInputParams):
 
 
 class Planet:
-    def __init__(self, predictor, predictor_type = "reg", label="A random planet", **kwargs):
+    def __init__(
+        self, predictor, predictor_type="reg", label="A random planet", **kwargs
+    ):
         self.default_values = {}
         self.initials = {}
         self.label = label
         self.vapor_reached = False
         self.status = "shadow of the future"
-        self.predictor_type = predictor_type # strategy for predicting initial conditions
+        self.predictor_type = (
+            predictor_type  # strategy for predicting initial conditions
+        )
         self.iterator_specs = {}
         self.predictor = "predictor_{}.pkl".format(
             predictor
         )  # points to the predictor model for the iterator
 
-    def set_values(self, default=False, pres_eps = [.9, 5e5], **kwargs):
+    def set_values(self, default=False, pres_eps=[0.6, 0.1], **kwargs):
         omit_keys = ["default_values", "allowed_keys", "label"]
         out_params = PlanetaryOutputParams()
 
@@ -383,9 +387,12 @@ class Planet:
                 if self.label == "telluric":
                     self.layer_constraints[0] = 3
                     self.layer_constraints[1] = 3
-                    self.layer_pressures[0] = random.uniform(self.P_center*eps1, self.P_surface_should*eps2)
+                    self.layer_pressures[0] = 10 ** random.uniform(
+                        np.log10(self.P_center * eps1),
+                        np.log10(self.P_center * eps2),
+                    )
                     self.layer_pressures[1] = self.layer_pressures[0]
-                    print ("updated layer pressures =", self.layer_pressures)
+                    print("updated layer pressures =", self.layer_pressures)
 
                 # aqua planets
                 elif self.label == "aqua":
@@ -393,9 +400,15 @@ class Planet:
                     self.layer_constraints[1] = 3
                     self.layer_constraints[3] = 3
 
-                    self.layer_pressures[0] = random.uniform(self.P_center*eps1, self.P_surface_should*eps2)
+                    self.layer_pressures[0] = 10 ** random.uniform(
+                        np.log10(self.P_center * eps1),
+                        np.log10(self.P_center * eps2),
+                    )
                     self.layer_pressures[1] = self.layer_pressures[0]
-                    self.layer_pressures[3] = random.uniform(self.layer_pressures[1]*eps1, self.P_surface_should*eps2)
+                    self.layer_pressures[3] = 10 ** random.uniform(
+                        np.log10(self.layer_pressures[1] * eps1),
+                        np.log10(self.P_surface_should * 1.1),
+                    )
 
                 # self.P_center = kwargs["planetary_params"]["pres_center"]
                 # self.T_center = kwargs["planetary_params"]["temp_center"]
@@ -419,7 +432,7 @@ class Planet:
         ]
 
         self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
-        
+
         if self.label == "aqua":
             self.Si_number_layers.append(0.0)
             self.Fe_number_layers.append(0.0)
@@ -428,9 +441,8 @@ class Planet:
             # mass and core mass are reduced accordingly at a given total mass.
             self.layer_masses[2] = self.M_surface_should - self.M_ocean_should
             self.layer_masses[3] = self.M_surface_should - self.M_ocean_should
-            self.layer_masses[
-                4
-            ] = 100.0  # Outermost layer is defined via surface conditions and not layer mass
+            # Outermost layer is defined via surface conditions and not layer mass
+            self.layer_masses[4] = 100.0
 
         try:
             self.x_all_core = Material.mat2at_core(xi=self.fractions[1], xiH=0.0)
@@ -546,6 +558,7 @@ class Planet:
             self.layer_properties[2]["indigenous_mass"]
             + self.layer_properties[3]["indigenous_mass"]
         ) / m_earth
+        self.core_mass_fraction_is = self.M_core_is * m_earth / self.M_surface_is
 
         try:
             self.M_ocean_is = self.layer_properties[4]["indigenous_mass"] / m_earth
@@ -686,7 +699,7 @@ class CustomPlanet(Planet):
 
 
 class BaseTypePlanet(Planet):
-    def __init__(self, label, planetary_params={}, run_params={}, predictor_type = "reg"):
+    def __init__(self, label, planetary_params={}, run_params={}, predictor_type="reg"):
         predictor = "predictor_{}.pkl".format(label)
         Planet.__init__(self, predictor, label=label, predictor_type=predictor_type)
 
@@ -714,14 +727,18 @@ class TelluricPlanet(BaseTypePlanet):
             label="telluric",
             planetary_params=planetary_params,
             run_params=run_params,
-            **kwargs
+            **kwargs,
         )
 
 
 class AquaPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}, **kwargs):
         BaseTypePlanet.__init__(
-            self, label="aqua", planetary_params=planetary_params, run_params=run_params, **kwargs
+            self,
+            label="aqua",
+            planetary_params=planetary_params,
+            run_params=run_params,
+            **kwargs,
         )
 
 
