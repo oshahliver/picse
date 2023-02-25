@@ -76,6 +76,62 @@ pl.print()
 pl.plot()
 ```
 
+### Blind sets
+
+Blind sets are sets of planetary models for that are integrated once using a given set of initial conditions to which no iterator is applied. This allows for a very time efficient creation of large numbers of structure models over specified parameter spaces without the option to specify all boundary conditions. Blind are, for instance, used to create the training data for machine learning algorithms that can replace more primitive methods for predicting initial conditions for given sets of boundary conditions.
+
+```python
+from pics.interiors import planet_workbench
+workbench = planet_workbench.Toolkit()
+```
+
+Create the meta data for the blind set:
+
+```python
+planetary_params_ranges = {
+    "Fe_number_mantle": [0.0, 0.5],
+    "T_center": [300, 3000],
+    "P_center": [1e10, 3e12],
+    "P_surface_should": [1e4, 1e9],
+}
+
+sampling_scales = {
+    "Fe_number_mantle": "lin",
+    "T_center": "lin",
+    "P_center": "log",
+    "P_surface_should": "log",
+}
+
+meta = {"base_type":"aqua",
+    "planetary_params_ranges": ppr,
+    "sampling_scales": sampling_scales,
+    "run_params":{}
+}
+```
+
+Initialize, set up, and create a blind set with 1000 planets uniformely sampled from the given parameter ranges:
+
+```python
+blindset = planet_workbench.BlindSet(tag="my_blindset")
+blindset.set_up(100, meta = meta, sampling="uni")
+blindset.create()
+```
+
+Export the main planetary data as a csv file:
+
+```python
+filepath = "your/file/path"
+blindset.export_file(filepath)
+```
+
+Import planetary data from an existing file:
+
+```python
+new_blindset = planet_workbench.BlindSet(tag="another_blindset")
+new_blindset.import_file(filepath)
+print(new_blindset.data.head())
+```
+
 
 ### Populations
 
