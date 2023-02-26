@@ -184,6 +184,7 @@ contains
 
          self%weight_fractions = self%mixture%weight_fractions
          self%fractions = self%mixture%fractions
+         
          self%xi_H2O = self%mixture%xi_H2O
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
@@ -206,10 +207,10 @@ contains
 
 !Here also the mixture must be computed and the shell gradients must
 !be updated
-
-!~ print *, 'fractions in init shell 1 =', self%fractions
+! print *, 'xi_Fe =', self%xi_Fe
+! print *, 'fractions in init shell 1 =', self%fractions
          call update_shell(self=self)
-!~ print *, 'fractions in init shell 2 =', self%fractions
+! print *, 'fractions in init shell 2 =', self%fractions
 
          self%initials%real_vals(1) = self%radius
          self%initials%real_vals(2) = self%temp

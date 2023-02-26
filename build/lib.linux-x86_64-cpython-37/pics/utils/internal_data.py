@@ -17,6 +17,7 @@ def create_data(planets):
         "radius": "R_surface_is",
         "mg_number": "Mg_number_is",
         "si_number": "Si_number_is",
+        "si_number_mantle": "Si_number_mantle",
         "fe_number_mantle": "Fe_number_mantle",
         "temp_surface": "T_surface_is",
         "pres_surface": "P_surface_is",

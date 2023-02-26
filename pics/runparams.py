@@ -92,7 +92,7 @@ fortplanet_output_keys = [
     "profiles",
     "shell_count",
     "shell_count_layers",
-    "fractions_out",
+    "fractions",
     "x_Fe_mantle",
     "Si_number_mantle",
     "mantle_exists",

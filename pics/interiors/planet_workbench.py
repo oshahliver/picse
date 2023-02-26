@@ -7,6 +7,7 @@ from pics.interiors import planet_creator, planet_iterator
 from pics.utils.plot_tools import plot_mr
 from pics.utils import file_manager, internal_data
 from pics.physicalparams import r_earth, m_earth
+from pics.materials.Material import Si_number_max, Si_number_min
 import sys
 import numpy as np
 import pandas as pd
@@ -38,7 +39,7 @@ class DataSet:
         self.planets = []
         self.data = None
         self.meta = {
-            "base_type":"None",
+            "base_type": "None",
             "planetary_params": {},
             "planetary_params_ranges": {},
             "sampling_scales": {},
@@ -71,7 +72,7 @@ class BlindSet(DataSet):
     def set_up(
         self,
         n,
-        meta = {},
+        meta={},
         sampling="uni",
     ):
 
@@ -140,6 +141,17 @@ class BlindSet(DataSet):
                             }
                         )
 
+        # TODO. find a more elegant way to handle the Si# in the mantle ...
+        # Sample the Si# in the mantle separately because the allowed ranges depend
+        # on the Fe content of the mantle which might have been sampled as well
+        Fe_number_mantle_all = self.planetary_params_all["Fe_number_mantle"]
+        # Just use linear sampling by default
+        # TODO. add option to chose different sampling strategies here
+        Si_number_mantle_all = [
+            np.random.uniform(Si_number_min(fe), Si_number_max(fe))
+            for fe in Fe_number_mantle_all
+        ]
+        self.planetary_params_all.update({"Si_number_mantle": Si_number_mantle_all})
         self.ready = True
 
     def create(self, new=True, convergence_check=True):
@@ -159,7 +171,7 @@ class BlindSet(DataSet):
                 planet_class = planet_creator.TelluricPlanet
             elif self.meta["base_type"] == "aqua":
                 planet_class = planet_creator.AquaPlanet
-            
+
             with alive_bar(
                 self.n_planets,
                 title=f"Creating population <{self.tag}>",
@@ -183,7 +195,7 @@ class BlindSet(DataSet):
                     )
 
                     pl.construct()
-
+                    # pl.print()
                     # TODO. Check models and reject spurious ones
                     self.planets.append(pl)
 

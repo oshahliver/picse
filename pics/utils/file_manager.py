@@ -70,11 +70,13 @@ def read_csv(path, specs={}, comment="#"):
                 if line[1] != "!":
                     # check if line is key or key-value pair
                     # is key-value pair
-                    
+
                     if len(split_string) > 1 and split_string[1].strip() != "":
                         key_value = line.strip()[1:].strip().split(":")
                         if "--" in key_value[1]:
-                            val = [check_type(x.strip()) for x in key_value[1].split("--")]
+                            val = [
+                                check_type(x.strip()) for x in key_value[1].split("--")
+                            ]
                         else:
                             val = check_type(key_value[1].strip())
 
@@ -84,7 +86,6 @@ def read_csv(path, specs={}, comment="#"):
                     else:
                         current_key = split_string[0]
                         metadata[current_key] = {}
-
 
                 else:
                     if current_key is None:
@@ -162,8 +163,8 @@ def write_to_csv(
             # Read in existing data
             existing_df, existing_meta = read_csv(target_file)
             # chack compatibility between old and new data
-            print ("existing meta =", existing_meta)
-            print ("meta =", meta)
+            print("existing meta =", existing_meta)
+            print("meta =", meta)
             compatible = compare_data(existing_df, data, existing_meta, meta)
 
             if compatible:

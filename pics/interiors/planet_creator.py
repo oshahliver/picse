@@ -233,7 +233,7 @@ class PlanetaryInputParams(Parameters):
                 fractions=[
                     [1.0],
                     [1.0, 0.0, 0.0, 0.0, 0.0],
-                    [0.5, 0.5],
+                    [0.75, 0.25],
                     [0.5, 0.5],
                     [1.0],
                 ],
@@ -626,10 +626,10 @@ class Planet:
         # fortran wrapper is called here
         # output = test_interface.interface.do_some_science_stuff(**kwargs)
         output = fortplanet.wrapper.create_planet(**kwargs)
-
         # update planetary output parameters
         for key, value in zip(fortplanet_output_keys, output):
             setattr(self, key, value)
+            
 
         self.mean_density = self.M_surface_is / (
             4.0 / 3.0 * np.pi * self.R_surface_is**3

@@ -274,6 +274,10 @@ contains
       n_shells_layers = pl%n_shells_layers
       Si_number_mantle = pl%Si_number_layers(3)
       xi_Fe_mantle = pl%Fe_number_layers(3)
+      
+      ! print *, "Si_number_mantle =", Si_number_mantle
+      ! print *, "Si_number =", Si_number_is
+
 ! mantle_exists = pl%mantle_exists
 ! inner_core_exists = pl%inner_core_exists
 ! outer_core_exists = pl%outer_core_exists
@@ -285,7 +289,7 @@ contains
       do i = 1, pl%lay
          if (size(pl%layers(i)%fractions) > 0) then
             do j = 1, layer_dims(i)
-               out_frac(i, j) = pl%fractions%axes(i)%real_array(j)
+               out_frac(i, j) = pl%layers(i)%fractions(j)
             end do
          end if
       end do
@@ -312,7 +316,7 @@ contains
       end do
 
       ! print *, 'NOTE: out_frac(5) is set to 1 manually in eosfort_wrapper! (No impurities in hydrosphere)'
-      out_frac(5, 1) = 1d0
+      ! out_frac(5, 1) = 1d0
 
 !call print_shell(self=pl%layers(2)%shells(1))
 

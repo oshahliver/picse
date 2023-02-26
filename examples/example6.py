@@ -20,7 +20,6 @@ workbench = planet_workbench.Toolkit()
 
 # define custom ranges for the planetary parameters
 ppr = {
-    # "Si_number_mantle": [0.3, 0.5],
     "Fe_number_mantle": [0.0, 0.5],
     "T_center": [300, 3000],
     "P_center": [1e10, 3e12],
@@ -29,7 +28,6 @@ ppr = {
 
 # define sampling strategy for each parameter
 sampling_scales = {
-    # "Si_number_mantle": "lin",
     "Fe_number_mantle": "lin",
     "T_center": "lin",
     "P_center": "log",
@@ -45,16 +43,17 @@ pps = {}
 
 blind = planet_workbench.BlindSet(tag="example")
 
-meta = {"base_type":"aqua",
+meta = {
+    "base_type": "aqua",
     "planetary_params": pps,
     "planetary_params_ranges": ppr,
     "sampling_scales": sampling_scales,
-    "run_params":{}
+    "run_params": {},
 }
 
 blind.set_up(
-    100000,
-    meta = meta,
+    100,
+    meta=meta,
     sampling="uni",
 )
 
@@ -65,9 +64,9 @@ blind.create()
 #######################################################################
 
 # Write data to file
-filepath = "/home/os18o068/Documents/PHD/Projects/pics_external_data/training_sets/training_2.csv"
+filepath = "/home/os18o068/Documents/PHD/Projects/pics_external_data/training_sets/training_1.csv"
 
-blind.export_file(filepath, specs = {"conflict":"add"})
+blind.export_file(filepath, specs={"conflict": "overwrite"})
 
 blind2 = planet_workbench.BlindSet(tag="reading")
 blind2.import_file(filepath)

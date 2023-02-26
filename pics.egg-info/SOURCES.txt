@@ -59,6 +59,7 @@ pics/interiors/hydrosphere_creator.py
 pics/interiors/mantle_creator.py
 pics/interiors/planet_creator.py
 pics/interiors/planet_iterator.py
+pics/interiors/planet_tracker.py
 pics/interiors/planet_workbench.py
 pics/materials/Choukround2007EOS.py
 pics/materials/Feistel2006EOS.py
