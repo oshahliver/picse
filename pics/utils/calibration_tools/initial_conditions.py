@@ -1,8 +1,8 @@
 import pickle
 import numpy as np
 import sys
-from pics.utils.context_manager import temp_path
-from pics.utils.internal_data import get_predictor_model
+from pics.utils.file_tools.context_manager import temp_path
+from pics.utils.file_tools.internal_data import get_predictor_model
 
 
 def predict_initials(

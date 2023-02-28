@@ -5,7 +5,7 @@ Created on Wed Jun 30 16:20:17 2021
 @author: shlah
 """
 
-import regression as regr
+import pics.utils.calibration_tools.regression as regr
 from scipy.optimize import least_squares, minimize
 from matplotlib.transforms import blended_transform_factory
 import matplotlib.pyplot as plt

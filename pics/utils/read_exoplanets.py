@@ -15,7 +15,7 @@ import matplotlib as mpl
 from adjustText import adjust_text
 from tabulate import tabulate
 import matplotlib.transforms as transforms
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 
 from pics.materials.phase_transitions_water_Wagner2002 import T_critical, P_critical
 from pics.physicalparams import M_solar, R_solar, T_solar, names_solar, r_earth, m_earth

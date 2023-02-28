@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import pandas as pd
-from PIMPphysicalparams import material_list
+from pics.physicalparams import material_list
 import numpy as np
 import os
 import eosTables
@@ -15,14 +15,14 @@ import sys
 import time
 import math
 import matplotlib as mpl
-import functionTools as ftool
+import pics.utils.function_tools.functionTools as ftool
 import astropy.table
 import warnings
 from astropy.io import ascii
 from astropy.nddata import NDData, CCDData
 import scipy.ndimage as ndimage
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     T_triple,
     T_critical,
     P_triple,
@@ -42,7 +42,7 @@ from PIMPphysicalparams import (
     mWs,
 )
 
-from PIMPrunparams import param_labels, param_lims, water_phases
+from pics.runparams import param_labels, param_lims, water_phases
 
 total_length = 50
 
