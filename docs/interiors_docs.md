@@ -28,6 +28,8 @@ Computes the thickness of the hydrosphere in meters and assigns it to the ```Pla
 
 #### ```Planet.compute_oxide_fractions()```:
 
+Computes the mole fractions of different oxides in the mantle from the atomic mantle composition.
+
 #### ```Planet.get_hydrosphere_props()```:
 
 Extracts the structure and basic properties of the hydrosphere. These include: the total thickness, the layering into different phase regions, the liquid water mass fraction.

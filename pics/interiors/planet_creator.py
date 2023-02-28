@@ -525,6 +525,9 @@ class Planet:
         self.ocean_depth = self.R_surface_is - self.layer_properties[3]["R_outer"]
 
     def compute_oxide_fractions(self):
+        """
+        Computes the mole fractions of different oxides in the mantle from the atomic mantle composition.
+        """
         # Compute mole fractions of oxides in the mantle
         if self.Fe_number_mantle > 0.0:
             self.xi_FeO_mantle = 1.0 - self.Si_number_mantle
