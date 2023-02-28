@@ -12,7 +12,7 @@ import numpy as np
 import os
 import MOI_model as analytical_models
 from matplotlib import pyplot as plt
-import pics.utils.functionTools as ftool
+import pics.utils.function_tools.functionTools as ftool
 import time
 import pandas as pd
 from matplotlib.patches import Rectangle
@@ -20,7 +20,7 @@ import sys
 import copy
 import matplotlib as mpl
 import matplotlib.transforms as transforms
-from PIMPphysicalparams import (
+from pics.physicalparams import (
     Mg_earth,
     Si_earth,
     SFe_earth,
@@ -31,11 +31,11 @@ from PIMPphysicalparams import (
     MoI_solar,
     M_solar,
 )
-from PIMPrunparams import layerColors, parameter_mask
+from pics.runparams import layerColors, parameter_mask
 import phase_transitions_water_Wagner2002 as phase
 import astropy.io
 import pics.utils.read_exoplanets as read_exoplanets
-import pics.utils.CircSegPlot as CircSegPlot
+import pics.utils.plot_tools.CircSegPlot as CircSegPlot
 
 # This mothafucka speeds up saving graphics with mpl like crazy
 mpl.use("Agg")

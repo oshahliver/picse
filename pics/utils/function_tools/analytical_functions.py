@@ -11,7 +11,7 @@ import sys
 from pics.utils import PIMPtools
 import numpy as np
 from matplotlib import pyplot as plt
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from pics.physicalparams import (
     T0_list,
     K0_list,

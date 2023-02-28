@@ -8,9 +8,8 @@ Created on Tue Mar 15 13:39:07 2022
 
 import numpy as np
 import math
-from pics.utils import functionTools as ftool
-from pics.utils.functionTools import for_recursive
-
+from pics.utils.function_tools import functionTools as ftool
+from pics.utils.function_tools.functionTools import for_recursive
 
 class LinearSystem:
     def __init__(

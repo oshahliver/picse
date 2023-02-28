@@ -138,7 +138,7 @@ Prints basic volumetric and thermodynamic properties of the mixture to standard 
 
 ## The ```pics.materials.EquationsOfState``` module
 
-The ```EquationsOfState``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks.
+The ```EquationsOfState``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks that are stored in a separate file.
 
 ### ```EquationsOfState.compute()```
 

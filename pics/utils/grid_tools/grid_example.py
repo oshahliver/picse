@@ -17,7 +17,7 @@ Parameter keys:
 
 """
 
-import grid_interpolation
+import pics.utils.grid_tools.grid_interpolation as grid_interpolation
 
 # Initiate grid instance
 grid = grid_interpolation.Grid()

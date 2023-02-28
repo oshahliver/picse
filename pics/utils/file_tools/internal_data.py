@@ -1,5 +1,5 @@
 from importlib import resources
-from pics.utils import file_manager as fman
+from pics.utils.file_tools import file_manager as fman
 from pics.physicalparams import r_earth, m_earth
 import pickle
 import pandas as pd
