@@ -152,14 +152,13 @@ Computes the density using the 3rd order Birch-Murnaghan equation of state.
 Parameters:
 
 ```int: ll=0```: Compound signature.\
-```float: d0=0```: Reference density.\
 ```float: T=0```: Temperature in kelvin.\
 ```float: P=0```: Pressure in Pa.\
 ```float: dmin=None```: Lower bound for density bisection.\
 ```float: dmax=None```: Upper bound for density bisection.\
 ```float: aT=None```: First fitting parameter to thermal expansion coefficient.\
 ```float: bT=None```: Second fitting parameter to thermal expansion coefficient.\
-```float: cT=None```: Third fitting parameter to thermal expansion coefficient.\
+```float: cT=None```: Third fitting parameter to thermal expansion coefficient.
 
 ### ```EquationsOfState.dPdrho_BM()```:
 
@@ -167,7 +166,7 @@ Computes the density derivative of the pressure using the 3rd order Birch-Murnag
 
 ### ```EquationsOfState.P_MGD()```:
 
-Computes the pressure using the  equation of state.
+Computes the pressure using the Mie-Grüneisen-Debye equation of state.
 
 ### ```EquationsOfState.rho_MGD()```:
 
@@ -176,6 +175,42 @@ Computes the density using the Mie-Grüneisen-Debye equation of state.
 ### ```EquationsOfState.dPdrho_MGD()```:
 
 Computes the density derivative of the pressure using the Mie-Grüneisen-Debye equation of state.
+
+### ```EquationsOfState.P_Vinet()```:
+
+Computes the pressure using the Vinet equation of state.
+
+### ```EquationsOfState.rho_Vinet()```:
+
+Computes the density using the Vinet equation of state.
+
+### ```EquationsOfState.dPdrho_Vinet()```:
+
+Computes the density derivative of the pressure using the Vinet equation of state.
+
+### ```EquationsOfState.P_Bel()```:
+
+Computes the pressure using the Belonoshko equation of state.
+
+### ```EquationsOfState.rho_Bel()```:
+
+Computes the density using the Belonoshko equation of state.
+
+### ```EquationsOfState.dPdrho_Bel()```:
+
+Computes the density derivative of the pressure using the Belonoshko equation of state.
+
+### ```EquationsOfState.P_VR()```:
+
+Computes the pressure using the Vinet-Rydberg equation of state.
+
+### ```EquationsOfState.rho_VR()```:
+
+Computes the density using the Vinet-Rydberg equation of state.
+
+### ```EquationsOfState.dPdrho_VR()```:
+
+Computes the density derivative of the pressure using the Vinet-Rydberg equation of state.
 
 ## The ```pics.materials.EquationsOfStateTables``` module
 
