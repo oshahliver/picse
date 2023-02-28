@@ -97,7 +97,7 @@ temperature is passed, nothing will be done. If the density and or density deriv
 
 Parameters:
 
-```P (float, optional)```: pressure in pascal. Default is ```None```.\
+```float: P=None```: pressure in pascal.\
 ```float: T=None```: temperature in kelvin.\
 ```float: d=None```: density in kilogram per cubic meter.\
 ```float: dPdrho=None```: density derivative of pressure.
