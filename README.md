@@ -109,7 +109,7 @@ Currently the structure integration for aqua planets does not always converge pr
 
 4. A machine-learning enhanced algorithm for handling initial conditions in order to boost performance of the code.
 
-5. A thermal evolution model.
+5. A thermal evolution model that solves the energy balance equation for planetary interiors with customizable energy sources and sinks s.a. radiogenic heating or stellar irradiation.
 
 ...
 
