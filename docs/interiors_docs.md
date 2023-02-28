@@ -12,7 +12,7 @@ The ```planet_creator.Planet``` class provides the scaffold for planetary interi
 
 #### ```Planet.set_values()```:
 
-This method sets up all planetary parameters and run parameters for the subsequent structure integration.
+This method sets up all planetary parameters and run parameters for the subsequent structure integration. The example below shows how to manually set up a planet. This is not required if ```BaseType``` planets are used.
 
 Example:
 
