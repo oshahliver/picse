@@ -92,7 +92,7 @@ Computes the mass fraction of each component of the mixture from their mole frac
 
 Parameters:
 
-```P (float, optional)```: pressure in gigapascal. Default is ```None```.
+```P (float, optional)```: pressure in gigapascal. Default is ```None```.\
 ```float: T=None```: temperature in kelvin
 ```float: d=None```: density in kilogram per cubic meter
 ```float: dPdrho=None```: density derivative of pressure
