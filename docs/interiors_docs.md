@@ -19,6 +19,8 @@ Example:
 ```python
 from pics.interiors import planet_creator
 
+pl = planet_creator.Planet()
+
 planetary_params = {"M_surface_should":1, "T_surface_should":300.0}
 run_params = {"accs":[1e-3, 1e-2]}
 
