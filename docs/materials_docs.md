@@ -13,6 +13,7 @@ Note: The following examples do not work yet as names of the classes and methods
 3. Vinet EoS (Vinet)
 4. Belonoshko EoS (Bel)
 5. Vinet-Rydberg EoS (VR)
+6. Free energy formulated EoS (FEF)
 
 ### Available chemical compounds
 
@@ -33,7 +34,7 @@ The following list contains all compounds for which an equation of state impleme
 | $\rm FeO$  | Iron oxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
 | $\rm FeH_x$  | Iron hydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
 | $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | No | Ref 5      |
-| $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Yes | Ref 5      |
+| $\rm H_2O$  | Water | 005 | FEF | 500-5000        | 250-600               | Yes | Ref 5      |
 
 The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
 
