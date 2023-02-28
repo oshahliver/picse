@@ -78,11 +78,11 @@ Computes volumetric and thermodynamic properties of the individual components at
 
 ### ```Mixture.update_fractions(new_fractions)```:
 
+Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
+
 Parameters:
 
-```new_fractions```: list containing the new molar abundances of each component of the mixture.
-
-Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
+```list: new_fractions=None```: list containing the new molar abundances of each component of the mixture.
 
 ### ```Mixture.update_weight_fractions()```:
 
