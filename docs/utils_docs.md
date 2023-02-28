@@ -2,6 +2,8 @@
 
 This module provides an insane amount of super useful stuff, some of which will be neede by other modules during the preparation of your models. Mostly, though, the purpose of the ```pics.utils``` module is to provide you with amazing tools to tinker around with your planets and create and manage entire modelling projects.
 
+Writing docs is super annoying, though, so i didn't get myself to do it for this module yet.
+
 ## Basic Usage
 
 ## The ```pics.utils.calibration_tools``` module
