@@ -12,6 +12,7 @@ Note: The following examples do not work yet as names of the classes and methods
 | $\rm (Mg,Fe)_2Si_2O_6$  | Pyroxene | 002 | PR       | 10-500               | 100-300               | Ref 2      |
 | $\rm (Mg,Fe)SiO_3$  | Perovskite | 003 | RK       | 50-1000              | 150-400               | Ref 3      |
 | $\rm (Mg,Fe)O$   | Periclase | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
+| $\rm Mg(OH)_2$   | Brucite | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
 | $\rm SiO_2$  | Stishovit | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeS$  | Iron sulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
