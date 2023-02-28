@@ -6,7 +6,13 @@ Note: The following examples do not work yet as names of the classes and methods
 
 ## Basic Usage
 
+### Availbale thermal equations of state
 
+1. 3rd order Birch-Murnaghan EoS (BM or BM3)
+2. Mie-Grüneisen-Debye EoS (MGD)
+3. Vinet EoS (Vinet)
+4. Belonoshko EoS (Bel)
+5. Vinet-Rydberg EoS (VR)
 
 ### Available chemical compounds
 
