@@ -35,14 +35,14 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 
 | Parameter                   | Validity Range               |
 |-----------------------------|------------------------------|
-| Total mass                  | 0.1 - 10 Earth masses        |
+| Total mass                  | 0.01 - 6 Earth masses        |
 | Water-mass-fraction         | 0 - 0.5                      |
-| Surface pressure            | 0 - 10 GPa                   |
+| Surface pressure            | 0.1 - 10'000 bar                   |
 | Surface temperature         | 100 - 3000 K                 |
-| Bulk $\rm[Mg]/[Mg + Fe]$            | 0.3 - 0.7                    |
-| Bulk $\rm[Si]/[Si + Mg]$            | 0.2 - 0.8                    |
-| Mantle $\rm[FeO]/[FeO + MgO]$         | 0.1 - 0.9                    |
-
+| Bulk $\rm[Mg]/[Mg + Fe]$            | 0.1 - 0.9                    |
+| Bulk $\rm[Si]/[Si + Mg]$            | 0.33 - 0.67                    |
+| Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5                    |
+| Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                    |
 
 
 
