@@ -15,9 +15,9 @@ The ```pics.materials``` lets you play around with different planetary building 
 | $\rm FeSi$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeO$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeH$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm H_2O$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm H_2O$  | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 
-
+The stated temperature and pressure ranges are only approximate. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\Si $ in the mantle minerals according to [1].
 
 Example:
 
@@ -73,3 +73,6 @@ Not ready!
 ## The ```pics.materials.MetalSilicatePartitioning``` module
 
 Not ready!
+
+<a id="1">[1]</a> 
+C. Sotin, et al. (2007).
