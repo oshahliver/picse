@@ -17,6 +17,8 @@ This method sets up all planetary parameters and run parameters for the subseque
 Example:
 
 ```python
+from pics.interiors import planet_creator
+
 planetary_params = {"M_surface_should":1, "T_surface_should":300.0}
 run_params = {"accs":[1e-3, 1e-2]}
 
