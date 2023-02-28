@@ -19,11 +19,14 @@ Example:
 ```python
 from pics.interiors import planet_creator
 
+# Create Planet instance
 pl = planet_creator.Planet()
 
+# Define planetary and run parameters if desired
 planetary_params = {"M_surface_should":1, "T_surface_should":300.0}
 run_params = {"accs":[1e-3, 1e-2]}
 
+# Create instances of parameter handlers
 pp = planet_creator.PlanetaryInputParams()
 rp = planet_creator.RunInputParams()
 
@@ -38,6 +41,7 @@ for key, val in planetary_params.items():
 for key, val in run_params.items():
     rp.default_values.update({key: val})
 
+# Adopt planetary and run parameters 
 pl.set_up(planetary_params = pp, run_params = rp)
 ```
 
@@ -50,8 +54,10 @@ Example:
 ```python
 from pics.interiors import planet_creator
 
+# Create instance of telluric planet using default specifications
 pl = planet_creator.TelluricPlanet()
-pl.set_up()
+
+# Perform initial structure integration
 pl.construct()
 ``` 
 
