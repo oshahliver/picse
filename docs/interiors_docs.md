@@ -173,6 +173,33 @@ The ```SpecificObject``` will provide tools to create samples of planetary model
 
 The ```MassRadius``` class allows the user to create mass-radius diagrams for user-defined compositions and surface conditions over a wide mass range.
 
+```python
+from pics.interiors import planet_workbench
+workbench = planet_workbench.Toolkit()
+
+mass_range = [0.5, 5.0]
+pps = [
+    {"T_surface_should": 300, "Mg_number_should": 0.3},
+    {"T_surface_should": 300, "Mg_number_should": 0.4},
+    {"T_surface_should": 300, "Mg_number_should": 0.5}
+]
+types = ["telluric" for i in range(len(pps))]
+
+# Create an instance of the MassRadius class
+mrd = planet_workbench.MassRadius(tag="my_mass_radius_diagram")
+
+# Set up mass radius curves with 5 data points per curve
+mrd.set_up(
+    5, planetary_params=pps, base_types=types, mass_range=mass_range, sampling="log"
+)
+
+mrd.create(workbench.iterator)
+
+# Extract the data as and plot the mass-radius diagram
+mrd.extract_data()
+mrd.plot()
+```
+
 ## The ```pics.interiors.planet_iterator``` module
 
 ## The ```pics.interiors.planet_tracker``` module
