@@ -6,7 +6,7 @@ Bla bla
 
 # Interiors
 
- ```&rarr;``` For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
+ For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
 
 ## Single Planets
 

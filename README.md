@@ -30,7 +30,18 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 ## Basic usage
 
-&rarr; For more detailed documentation, see [main documentation](./docs/README.md).
+For more detailed documentation, see [main documentation](./docs/README.md).
+
+| Parameter                   | Validity Range               |
+|-----------------------------|------------------------------|
+| Total mass                  | 0.1 - 10 Earth masses        |
+| Water-mass-fraction         | 0 - 0.5                      |
+| Surface pressure            | 0 - 10 GPa                   |
+| Surface temperature         | 100 - 3000 K                 |
+| [Mg]/[Mg + Fe]              | 0.3 - 0.7                    |
+| [Si]/[Si + Mg]              | 0.2 - 0.8                    |
+| [FeO]/[FeO + MgO]           | 0.1 - 0.9                    |
+
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
