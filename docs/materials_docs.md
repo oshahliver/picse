@@ -16,7 +16,7 @@ Note: The following examples do not work yet as names of the classes and methods
 | $\rm FeS$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeSi$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeO$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeH$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeH_x$  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm Fe_3 C$  | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 | $\rm H_2O$  | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 
