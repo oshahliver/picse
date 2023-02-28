@@ -45,6 +45,16 @@ pl.set_up(planetary_params = pp, run_params = rp)
 
 This method calls the structure integrator for the specified planetary parameters and run parameters and performs the integration from the center to the surface.
 
+Example:
+
+```python
+from pics.interiors import planet_creator
+
+pl = planet_creator.TelluricPlanet()
+pl.set_up()
+pl.construct()
+``` 
+
 #### ```Planet.update_initials()```:
 
 #### ```Planet.update_values()```:
