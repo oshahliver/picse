@@ -1,6 +1,38 @@
 # The ```pics.interiors``` Module: The higher-level tools for creating planetary interior models
 
-## Basic Usage
+The true power of the PICSE package lies in the availability of a sphisticated library of higher-level tools that was specifically created for setting up, creating, and analysing planetary interior models. This library is continuously improved and updated.
+
+## Basic usage
+
+Example:
+
+```python
+from pics.interiors import planet_iterator, planet_creator
+
+# Load the equations of state
+planet_creator.load_eos_tables() 
+
+# Create an instance of the iterator
+iterator = planet_iterator.Toolkit()
+
+# Define planetary parameters
+planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)
+
+# Create and construct planet instance
+pl = planet_creator.TelluricPlanet(planetary_params = planet_specs)
+pl.construct()
+
+# Pass planet to the iterator to match boundary conditions
+iterator_specs = dict(acc=[0.01, 0.01])
+iterator.iterate(planet=pl, iterator_specs = iterator_specs)
+
+# Inspect the model
+pl.print()
+pl.plot()
+```
+
+
+## The individual components
 
 ## The ```pics.interiors.planet_creator``` module
 
@@ -12,7 +44,7 @@ The ```planet_creator.Planet``` class provides the scaffold for planetary interi
 
 #### ```Planet.set_values()```:
 
-This method sets up all planetary parameters and run parameters for the subsequent structure integration. The example below shows how to manually set up a planet. This is handled internally by PICSE if ```BaseType``` planets are used.
+This method sets up all planetary parameters and run parameters for the subsequent structure integration. The example below shows how to manually set up a planet. This is handled internally by PICSE if the ```BaseTypePlanet``` class is used (recommended).
 
 Example:
 
