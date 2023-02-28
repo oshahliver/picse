@@ -79,6 +79,7 @@ Computes volumetric and thermodynamic properties of the individual components at
 ### ```Mixture.update_fractions(new_fractions)```:
 
 Parameters:
+
 ```new_fractions```: list containing the new molar abundances of each component of the mixture.
 
 Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
@@ -90,10 +91,11 @@ Computes the mass fraction of each component of the mixture from their mole frac
 ### ```Mixture.update()```:
 
 Parameters:
-float: P = None: pressure in gigapascal
-float: T = None: temperature in kelvin
-float: d = None: density in kilogram per cubic meter
-float: dPdrho = None: density derivative of pressure
+
+```P (float, optional)```: pressure in gigapascal. Default is ```None```.
+```float: T=None```: temperature in kelvin
+```float: d=None```: density in kilogram per cubic meter
+```float: dPdrho=None```: density derivative of pressure
 
 This method updates the material instance of each component of the
 mixture individually and then computes the new mean density in the cell
