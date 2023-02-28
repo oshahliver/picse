@@ -6,17 +6,17 @@ Bla bla
 
 # Interiors
 
-For more detailed documentation, see [interiors](./interiors_docs.md).
+ ```&rarr;``` For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
 
 ## Single Planets
 
-To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
+To set up a simple planetary model import the ```planet_creator```, for handling of the planetary objects and their properties, and the ```planet_iterator```, for handling of the boundary conditions (For more details, see [interiors](.interiors_docs.md).).
 
 ```python
 from pics.interiors import planet_iterator, planet_creator
 ```
 
-Next, load the EoS tables into memory for subsequent use during the structure integration. If you forget this step, you'll most likely encounter a segmentation fault.
+Next, load the EoS tables into memory for subsequent use during the structure integration. If you forget this step, you'll most likely encounter a segmentation fault. (For more details, see [materials](.materials_docs.md).)
 
 ```python
 planet_creator.load_eos_tables() 
