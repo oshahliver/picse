@@ -1,4 +1,4 @@
-# The ```pics.utils``` Module: A collection of utilities to assist with your projects
+# The ```pics.utils``` module: A collection of utilities to assist with your planetary modelling projects
 
 ## Basic Usage
 
