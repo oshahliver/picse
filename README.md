@@ -33,15 +33,15 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 For more detailed documentation, see [main documentation](./docs/README.md).
 
 
-| Parameter                   | Validity Range           |
-|-----------------------------|--------------------------|
-| Total mass                  | 0.1 - 10 Earth masses    |
-| Water-mass-fraction         | 0 - 0.5                  |
-| Surface pressure            | 0 - 10 GPa               |
-| Surface temperature         | 100 - 3000 K             |
-| ![Mg]/![Mg + Fe]            | 0.3 - 0.7                |
-| ![Si]/![Si + Mg]            | 0.2 - 0.8                |
-| ![FeO]/![FeO + MgO]         | 0.1 - 0.9                |
+| Parameter                   | Validity Range               |
+|-----------------------------|------------------------------|
+| Total mass                  | 0.1 - 10 Earth masses        |
+| Water-mass-fraction         | 0 - 0.5                      |
+| Surface pressure            | 0 - 10 GPa                   |
+| Surface temperature         | 100 - 3000 K                 |
+| \\(\\frac{Mg}{Mg + Fe}\\)   | 0.3 - 0.7                    |
+| \\(\\frac{Si}{Si + Mg}\\)   | 0.2 - 0.8                    |
+| \\(\\frac{FeO}{FeO + MgO}\\) | 0.1 - 0.9                    |
 
 
 
