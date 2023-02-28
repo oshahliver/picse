@@ -2,7 +2,7 @@
 
 The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. Note that the actual implementation of the equations of state in the structure code uses pre-generated equation of state tables and table interpolation algorithms to boost performance.
 
-Note: The following examples do not work yet as names of the classes and methods in the source files is not compatible with the naming convention of PICSE.
+Note: The following examples do not work yet as names of the classes and methods in the source files is not compatible with the naming convention of PICSE. So if you value your sanity stay away from them for the time being...
 
 ## Basic Usage
 
@@ -59,11 +59,21 @@ dens = eos.compute(ll = 3, what = "dens", pres = 2e10, temp = 300.)
 print(all_props)
 ```
 
-## The```pics.materials.Material``` module
+## The ```pics.materials.Material``` module
 
 ### The ```Material.Unit``` class
 
+The ```Mixture``` class is a useful tool for investigating and visualizing the properties of isolated planetary building blocks and to create equation of state tables.
+
+Note. The ```Unit``` class is a separate implementation from the corresponding routines of the structure integrator implemented in fortran.
+
 ### The ```Material.Mixture``` class
+
+The ```Mixture``` class is a useful tool for investigating and visualizing the properties of mixtures different planetary building blocks and to create equation of state tables.
+
+Note. The ```Mixture``` class is a separate implementation from the corresponding routines of the structure integrator implemented in fortran.
+
+Example:
 
 ```python
 from pics.meterials import material
