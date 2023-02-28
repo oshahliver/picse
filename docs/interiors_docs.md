@@ -14,6 +14,29 @@ The ```planet_creator.Planet``` class provides the scaffold for planetary interi
 
 This method sets up all planetary parameters and run parameters for the subsequent structure integration.
 
+Example:
+
+```python
+planetary_params = {"M_surface_should":1, "T_surface_should":300.0}
+run_params = {"accs":[1e-3, 1e-2]}
+
+pp = planet_creator.PlanetaryInputParams()
+rp = planet_creator.RunInputParams()
+
+pp.set_default_values()
+rp.set_default_values()
+
+# update planetary parameters if passed by user
+for key, val in planetary_params.items():
+    pp.default_values.update({key: val})
+
+# update run parameters if passed by user
+for key, val in run_params.items():
+    rp.default_values.update({key: val})
+
+pl.set_up(planetary_params = pp, run_params = rp)
+```
+
 #### ```Planet.construct()```:
 
 This method calls the structure integrator for the specified planetary parameters and run parameters and performs the integration from the center to the surface.
@@ -28,7 +51,7 @@ Computes the thickness of the hydrosphere in meters and assigns it to the ```Pla
 
 #### ```Planet.compute_oxide_fractions()```:
 
-Computes the mole fractions of different oxides in the mantle from the atomic mantle composition.
+Computes the mole fractions of different oxides in the mantle from the atomic mantle composition. The planet needs to be constracted first.
 
 Example:
 

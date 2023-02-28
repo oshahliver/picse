@@ -526,7 +526,7 @@ class Planet:
 
     def compute_oxide_fractions(self):
         """
-        Computes the mole fractions of different oxides in the mantle from the atomic mantle composition.
+        Computes the mole fractions of different oxides in the mantle from the atomic mantle composition. The planet needs to be constracted first.
         """
         # Compute mole fractions of oxides in the mantle
         if self.Fe_number_mantle > 0.0:
