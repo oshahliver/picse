@@ -131,9 +131,55 @@ Prints basic volumetric and thermodynamic properties of the mixture to standard 
 
 ## The ```pics.materials.EquationsOfState``` module
 
+The ```EquationsOfState``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks.
+
 ### ```EquationsOfState.compute()```
 
+### ```EquationsOfState.P_BM()```:
+
+Computes the pressure using the 3rd order Birch-Murnaghan equation of state.
+
+Parameters:
+
+```float: eta=0```: Compression ratio.\
+```float: K=0```: Bulk modulus.\
+```float: K0_prime=0```: Pressure derivative of bulk modulus.
+
+### ```EquationsOfState.rho_BM()```:
+
+Computes the density using the 3rd order Birch-Murnaghan equation of state.
+
+Parameters:
+
+```int: ll=0```: Compound signature.\
+```float: d0=0```: Reference density.\
+```float: T=0```: Temperature in kelvin.\
+```float: P=0```: Pressure in Pa.\
+```float: dmin=None```: Lower bound for density bisection.\
+```float: dmax=None```: Upper bound for density bisection.\
+```float: aT=None```: First fitting parameter to thermal expansion coefficient.\
+```float: bT=None```: Second fitting parameter to thermal expansion coefficient.\
+```float: cT=None```: Third fitting parameter to thermal expansion coefficient.\
+
+### ```EquationsOfState.dPdrho_BM()```:
+
+Computes the density derivative of the pressure using the 3rd order Birch-Murnaghan equation of state.
+
+### ```EquationsOfState.P_MGD()```:
+
+Computes the pressure using the  equation of state.
+
+### ```EquationsOfState.rho_MGD()```:
+
+Computes the density using the Mie-Grüneisen-Debye equation of state.
+
+### ```EquationsOfState.dPdrho_MGD()```:
+
+Computes the density derivative of the pressure using the Mie-Grüneisen-Debye equation of state.
+
 ## The ```pics.materials.EquationsOfStateTables``` module
+
+Not ready!
 
 ## The ```pics.materials.Hydration``` module
 
