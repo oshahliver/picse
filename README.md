@@ -32,6 +32,8 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 For more detailed documentation, see [main documentation](./docs/README.md).
 
+
+
 The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
 | Parameter                   | Calibration Range               |
@@ -44,6 +46,10 @@ The current version of the PICS code uses a machine-learning enhanced algorithm 
 | Bulk $\rm[Si]/[Si + Mg]$            | 0.33 - 0.67                    |
 | Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5                    |
 | Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                    |
+| Core $\rm[S]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
+| Core $\rm[O]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
+| Core $\rm[Si]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
+| Core $\rm[H]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
 
 The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
 
