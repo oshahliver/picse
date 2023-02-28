@@ -98,7 +98,7 @@ Currently the structure integration for aqua planets does not always converge pr
 
 ...
 
-## Coming soon
+## Coming soon (I hope!)
 
 
 1. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
