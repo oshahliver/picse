@@ -19,6 +19,13 @@ mix.update(temp=350.0, pres=3e10)
 
 # Print the mixture properties
 mix.print()
+
+# Compute all EoS parameters and only density for compound 3
+all_props = eos.compute(ll = 3, pres = 2e10, temp = 300.)
+dens = eos.compute(ll = 3, what = "dens", pres = 2e10, temp = 300.)
+
+# Print the material properties
+print(all_props)
 ```
 
 ## The```pics.materials.Material``` module
