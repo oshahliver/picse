@@ -32,8 +32,11 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 For more detailed documentation, see [main documentation](./docs/README.md).
 
-<div style="text-align:center">
-    
+
+&nbsp;
+
+&nbsp;
+
 | Parameter                   | Validity Range               |
 |-----------------------------|------------------------------|
 | Total mass                  | 0.1 - 10 Earth masses        |
@@ -44,7 +47,11 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 | [Si]/[Si + Mg]              | 0.2 - 0.8                    |
 | [FeO]/[FeO + MgO]           | 0.1 - 0.9                    |
 
-</div>
+&nbsp;
+
+&nbsp;
+
+
 
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
