@@ -32,7 +32,7 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 For more detailed documentation, see [main documentation](./docs/README.md).
 
-
+### Understanding the model
 
 The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
@@ -54,6 +54,8 @@ The current version of the PICS code uses a machine-learning enhanced algorithm 
 | Core $\rm[H]/[S + O + Si + H + Fe]$         | 0 - 0                    |
 
 The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
+
+### Creating your first planet
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
