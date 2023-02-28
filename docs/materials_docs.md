@@ -93,9 +93,9 @@ Computes the mass fraction of each component of the mixture from their mole frac
 Parameters:
 
 ```P (float, optional)```: pressure in gigapascal. Default is ```None```.\
-```float: T=None```: temperature in kelvin
-```float: d=None```: density in kilogram per cubic meter
-```float: dPdrho=None```: density derivative of pressure
+```float: T=None```: temperature in kelvin.\
+```float: d=None```: density in kilogram per cubic meter.\
+```float: dPdrho=None```: density derivative of pressure.\
 
 This method updates the material instance of each component of the
 mixture individually and then computes the new mean density in the cell
