@@ -79,8 +79,8 @@ compontents in the mixture and computes volumetric and thermodynamic properties 
 
 Parameters:
 
-```float: T=None```: Temperature in kelvin.
-```float: P=None```: Pressure in pascal.
+```float: T=None```: Temperature in kelvin.\
+```float: P=None```: Pressure in pascal.\
 ```int: phase=None```: Phase region signature.
 
 ### ```Mixture.update_fractions(new_fractions)```:
