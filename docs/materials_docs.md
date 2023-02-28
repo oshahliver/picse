@@ -6,21 +6,24 @@ Note: The following examples do not work yet as names of the classes and methods
 
 ## Basic Usage
 
-| Compound | Name | ID  | EoS      | Pressure range (GPa) | Temperature range (K) | Literature |
-|----------|------|-----|----------|----------------------|-----------------------|------------|
-| $\rm (Mg,Fe)_2Si O_4$  | Olivine | 001 | SRK      | 1-100                | 50-200                | Ref 1      |
-| $\rm (Mg,Fe)_2Si_2O_6$  | Pyroxene | 002 | PR       | 10-500               | 100-300               | Ref 2      |
-| $\rm (Mg,Fe)SiO_3$  | Perovskite | 003 | RK       | 50-1000              | 150-400               | Ref 3      |
-| $\rm (Mg,Fe)O$   | Periclase | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
-| $\rm Mg(OH)_2$   | Brucite | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
-| $\rm SiO_2$  | Stishovit | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeS$  | Iron sulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+The following list contains all compounds for which an equation of state implementation is available.
+
+
+| Compound | Name | ID  | EoS      | Pressure range (GPa) | Temperature range (K) | Table | Literature |
+|----------|------|-----|----------|----------------------|-----------------------|-----|------------|
+| $\rm (Mg,Fe)_2Si O_4$  | Olivine | 001 | SRK      | 1-100                | 50-200                | Yes | Ref 1      |
+| $\rm (Mg,Fe)_2Si_2O_6$  | Pyroxene | 002 | PR       | 10-500               | 100-300               | Yes | Ref 2      |
+| $\rm (Mg,Fe)SiO_3$  | Perovskite | 003 | RK       | 50-1000              | 150-400               | Yes | Ref 3      |
+| $\rm (Mg,Fe)O$   | Periclase | 004 | Redlich | 100-2000             | 200-500               | Yes | Ref 4      |
+| $\rm Mg(OH)_2$   | Brucite | 004 | Redlich | 100-2000             | 200-500               | Yes | Ref 4      |
+| $\rm SiO_2$  | Stishovit | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
+| $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
+| $\rm FeS$  | Iron sulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
 | $\rm FeSi$  | Ferrosilicon | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeO$  | Iron oxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeH_x$  | Iron hydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
-| $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeO$  | Iron oxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
+| $\rm FeH_x$  | Iron hydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
+| $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | No | Ref 5      |
+| $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Yes | Ref 5      |
 
 The stated temperature and pressure ranges are only approximate. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
 
