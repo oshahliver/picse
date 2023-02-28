@@ -7,7 +7,7 @@ Note: The following examples do not work yet as names of the classes and methods
 ## Basic Usage
 
 | Compound | Name | ID  | EoS      | Pressure range (GPa) | Temperature range (K) | Literature |
-|----------|-----|----------|----------------------|-----------------------|------------|
+|----------|------|-----|----------|----------------------|-----------------------|------------|
 | $\rm (Mg,Fe)_2Si O_4$  | Olivine | 001 | SRK      | 1-100                | 50-200                | Ref 1      |
 | $\rm (Mg,Fe)_2Si_2O_6$  | Pyroxene | 002 | PR       | 10-500               | 100-300               | Ref 2      |
 | $\rm (Mg,Fe)SiO_3$  | Perovskite | 003 | RK       | 50-1000              | 150-400               | Ref 3      |
@@ -16,7 +16,7 @@ Note: The following examples do not work yet as names of the classes and methods
 | $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeS$  | Ironsulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeSi$  | Ironsilicon | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeO$  | Ironoxide|  005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeO$  | Ironoxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm FeH_x$  | Ironhydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm Fe_3 C$  | No clue | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 | $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
