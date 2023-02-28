@@ -1,6 +1,16 @@
 # The ```pics.interiors``` Module: The higher-level tools for creating planetary interior models
 
-The true power of the PICSE package lies in the availability of a sphisticated library of higher-level tools that was specifically created for setting up, creating, and analysing planetary interior models. This library is continuously improved and updated.
+The true power of the PICSE package lies in the availability of a sphisticated library of higher-level tools that was specifically created for setting up, creating, and analysing planetary interior models. This library is continuously improved and updated. Here are a few examples of what the ```picse.interiors``` module has to offer:
+
+1. Offers the possibility to use base-type planets (e.g. telluric and aqua planets) for quick and robust creation of planets while maintaining the option to create more user-specific models using more generic classes.
+
+2. Ready-to-use classes to create populations of planets and mass-radius diagrams with ease.
+
+3. Provides great flexibility for specifying planetary- and run parameters to explore a wide range of models and modelling strategies.
+
+4. Machine-learning enhanced algorithms for predicting initial conditions and matching user specified boundary conditions over a wide parameter space that boost performance and stability. 
+
+
 
 ## Basic usage
 
