@@ -2799,6 +2799,13 @@ class Mixture:
         temperature is passed, nothing will be done. If d and or dPdrho are
         passed the individual d and dPdrho contributions for each material will
         be reconstructed without calling the eos which is more efficient.
+        
+        Parameters:
+        P (float, optional): Pressure in Pa. Defaults to None.
+        T (float, optional): Temperature in K. Defaults to None. 
+        d (float, optional): Density in kg per cubic meter. Defaults to None.
+        dPdrho (float, optional): Density derivative of pressure. Defaults to None.
+
         """
         # update only if new pressure and|or temperature has been specified
         if T == None and P == None:

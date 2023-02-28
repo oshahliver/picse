@@ -90,19 +90,17 @@ Computes the mass fraction of each component of the mixture from their mole frac
 
 ### ```Mixture.update()```:
 
-Parameters:
-
-```P (float, optional)```: pressure in gigapascal. Default is ```None```.\
-```float: T=None```: temperature in kelvin.\
-```float: d=None```: density in kilogram per cubic meter.\
-```float: dPdrho=None```: density derivative of pressure.\
-
 This method updates the material instance of each component of the
 mixture individually and then computes the new mean density in the cell
 without re-initializing any component objects. If no new pressure or
-temperature is passed, nothing will be done. If d and or dPdrho are
-passed the individual d and dPdrho contributions for each material will
-be reconstructed without calling the eos which is more efficient.
+temperature is passed, nothing will be done. If the density and or density derivative of the pressure are passed the individual contributions of the densities and density derivatives of the pressure of each material will be reconstructed without calling the equation of statee which is more efficient.
+
+Parameters:
+
+```P (float, optional)```: pressure in pascal. Default is ```None```.\
+```float: T=None```: temperature in kelvin.\
+```float: d=None```: density in kilogram per cubic meter.\
+```float: dPdrho=None```: density derivative of pressure.
 
 ### ```Mixture.plot()```:
 
