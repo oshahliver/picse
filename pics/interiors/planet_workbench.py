@@ -154,13 +154,13 @@ class BlindSet(DataSet):
         self.planetary_params_all.update({"Si_number_mantle": Si_number_mantle_all})
         self.ready = True
 
-    def create(self, new=True, convergence_check=True, write_frequency = 2):
+    def create(self, new=True, convergence_check=True, write_frequency=2):
         """
         Creates the planets and constructs them according to the specified properties.
         """
 
         write_frequency = min(write_frequency, self.n_planets)
-        write_batches = int(self.n_planets/write_frequency)
+        write_batches = int(self.n_planets / write_frequency)
 
         if not self.ready:
             raise AttributeError(

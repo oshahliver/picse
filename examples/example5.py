@@ -47,8 +47,8 @@ X_train_norm = scaler.fit_transform(X_train)
 X_test_norm = scaler.fit_transform(X_test)
 
 # set up parameter ranges
-num_layers = [1,2, 3, 4, 5, 6]
-layer_size = [32,64, 128, 256]
+num_layers = [1, 2, 3, 4, 5, 6]
+layer_size = [32, 64, 128, 256]
 activation = ["relu"]
 
 # iterate over all combinations of parameters

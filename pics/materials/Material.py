@@ -809,13 +809,13 @@ def T_liquidus_pyrolite_prime(P):
 
 def specific_thermal_energy(T, P, C_p):
     """Computes the specific thermal energy of a substance at temperature T and pressure P using the heat capacity function C_p(T,P)"""
-    
+
     # Compute the internal energy using the heat capacity function
     U = integrate.quad(C_p, 0.0, T, args=(P,))[0]
-    
+
     # Compute the thermal energy using the internal energy and specific volume (assuming m = 1)
-    E_therm = U + P/C_p(T,P)
-    
+    E_therm = U + P / C_p(T, P)
+
     return E_therm
 
 
@@ -847,12 +847,12 @@ def iron_heat_capacity(T, P):
     cp = (
         a
         + b * x
-        + c * x ** 2
-        + d * x ** 3
-        + (e + f * x + g * x ** 2 + h * x ** 3) * y
-        + j * y ** 2
-        + k * y * x ** 2
-        + i * y * x ** 3
+        + c * x**2
+        + d * x**3
+        + (e + f * x + g * x**2 + h * x**3) * y
+        + j * y**2
+        + k * y * x**2
+        + i * y * x**3
     )
 
     return cp
@@ -886,11 +886,11 @@ def pyrolite_heat_capacity(T, rho):
     cp = (
         a
         + b * x
-        + c * x ** 2
-        + d * x ** 3
-        + (e + f * x + g * x ** 2 + h * x ** 3 + i * x ** 4) * y
-        + j * y ** 2
-        + k * y * x ** 2
+        + c * x**2
+        + d * x**3
+        + (e + f * x + g * x**2 + h * x**3 + i * x**4) * y
+        + j * y**2
+        + k * y * x**2
     )
 
     return cp
