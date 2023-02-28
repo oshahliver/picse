@@ -32,8 +32,9 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 For more detailed documentation, see [main documentation](./docs/README.md).
 
+The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
-| Parameter                   | Validity Range               |
+| Parameter                   | Calibration Range               |
 |-----------------------------|------------------------------|
 | Total mass                  | 0.01 - 6 Earth masses        |
 | Water-mass-fraction         | 0 - 0.5                      |
@@ -44,9 +45,7 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 | Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5                    |
 | Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                    |
 
-
-
-
+You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
