@@ -306,6 +306,7 @@ class Planet:
         self.default_values = {}
         self.initials = {}
         self.label = label
+
         self.vapor_reached = False
         self.status = "shadow of the future"
         self.predictor_type = (
@@ -482,6 +483,25 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
+    def compute_ocean_depth(self):
+        self.ocean_depth = self.R_surface_is - self.layer_properties[3]["R_outer"]
+    
+    def compute_oxide_fractions(self):
+        # Compute mole fractions of oxides in the mantle
+        if self.Fe_number_mantle > 0.0:
+            self.xi_FeO_mantle = 1.0 - self.Si_number_mantle
+            self.xi_FeO_mantle /= (
+                (1.0 - self.Fe_number_mantle) / self.Fe_number_mantle
+                + 1.0
+                - self.Si_number_mantle
+            )
+
+        else:
+            self.xi_FeO_mantle = 0.0
+
+        self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
+        self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
+
     def compute_core_mass(self, n=3, M_IC=0.0):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
@@ -559,12 +579,18 @@ class Planet:
             + self.layer_properties[3]["indigenous_mass"]
         ) / m_earth
         self.core_mass_fraction_is = self.M_core_is * m_earth / self.M_surface_is
-
+        self.core_radius = self.layer_properties[1]["R_outer"]
+        
         try:
             self.M_ocean_is = self.layer_properties[4]["indigenous_mass"] / m_earth
 
         except IndexError:
             self.M_ocean_is = 0.0
+
+        self.mean_density = self.M_surface_is / (
+            4.0 / 3.0 * np.pi * self.R_surface_is**3
+        )
+        self.compute_ocean_depth()
 
     def check_convergence(self, ocean=0.01):
         accs = self.iterator_specs["acc"]
@@ -629,11 +655,6 @@ class Planet:
         # update planetary output parameters
         for key, value in zip(fortplanet_output_keys, output):
             setattr(self, key, value)
-            
-
-        self.mean_density = self.M_surface_is / (
-            4.0 / 3.0 * np.pi * self.R_surface_is**3
-        )
 
         self.update_layers(self.layer_properties_dummy)
         self.trim_profiles()

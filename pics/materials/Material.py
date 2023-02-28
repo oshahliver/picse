@@ -84,6 +84,8 @@ from matplotlib import pyplot as plt
 # from pics.materials import hydration
 from decimal import Decimal
 from pics.utils import plotTools
+import scipy.integrate as integrate
+
 import warnings
 
 # from pics.materials import brucite_phase as bruce
@@ -803,6 +805,95 @@ def T_liquidus_pyrolite_prime(P):
     c = 1.9
 
     return T0 * 1.0 / c / a * (1.0 + P / a) ** (1.0 / c - 1.0)
+
+
+def specific_thermal_energy(T, P, C_p):
+    """Computes the specific thermal energy of a substance at temperature T and pressure P using the heat capacity function C_p(T,P)"""
+    
+    # Compute the internal energy using the heat capacity function
+    U = integrate.quad(C_p, 0.0, T, args=(P,))[0]
+    
+    # Compute the thermal energy using the internal energy and specific volume (assuming m = 1)
+    E_therm = U + P/C_p(T,P)
+    
+    return E_therm
+
+
+def iron_heat_capacity(T, P):
+    """Computes the heat capacity of iron at a given temperature and pressure from Stacey et al. 2001.
+
+    Parameters:
+    T (float or ndarray): temperature in K
+    P (float or ndarray): pressure in Pa
+
+    Returns:
+    float or ndarray: heat capacity in J/kg/K
+    """
+    x = T / 1000.0
+    y = P / 1.0e9
+
+    a = 6.53538
+    b = -0.00211775
+    c = 3.34129e-7
+    d = -2.90386e-11
+    e = 1.47786
+    f = -0.00688309
+    g = 1.10548e-6
+    h = -9.19282e-11
+    i = -0.0353877
+    j = 0.000136698
+    k = -7.21556e-9
+
+    cp = (
+        a
+        + b * x
+        + c * x ** 2
+        + d * x ** 3
+        + (e + f * x + g * x ** 2 + h * x ** 3) * y
+        + j * y ** 2
+        + k * y * x ** 2
+        + i * y * x ** 3
+    )
+
+    return cp
+
+
+def pyrolite_heat_capacity(T, rho):
+    """Computes the heat capacity of pyrolite at a given temperature and density from Stixrude and Lithgow-Bertelloni 2011.
+
+    Parameters:
+    T (float or ndarray): temperature in K
+    rho (float or ndarray): density in kg/m^3
+
+    Returns:
+    float or ndarray: heat capacity in J/kg/K
+    """
+    a = 2.054
+    b = 4.581
+    c = -0.0537
+    d = -0.000072
+    e = 5.09
+    f = -1.52
+    g = -0.167
+    h = 0.117
+    i = 0.019
+    j = 0.00071
+    k = 0.0011
+
+    x = T / 1000.0
+    y = rho / 1000.0
+
+    cp = (
+        a
+        + b * x
+        + c * x ** 2
+        + d * x ** 3
+        + (e + f * x + g * x ** 2 + h * x ** 3 + i * x ** 4) * y
+        + j * y ** 2
+        + k * y * x ** 2
+    )
+
+    return cp
 
 
 def gamma_FeO(P=None, xiFeO=0.0):

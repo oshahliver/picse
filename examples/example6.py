@@ -52,7 +52,7 @@ meta = {
 }
 
 blind.set_up(
-    100,
+    400000,
     meta=meta,
     sampling="uni",
 )
@@ -66,7 +66,7 @@ blind.create()
 # Write data to file
 filepath = "/home/os18o068/Documents/PHD/Projects/pics_external_data/training_sets/training_1.csv"
 
-blind.export_file(filepath, specs={"conflict": "overwrite"})
+blind.export_file(filepath, specs={"conflict": "add"})
 
 blind2 = planet_workbench.BlindSet(tag="reading")
 blind2.import_file(filepath)

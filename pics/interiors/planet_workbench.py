@@ -154,7 +154,14 @@ class BlindSet(DataSet):
         self.planetary_params_all.update({"Si_number_mantle": Si_number_mantle_all})
         self.ready = True
 
-    def create(self, new=True, convergence_check=True):
+    def create(self, new=True, convergence_check=True, write_frequency = 2):
+        """
+        Creates the planets and constructs them according to the specified properties.
+        """
+
+        write_frequency = min(write_frequency, self.n_planets)
+        write_batches = int(self.n_planets/write_frequency)
+
         if not self.ready:
             raise AttributeError(
                 "The population you are trying to create is not set up"
@@ -180,6 +187,9 @@ class BlindSet(DataSet):
             ) as bar:
 
                 for i in range(self.n_planets):
+                    # export data batch wise according to specified frequency
+                    if float(int(i / write_batches)) == i / write_batches:
+                        pass
 
                     planetary_params.update(
                         {key: val[i] for key, val in self.planetary_params_all.items()}

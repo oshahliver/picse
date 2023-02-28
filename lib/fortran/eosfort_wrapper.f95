@@ -269,7 +269,7 @@ contains
       O_count = pl%N_O
       S_count = pl%N_S
       ocean_frac_is = pl%ocean_frac_is
-      moment_of_inertia = pl%MOI_is
+      moment_of_inertia = pl%MOI_is / (pl%M_surface_is * pl%R_surface_is**2)
       n_shells = pl%n_shells
       n_shells_layers = pl%n_shells_layers
       Si_number_mantle = pl%Si_number_layers(3)

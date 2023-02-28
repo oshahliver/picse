@@ -1,6 +1,6 @@
 from importlib import resources
 from pics.utils import file_manager as fman
-import pkg_resources
+from pics.physicalparams import r_earth, m_earth
 import pickle
 import pandas as pd
 import csv
@@ -15,6 +15,7 @@ def create_data(planets):
     labels = {
         "mass": "M_surface_is",
         "radius": "R_surface_is",
+        "moi_factor": "moment_of_inertia_is",
         "mg_number": "Mg_number_is",
         "si_number": "Si_number_is",
         "si_number_mantle": "Si_number_mantle",
@@ -23,8 +24,28 @@ def create_data(planets):
         "pres_surface": "P_surface_is",
         "temp_center": "T_center",
         "pres_center": "P_center",
+        "core_radius": "core_radius",
         "core_mass_fraction": "core_mass_fraction_is",
         "ocean_mass_fraction": "ocean_fraction_is",
+        "ocean_depth": "ocean_depth",
+    }
+
+    scalings = {
+        "mass": 1 / m_earth,
+        "radius": 1 / r_earth,
+        "moi_factor": 1,
+        "mg_number": 1,
+        "si_number": 1,
+        "si_number_mantle": 1,
+        "fe_number_mantle": 1,
+        "temp_surface": 1,
+        "pres_surface": 1,
+        "temp_center": 1,
+        "pres_center": 1,
+        "core_radius": 1,
+        "core_mass_fraction": 1,
+        "ocean_mass_fraction": 1,
+        "ocean_depth": 1,
     }
 
     data = {}

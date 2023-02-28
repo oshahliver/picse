@@ -4,7 +4,7 @@
 
 ## General Information
 
-The PICS project (Planetary Interior Compositions and Structures) is based on the planetary structure code I developed during my joint PhD program at the University of Bern and the University of Zürich. The general objective of the project is to provide ready-to-use tools for generating interior models of planets or moons. These tools can help us to bridge persisting gaps between observations and theory in the context of classification and characterization of exoplanets and solar system bodies.
+The PICS project (Planetary Interior Compositions and Structures) is based on the planetary structure code I developed during my joint PhD program at the University of Bern and the University of Zürich. The general objective of the project is to provide ready-to-use tools for generating interior models of terrestrial and water-rich planets and moons. These tools can help us to bridge persisting gaps between observations and theory in the context of classification and characterization of exoplanets and solar system bodies.
 
 PICS generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. Each layer is described as a multi-component chemical system that is modelled using adequate thermal equations of state and simple mixing laws. For more information about the physics of the model see [[1],[2]](#1).
 
@@ -31,6 +31,8 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 ## Basic usage
 
 ### Single planets
+
+For more detailed documentation, see [docs](docs/interiors_docs.md).
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
@@ -226,6 +228,10 @@ Currently the structure integration for aqua planets does not always converge pr
 2. A interactive data structure with some basic analysis and visualization capabilities.
 
 3. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
+
+4. A machine-learning enhanced algorithm for handling initial conditions in order to boost performance of the code.
+
+5. A thermal evolution model.
 
 ...
 
