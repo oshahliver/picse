@@ -45,11 +45,13 @@ The current version of the PICS code uses a machine-learning enhanced algorithm 
 | Bulk $\rm[Mg]/[Mg + Fe]$            | 0.1 - 0.9                    |
 | Bulk $\rm[Si]/[Si + Mg]$            | 0.33 - 0.67                    |
 | Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5                    |
-| Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                    |
-| Core $\rm[S]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
-| Core $\rm[O]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
-| Core $\rm[Si]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
-| Core $\rm[H]/[S + O + Si + H + Fe]$         | 0 - 0.67                    |
+| Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                   |
+| Mantle $\rm[CaO]/[CaO + MgO]$         | 0 - 0                    |
+| Mantle $\rm[Al_2O_3]/[Al_2O_3 + MgO]$         | 0 - 0                    |
+| Core $\rm[S]/[S + O + Si + H + Fe]$         | 0 - 0                    |
+| Core $\rm[O]/[S + O + Si + H + Fe]$         | 0 - 0                    |
+| Core $\rm[Si]/[S + O + Si + H + Fe]$         | 0 - 0                    |
+| Core $\rm[H]/[S + O + Si + H + Fe]$         | 0 - 0                    |
 
 The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
 
