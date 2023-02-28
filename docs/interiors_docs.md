@@ -20,11 +20,11 @@ This method calls the structure integrator for the specified planetary parameter
 
 #### ```Planet.update_initials()```:
 
-#### Planet.update_values()
+#### ```Planet.update_values()```:
 
-#### Planet.compute_ocean_depth()
+#### ```Planet.compute_ocean_depth()```:
 
-#### Planet.compute_oxide_fractions()
+#### ```Planet.compute_oxide_fractions()```:
 
 #### Planet.compute_core_mass()
 
