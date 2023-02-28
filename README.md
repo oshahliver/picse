@@ -30,7 +30,7 @@ NOTE: The installation process was only tested on a Linux Ubuntu system.
 
 ## Basic usage
 
-```&rarr;``` For more detailed documentation, see [main documentation](./docs/README.md).
+&rarr; For more detailed documentation, see [main documentation](./docs/README.md).
 
 To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
 
