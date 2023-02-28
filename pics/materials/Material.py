@@ -2792,7 +2792,7 @@ class Mixture:
         # compute mean isothermal bulk modulus
         self.K_isoth = self.dPdrho * self.dens
 
-    def Update(self, P=None, T=None, d=None, dPdrho=None, **kwargs):
+    def Update(self, float: P = None, T=None, d=None, dPdrho=None, **kwargs):
         """This method updates the material instance of each component of the
         mixture individually and then computes the new mean density in the cell
         without re-initializing any component objects. If no new pressure or

@@ -72,11 +72,47 @@ mix_specs = {"contents": [3, 5], "fractions": [0.25, 0.75], "temp": 300.0, "pres
 mix = material.Mixture(specs=mix_specs)
 ```
 
-## The```pics.materials.EquationsOfState``` module
-
-### ```EquationsOfState.compute()```
+### ```Mixture.compute()```:
 
 Computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture and uses a simple mixing laws to compute the bulk properties of the mixture. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
+
+### ```Mixture.update_fractions(new_fractions)```:
+
+Parameters:
+```new_fractions```: list containing the new molar abundances of each component of the mixture.
+
+Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
+
+### ```Mixture.update_weight_fractions()```:
+
+Computes the mass fraction of each component of the mixture from their mole fractions and the molar masses.
+
+### ```Mixture.update()```:
+
+Parameters:
+float: P = None: pressure in gigapascal
+float: T = None: temperature in kelvin
+float: d = None: density in kilogram per cubic meter
+float: dPdrho = None: density derivative of pressure
+
+This method updates the material instance of each component of the
+mixture individually and then computes the new mean density in the cell
+without re-initializing any component objects. If no new pressure or
+temperature is passed, nothing will be done. If d and or dPdrho are
+passed the individual d and dPdrho contributions for each material will
+be reconstructed without calling the eos which is more efficient.
+
+### ```Mixture.plot()```:
+
+Simple plotting routine to visualize basic volumetric and thermodynamic properties of the mixture.
+
+### ```Mixture.print()```:
+
+Prints basic volumetric and thermodynamic properties of the mixture to standard output.
+
+## The ```pics.materials.EquationsOfState``` module
+
+### ```EquationsOfState.compute()```
 
 ## The ```pics.materials.EquationsOfStateTables``` module
 
