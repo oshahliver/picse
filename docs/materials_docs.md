@@ -6,6 +6,10 @@ Note: The following examples do not work yet as names of the classes and methods
 
 ## Basic Usage
 
+
+
+### Available chemical compounds
+
 The following list contains all compounds for which an equation of state implementation is available.
 
 
@@ -25,7 +29,7 @@ The following list contains all compounds for which an equation of state impleme
 | $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | No | Ref 5      |
 | $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Yes | Ref 5      |
 
-The stated temperature and pressure ranges are only approximate. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
+The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
 
 Example:
 
@@ -71,6 +75,8 @@ mix = material.Mixture(specs=mix_specs)
 ## The```pics.materials.EquationsOfState``` module
 
 ### ```EquationsOfState.compute()```
+
+Computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture and uses a simple mixing laws to compute the bulk properties of the mixture. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
 
 ## The ```pics.materials.EquationsOfStateTables``` module
 
