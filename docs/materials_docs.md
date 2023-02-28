@@ -1,6 +1,19 @@
 # The ```pics.materials``` Module: A collection of tools to handle the properties and equations of state of planetary building blocks
 
+The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. 
+
 ## Basic Usage
+
+| Compound | ID  | EoS      | Pressure range (bar) | Temperature range (K) | Literature |
+|----------|-----|----------|----------------------|-----------------------|------------|
+| Methane  | 001 | SRK      | 1-100                | 50-200                | Ref 1      |
+| Ethane   | 002 | PR       | 10-500               | 100-300               | Ref 2      |
+| Propane  | 003 | RK       | 50-1000              | 150-400               | Ref 3      |
+| Butane   | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
+| Pentane  | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+
+
+Example:
 
 ```python
 from pics.materials import material, eos
