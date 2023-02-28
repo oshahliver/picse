@@ -39,9 +39,9 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 | Water-mass-fraction         | 0 - 0.5                      |
 | Surface pressure            | 0 - 10 GPa                   |
 | Surface temperature         | 100 - 3000 K                 |
-| $[Mg]/[Mg + Fe]$            | 0.3 - 0.7                    |
-| $[Si]/[Si + Mg]$            | 0.2 - 0.8                    |
-| $[FeO]/[FeO + MgO]$         | 0.1 - 0.9                    |
+| Bulk $\rm[Mg]/[Mg + Fe]$            | 0.3 - 0.7                    |
+| Bulk $\rm[Si]/[Si + Mg]$            | 0.2 - 0.8                    |
+| Mantle $\rm[FeO]/[FeO + MgO]$         | 0.1 - 0.9                    |
 
 
 
