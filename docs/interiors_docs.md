@@ -42,9 +42,6 @@ pl.print()
 pl.plot()
 ```
 
-
-## The individual components of ```pics.interiors```
-
 ## The ```pics.interiors.planet_creator``` module
 
 ### The ```planet_creator.PlanetaryInputParams``` and ```planet_creator.PlanetaryOutputParams``` classes

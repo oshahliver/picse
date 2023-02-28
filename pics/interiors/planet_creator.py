@@ -506,7 +506,7 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
-    def get_hydrosphere_props(self, mode = "basic"):
+    def get_hydrosphere_props(self, mode="basic"):
         """
         Extracts the structure and basic properties of the hydrosphere. These
         include: the total thickness, the layering into different phase regions,

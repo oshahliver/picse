@@ -97,6 +97,10 @@ plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 
 
 class Sotin:
+    """
+    Basic implementation of the composition model by Sotin et al. 2007.
+    """
+
     def __init__(self, MgSi=1.131, FeSi=0.986, Mg_number_Si=0.9):
         self.MgSi = MgSi
         self.Mg_number_Si = Mg_number_Si
@@ -2304,17 +2308,17 @@ class Unit:
             print("{:<20} {:>0}".format(line[0], line[1]))
 
         if level == 1:
-
-            print(
-                "\nK_0   [GPa]  :",
-                k0,
-                "\nK_0´ :",
-                k0prime,
-                "\nrho_0 [kg/m³]:",
-                d0,
-                "\nrho_T0[kg/m³]:",
-                dT0,
-            )
+            pass
+            # print(
+            #     "\nK_0   [GPa]  :",
+            #     k0,
+            #     "\nK_0´ :",
+            #     k0prime,
+            #     "\nrho_0 [kg/m³]:",
+            #     d0,
+            #     "\nrho_T0[kg/m³]:",
+            #     dT0,
+            # )
 
     # def Compute(self, d=None, T=None, P=None, phase=None, **kwargs):
     #     """Here the material paremeters are computed. Normally values for P
