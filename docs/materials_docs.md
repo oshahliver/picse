@@ -1,6 +1,8 @@
 # The ```pics.materials``` Module: A collection of tools to handle the properties and equations of state of planetary building blocks
 
-The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. 
+The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. Note that the actual implementation of the equations of state in the structure code uses pre-generated equation of state tables and table interpolation algorithms to boost performance.
+
+Note: The following examples do not work yet as names of the classes and methods in the source files is not compatible with the naming convention of PICSE.
 
 ## Basic Usage
 
