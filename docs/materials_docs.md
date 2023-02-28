@@ -14,11 +14,11 @@ Note: The following examples do not work yet as names of the classes and methods
 | $\rm (Mg,Fe)O$   | Periclase | 004 | Redlich | 100-2000             | 200-500               | Ref 4      |
 | $\rm SiO_2$  | Stishovit | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
 | $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeS$  | Ironsulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeSi$  | Ironsilicon | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeO$  | Ironoxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm FeH_x$  | Ironhydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
-| $\rm Fe_3 C$  | No clue | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeS$  | Iron sulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeSi$  | Ferrosilicon | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeO$  | Iron oxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm FeH_x$  | Iron hydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Ref 5      |
+| $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 | $\rm H_2O$  | Water | 005 | Ab-Initio | 500-5000        | 250-600               | Ref 5      |
 
 The stated temperature and pressure ranges are only approximate. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
