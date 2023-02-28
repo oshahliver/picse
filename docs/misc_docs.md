@@ -2,5 +2,5 @@
 
 ## Basic usage
 
-Mostly useless
+Wanna here my advise? Don't even botter using this shit!
 
