@@ -506,7 +506,22 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
+    def get_hydrosphere_props(self, mode = "basic"):
+        """
+        Extracts the structure and basic properties of the hydrosphere. These
+        include: the total thickness, the layering into different phase regions,
+        the liquid water mass fraction.
+
+        Parameters:
+        mode (str, optional): Specifies the amount of information to be extracted
+        for the hydrosphere. Defaults to "basic".
+        """
+        raise NotImplementedError("Patience, young one!")
+
     def compute_ocean_depth(self):
+        """
+        Computes the depth thickness of the hydrosphere.
+        """
         self.ocean_depth = self.R_surface_is - self.layer_properties[3]["R_outer"]
 
     def compute_oxide_fractions(self):

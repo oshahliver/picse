@@ -24,7 +24,13 @@ This method calls the structure integrator for the specified planetary parameter
 
 #### ```Planet.compute_ocean_depth()```:
 
+Computes the thickness of the hydrosphere in meters and assigns it to the ```Planet.ocean_depth``` attribute.
+
 #### ```Planet.compute_oxide_fractions()```:
+
+#### ```Planet.get_hydrosphere_props()```:
+
+Extracts the structure and basic properties of the hydrosphere. These include: the total thickness, the layering into different phase regions, the liquid water mass fraction.
 
 #### Planet.compute_core_mass()
 
