@@ -74,7 +74,14 @@ mix = material.Mixture(specs=mix_specs)
 
 ### ```Mixture.compute()```:
 
-Computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture and uses a simple mixing laws to compute the bulk properties of the mixture. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
+Initializes a new material instance for each of the
+compontents in the mixture and computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture. Uses simple mixing laws to compute the bulk properties of the mixture from the individual components. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
+
+Parameters:
+
+```float: T=None```: Temperature in kelvin.
+```float: P=None```: Pressure in pascal.
+```int: phase=None```: Phase region signature.
 
 ### ```Mixture.update_fractions(new_fractions)```:
 
@@ -82,7 +89,7 @@ Changes the relative abundances of the individual components at fixed P and T an
 
 Parameters:
 
-```list: new_fractions=None```: list containing the new molar abundances of each component of the mixture.
+```list: new_fractions```: list containing the new molar abundances of each component of the mixture.
 
 ### ```Mixture.update_weight_fractions()```:
 
