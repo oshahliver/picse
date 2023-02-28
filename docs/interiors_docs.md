@@ -155,6 +155,24 @@ Extracts the structure and basic properties of the hydrosphere. These include: t
 
 ## The ```pics.interiors.planet_workbench``` module
 
+### The ```planet_workbench.DataSet``` class
+
+### The ```planet_workbench.BlindSet``` class
+
+The ```BlindSet``` class generates samples of planetary models within specified parameter ranges without invoking the iterator. This allows for the creation of large data sets for which no pre-defined sets of boundary conditions must be matched with great accuracy. Such samples can, for instance, be used for machine-learning applications and creating new model calibrations for PICSE.
+
+### The ```planet_workbench.Population``` class
+
+
+
+### The ```planet_workbench.SpecificObject``` class
+
+The ```SpecificObject``` will provide tools to create samples of planetary models that match specified properties of real objects s.a. observed the terrestrial planets and natural satellites in the Solar System or observed exoplanets.
+
+### The ```planet_workbench.MassRadius``` class
+
+The ```MassRadius``` class allows the user to create mass-radius diagrams for user-defined compositions and surface conditions over a wide mass range.
+
 ## The ```pics.interiors.planet_iterator``` module
 
 ## The ```pics.interiors.planet_tracker``` module
