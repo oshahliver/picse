@@ -6,10 +6,10 @@ This is a temporary script file.
 """
 
 import itertools
-from pics.utils.print_tools import print_planet
-from pics.utils.plot_tools import plot_structure
+from pics.utils.print_tools.print_tools import print_planet
+from pics.utils.plot_tools.plot_tools import plot_structure
 from tabulate import tabulate
-from pics.utils.internal_data import get_eos_dir
+from pics.utils.file_tools.internal_data import get_eos_dir
 from pics.interiors import core_creator
 import random
 
@@ -24,8 +24,8 @@ from pics.runparams import (
     supported_base_types,
 )
 
-from pics.utils.initial_conditions import predict_initials
-from pics.utils.internal_data import get_predictor_model
+from pics.utils.calibration_tools.initial_conditions import predict_initials
+from pics.utils.file_tools.internal_data import get_predictor_model
 from pics.utils import fortplanet, fortfunctions
 from pics.materials import Material
 from pics.physicalparams import (

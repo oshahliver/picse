@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 # import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
-from pics.utils import matrix_generator as mgen
+from pics.utils.function_tools import matrix_generator as mgen
 import numpy as np
 
 # from pics.utils import readPREM, logTrans, plotTools

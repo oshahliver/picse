@@ -2,7 +2,7 @@
 using various approaches including simple regression models and neural networks
 """
 
-from pics.utils import internal_data as intdat
+from pics.utils.file_tools import internal_data as intdat
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense

@@ -15,7 +15,7 @@ import matplotlib.transforms as transforms
 
 import numpy as np
 from scipy.interpolate import interp1d
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 import iapws
 from pics.runparams import eos_pres_trans, plot_params, color_list
 import matplotlib

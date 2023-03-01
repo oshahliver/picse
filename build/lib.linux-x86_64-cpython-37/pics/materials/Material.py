@@ -84,6 +84,8 @@ from matplotlib import pyplot as plt
 # from pics.materials import hydration
 from decimal import Decimal
 from pics.utils import plotTools
+import scipy.integrate as integrate
+
 import warnings
 
 # from pics.materials import brucite_phase as bruce
@@ -95,6 +97,10 @@ plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 
 
 class Sotin:
+    """
+    Basic implementation of the composition model by Sotin et al. 2007.
+    """
+
     def __init__(self, MgSi=1.131, FeSi=0.986, Mg_number_Si=0.9):
         self.MgSi = MgSi
         self.Mg_number_Si = Mg_number_Si
@@ -803,6 +809,95 @@ def T_liquidus_pyrolite_prime(P):
     c = 1.9
 
     return T0 * 1.0 / c / a * (1.0 + P / a) ** (1.0 / c - 1.0)
+
+
+def specific_thermal_energy(T, P, C_p):
+    """Computes the specific thermal energy of a substance at temperature T and pressure P using the heat capacity function C_p(T,P)"""
+
+    # Compute the internal energy using the heat capacity function
+    U = integrate.quad(C_p, 0.0, T, args=(P,))[0]
+
+    # Compute the thermal energy using the internal energy and specific volume (assuming m = 1)
+    E_therm = U + P / C_p(T, P)
+
+    return E_therm
+
+
+def iron_heat_capacity(T, P):
+    """Computes the heat capacity of iron at a given temperature and pressure from Stacey et al. 2001.
+
+    Parameters:
+    T (float or ndarray): temperature in K
+    P (float or ndarray): pressure in Pa
+
+    Returns:
+    float or ndarray: heat capacity in J/kg/K
+    """
+    x = T / 1000.0
+    y = P / 1.0e9
+
+    a = 6.53538
+    b = -0.00211775
+    c = 3.34129e-7
+    d = -2.90386e-11
+    e = 1.47786
+    f = -0.00688309
+    g = 1.10548e-6
+    h = -9.19282e-11
+    i = -0.0353877
+    j = 0.000136698
+    k = -7.21556e-9
+
+    cp = (
+        a
+        + b * x
+        + c * x**2
+        + d * x**3
+        + (e + f * x + g * x**2 + h * x**3) * y
+        + j * y**2
+        + k * y * x**2
+        + i * y * x**3
+    )
+
+    return cp
+
+
+def pyrolite_heat_capacity(T, rho):
+    """Computes the heat capacity of pyrolite at a given temperature and density from Stixrude and Lithgow-Bertelloni 2011.
+
+    Parameters:
+    T (float or ndarray): temperature in K
+    rho (float or ndarray): density in kg/m^3
+
+    Returns:
+    float or ndarray: heat capacity in J/kg/K
+    """
+    a = 2.054
+    b = 4.581
+    c = -0.0537
+    d = -0.000072
+    e = 5.09
+    f = -1.52
+    g = -0.167
+    h = 0.117
+    i = 0.019
+    j = 0.00071
+    k = 0.0011
+
+    x = T / 1000.0
+    y = rho / 1000.0
+
+    cp = (
+        a
+        + b * x
+        + c * x**2
+        + d * x**3
+        + (e + f * x + g * x**2 + h * x**3 + i * x**4) * y
+        + j * y**2
+        + k * y * x**2
+    )
+
+    return cp
 
 
 def gamma_FeO(P=None, xiFeO=0.0):
@@ -2213,17 +2308,17 @@ class Unit:
             print("{:<20} {:>0}".format(line[0], line[1]))
 
         if level == 1:
-
-            print(
-                "\nK_0   [GPa]  :",
-                k0,
-                "\nK_0´ :",
-                k0prime,
-                "\nrho_0 [kg/m³]:",
-                d0,
-                "\nrho_T0[kg/m³]:",
-                dT0,
-            )
+            pass
+            # print(
+            #     "\nK_0   [GPa]  :",
+            #     k0,
+            #     "\nK_0´ :",
+            #     k0prime,
+            #     "\nrho_0 [kg/m³]:",
+            #     d0,
+            #     "\nrho_T0[kg/m³]:",
+            #     dT0,
+            # )
 
     # def Compute(self, d=None, T=None, P=None, phase=None, **kwargs):
     #     """Here the material paremeters are computed. Normally values for P
@@ -2697,13 +2792,20 @@ class Mixture:
         # compute mean isothermal bulk modulus
         self.K_isoth = self.dPdrho * self.dens
 
-    def Update(self, P=None, T=None, d=None, dPdrho=None, **kwargs):
+    def Update(self, float: P = None, T=None, d=None, dPdrho=None, **kwargs):
         """This method updates the material instance of each component of the
         mixture individually and then computes the new mean density in the cell
         without re-initializing any component objects. If no new pressure or
         temperature is passed, nothing will be done. If d and or dPdrho are
         passed the individual d and dPdrho contributions for each material will
         be reconstructed without calling the eos which is more efficient.
+        
+        Parameters:
+        P (float, optional): Pressure in Pa. Defaults to None.
+        T (float, optional): Temperature in K. Defaults to None. 
+        d (float, optional): Density in kg per cubic meter. Defaults to None.
+        dPdrho (float, optional): Density derivative of pressure. Defaults to None.
+
         """
         # update only if new pressure and|or temperature has been specified
         if T == None and P == None:

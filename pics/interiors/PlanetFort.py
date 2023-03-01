@@ -5,7 +5,7 @@ Created on Tue Dec  4 14:05:05 2018
 @author: os18o068
 """
 
-from pics.utils import regression as regr
+from pics.utils.calibration_tools import regression as regr
 import matplotlib.ticker
 from matplotlib import pyplot as plt
 from matplotlib.ticker import (
@@ -75,14 +75,14 @@ from pics.runparams import (
 
 import numpy as np
 import time
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
 import astropy.table
 from astropy.io import ascii
 import warnings
-from pics.utils import plotTools
+from pics.utils.plot_tools.plot_tools import plotTools
 from pics.utils import fortplanet
 from pics.utils import fortfunctions
 from pics.materials import Material

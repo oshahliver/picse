@@ -27,8 +27,8 @@ from pics.physicalparams import (
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from pics.runparams import color_list, grid_color, plot_params, background_color
-from pics.utils import functionTools as ftool
-from pics.utils import plotTools
+from pics.utils.function_tools import functionTools as ftool
+from pics.utils.plot_tools import plotTools
 
 
 # Mantle geotherm from Stixrude 2009

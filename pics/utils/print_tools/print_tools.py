@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from pics.physicalparams import r_earth, m_earth, mH2O, material_list_fort
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 
 
 def print_planet(self, style=0, digits=3):

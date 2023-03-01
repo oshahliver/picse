@@ -11,7 +11,7 @@ import pics.materials.Material as Material
 import pics.interiors.Planet as Planet
 from pics.interiors import PlanetTest
 import pics.interiors.PlanetFort as PlanetFort
-import pics.utils.functionTools as ftool
+import pics.utils.function_tools.functionTools as ftool
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter, AutoMinorLocator
@@ -28,9 +28,9 @@ import astropy.table
 from astropy.io import ascii
 import time
 from pics.utils import readPREM
-import pics.utils.logTrans as logTrans
+import pics.utils.function_tools.logTrans as logTrans
 import random
-import pics.utils.plotTools as plotTools
+import pics.utils.plot_tools.plotTools as plotTools
 from pics.physicalparams import (
     m_earth,
     r_earth,

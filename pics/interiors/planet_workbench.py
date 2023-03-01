@@ -4,8 +4,9 @@ samples of planetary models, creating MR-relations and perform some post-process
 """
 
 from pics.interiors import planet_creator, planet_iterator
-from pics.utils.plot_tools import plot_mr
-from pics.utils import file_manager, internal_data
+from pics.utils.file_tools import file_manager
+from pics.utils.plot_tools.plot_tools import plot_mr
+from pics.utils.file_tools import internal_data
 from pics.physicalparams import r_earth, m_earth
 from pics.materials.Material import Si_number_max, Si_number_min
 import sys

@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import matplotlib
 from pics.physicalparams import m_earth, r_earth, G, R_solar, M_solar, MoI_solar
 import random
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 import pandas as pd
 import plotly.express as px

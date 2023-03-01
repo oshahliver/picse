@@ -14,7 +14,7 @@ Range over which the EOS is constrained by experimental data:
 from matplotlib import pyplot as plt
 import matplotlib.ticker
 from matplotlib import rc
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from pics.materials import phase_transitions_water_Wagner2002 as phase
 from pics.physicalparams import Rgas
 import numpy as np

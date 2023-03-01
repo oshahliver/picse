@@ -19,7 +19,7 @@ import matplotlib.ticker as ticker
 from matplotlib import rc
 import numpy as np
 import time
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from pics.materials import phase_transitions_water_Wagner2002 as phase
 
 # ------------------------------------------------------------------------------

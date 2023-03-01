@@ -102,6 +102,7 @@ Parameters:
 ```float: P=None```: Pressure in pascal.\
 ```int: phase=None```: Phase region signature.
 
+
 ### ```Mixture.update_fractions(new_fractions)```:
 
 Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
@@ -136,13 +137,31 @@ Simple plotting routine to visualize basic volumetric and thermodynamic properti
 
 Prints basic volumetric and thermodynamic properties of the mixture to standard output.
 
-## The ```pics.materials.EquationsOfState``` module
+## The ```pics.materials.eos``` module
 
-The ```EquationsOfState``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks that are stored in a separate file.
+The ```eos``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks that are stored in a separate file.
 
-### ```EquationsOfState.compute()```
+### ```eos.compute()```
 
-### ```EquationsOfState.P_BM()```:
+Employs the EOS for the given material and computes the specified quantity at a given conditions.
+
+Example:
+
+```python
+from pics.materials import eos
+
+# Compute all properties of water at 10^8 Pa and 250 K
+params = eos.compute(ll=0, P=1e8, T=250)
+print(params)
+```
+Output:
+
+```pyhton
+(930.1989519862619, 250, 100000000.0, 1.835892480225174e-08, 10031472.1821997, 0, 0.0, 0.00013061068220559486, 0.0)
+
+```
+
+### ```eos.P_BM()```:
 
 Computes the pressure using the 3rd order Birch-Murnaghan equation of state.
 
@@ -152,7 +171,7 @@ Parameters:
 ```float: K=0```: Bulk modulus.\
 ```float: K0_prime=0```: Pressure derivative of bulk modulus.
 
-### ```EquationsOfState.rho_BM()```:
+### ```eos.rho_BM()```:
 
 Computes the density using the 3rd order Birch-Murnaghan equation of state.
 
@@ -167,59 +186,59 @@ Parameters:
 ```float: bT=None```: Second fitting parameter to thermal expansion coefficient.\
 ```float: cT=None```: Third fitting parameter to thermal expansion coefficient.
 
-### ```EquationsOfState.dPdrho_BM()```:
+### ```eos.dPdrho_BM()```:
 
 Computes the density derivative of the pressure using the 3rd order Birch-Murnaghan equation of state.
 
-### ```EquationsOfState.P_MGD()```:
+### ```eos.P_MGD()```:
 
 Computes the pressure using the Mie-Grüneisen-Debye equation of state.
 
-### ```EquationsOfState.rho_MGD()```:
+### ```eos.rho_MGD()```:
 
 Computes the density using the Mie-Grüneisen-Debye equation of state.
 
-### ```EquationsOfState.dPdrho_MGD()```:
+### ```eos.dPdrho_MGD()```:
 
 Computes the density derivative of the pressure using the Mie-Grüneisen-Debye equation of state.
 
-### ```EquationsOfState.P_Vinet()```:
+### ```eos.P_Vinet()```:
 
 Computes the pressure using the Vinet equation of state.
 
-### ```EquationsOfState.rho_Vinet()```:
+### ```eos.rho_Vinet()```:
 
 Computes the density using the Vinet equation of state.
 
-### ```EquationsOfState.dPdrho_Vinet()```:
+### ```eos.dPdrho_Vinet()```:
 
 Computes the density derivative of the pressure using the Vinet equation of state.
 
-### ```EquationsOfState.P_Bel()```:
+### ```eos.P_Bel()```:
 
 Computes the pressure using the Belonoshko equation of state.
 
-### ```EquationsOfState.rho_Bel()```:
+### ```eos.rho_Bel()```:
 
 Computes the density using the Belonoshko equation of state.
 
-### ```EquationsOfState.dPdrho_Bel()```:
+### ```eos.dPdrho_Bel()```:
 
 Computes the density derivative of the pressure using the Belonoshko equation of state.
 
-### ```EquationsOfState.P_VR()```:
+### ```eos.P_VR()```:
 
 Computes the pressure using the Vinet-Rydberg equation of state.
 
-### ```EquationsOfState.rho_VR()```:
+### ```eos.rho_VR()```:
 
 Computes the density using the Vinet-Rydberg equation of state.
 
-### ```EquationsOfState.dPdrho_VR()```:
+### ```eos.dPdrho_VR()```:
 
 Computes the density derivative of the pressure using the Vinet-Rydberg equation of state.
 
-## The ```pics.materials.EquationsOfStateTables``` module
+## The ```pics.materials.eosTables``` module
 
 Not ready!
 

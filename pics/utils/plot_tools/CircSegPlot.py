@@ -11,10 +11,10 @@ import matplotlib as mpl
 import numpy as np
 import matplotlib
 import copy
-import functionTools as ftool
-from PIMPrunparams import layerColors, layerCodes
+import pics.utils.function_tools.functionTools as ftool
+from pics.runparams import layerColors, layerCodes
 import matplotlib.transforms as transforms
-from PIMPphysicalparams import m_earth
+from pics.physicalparams import m_earth
 
 matplotlib.rcParams["text.usetex"] = True
 # This mothafucka speeds up saving graphics with mpl like crazy
@@ -770,7 +770,7 @@ class PieGhost:
             self.phi2 = np.pi * 2 / 3
 
         self.r = r  # Radius of circle
-        self.angles = np.linspace(self.phi1, self.phi2, 2**res)
+        self.angles = np.linspace(self.phi1, self.phi2, 2 ** res)
         self.offset = offset
 
         # Create circle segment
@@ -801,7 +801,7 @@ class PieSlice:
             self.phi2 = np.pi * 2 / 3
 
         self.r = r  # Radius of circle
-        self.angles = np.linspace(self.phi1, self.phi2, 2**res)
+        self.angles = np.linspace(self.phi1, self.phi2, 2 ** res)
         self.offset = offset
 
         # Create circle segment

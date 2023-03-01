@@ -65,7 +65,7 @@ from pics.runparams import (
 )
 import numpy as np
 import time
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
@@ -76,7 +76,7 @@ import warnings
 from pics.materials import Material
 
 # import eosfort
-from pics.utils import plotTools
+from pics.utils.plot_tools.plot_tools import plotTools
 from pics.utils import fortfunctions
 import matplotlib
 

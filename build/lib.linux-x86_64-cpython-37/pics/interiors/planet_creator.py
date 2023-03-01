@@ -6,10 +6,10 @@ This is a temporary script file.
 """
 
 import itertools
-from pics.utils.print_tools import print_planet
-from pics.utils.plot_tools import plot_structure
+from pics.utils.print_tools.print_tools import print_planet
+from pics.utils.plot_tools.plot_tools import plot_structure
 from tabulate import tabulate
-from pics.utils.internal_data import get_eos_dir
+from pics.utils.file_tools.internal_data import get_eos_dir
 from pics.interiors import core_creator
 import random
 
@@ -24,8 +24,8 @@ from pics.runparams import (
     supported_base_types,
 )
 
-from pics.utils.initial_conditions import predict_initials
-from pics.utils.internal_data import get_predictor_model
+from pics.utils.calibration_tools.initial_conditions import predict_initials
+from pics.utils.file_tools.internal_data import get_predictor_model
 from pics.utils import fortplanet, fortfunctions
 from pics.materials import Material
 from pics.physicalparams import (
@@ -317,7 +317,22 @@ class Planet:
             predictor
         )  # points to the predictor model for the iterator
 
-    def set_values(self, default=False, pres_eps=[0.6, 0.1], **kwargs):
+    def set_values(
+        self,
+        default=False,
+        pres_eps=[0.6, 0.1],
+        planetary_params: PlanetaryInputParams = None,
+        run_params: RunInputParams = None,
+    ):
+        """
+        Sets up the planet and
+
+        Parameters:
+        default (bool, optional): Use default values for all properties. Defaults to False.
+        pres_eps (list, optional): Relative pressure offsets for sampling. Defaults to [0.6, 01.]
+        planetary_params (PlanetaryInputParams, optional): The physical parameters describing the planet. Defaults to {}.
+        run_params (RunInputParams, optional): The run parameters for the simulation. Defaults to {}.
+        """
         omit_keys = ["default_values", "allowed_keys", "label"]
         out_params = PlanetaryOutputParams()
 
@@ -326,15 +341,15 @@ class Planet:
             setattr(self, key, value)
 
         # initialize input parameters
-        if "planetary_params" in kwargs:
+        if planetary_params is not None:
             # set attributes
-            for key, value in kwargs["planetary_params"].default_values.items():
+            for key, value in planetary_params.default_values.items():
                 if not key in omit_keys:
                     setattr(self, key, value)
 
         # initialize run parameters
-        if "run_params" in kwargs:
-            for key, value in kwargs["run_params"].__dict__.items():
+        if run_params is not None:
+            for key, value in run_params.__dict__.items():
                 if not key in omit_keys:
                     setattr(self, key, value)
 
@@ -373,50 +388,58 @@ class Planet:
             self.P_center *= 1e9  # convert to Pa
 
         elif self.predictor_type == "man":
-            if (
-                "P_center" in kwargs["planetary_params"].default_values.keys()
-                and "T_center" in kwargs["planetary_params"].default_values.keys()
-            ):
-                # values have already been set with the rest of the planetary params
-                # for manual predictor the core-to-mantle transition and the mantle-to-ocean
-                # transition are defined via a pressure value selected from within the range
-                # between the central pressure and the surface pressure
+            if planetary_params is not None:
 
-                # terrestrial planets
-                eps1, eps2 = pres_eps
+                # Check if pressure and temperature values have been passed
+                if (
+                    "P_center" in planetary_params.default_values.keys()
+                    and "T_center" in planetary_params.default_values.keys()
+                ):
+                    # values have already been set with the rest of the planetary params
+                    # for manual predictor the core-to-mantle transition and the mantle-to-ocean
+                    # transition are defined via a pressure value selected from within the range
+                    # between the central pressure and the surface pressure
 
-                if self.label == "telluric":
-                    self.layer_constraints[0] = 3
-                    self.layer_constraints[1] = 3
-                    self.layer_pressures[0] = 10 ** random.uniform(
-                        np.log10(self.P_center * eps1),
-                        np.log10(self.P_center * eps2),
+                    # terrestrial planets
+                    eps1, eps2 = pres_eps
+
+                    if self.label == "telluric":
+                        self.layer_constraints[0] = 3
+                        self.layer_constraints[1] = 3
+                        self.layer_pressures[0] = 10 ** random.uniform(
+                            np.log10(self.P_center * eps1),
+                            np.log10(self.P_center * eps2),
+                        )
+                        self.layer_pressures[1] = self.layer_pressures[0]
+                        print("updated layer pressures =", self.layer_pressures)
+
+                    # aqua planets
+                    elif self.label == "aqua":
+                        self.layer_constraints[0] = 3
+                        self.layer_constraints[1] = 3
+                        self.layer_constraints[3] = 3
+
+                        self.layer_pressures[0] = 10 ** random.uniform(
+                            np.log10(self.P_center * eps1),
+                            np.log10(self.P_center * eps2),
+                        )
+                        self.layer_pressures[1] = self.layer_pressures[0]
+                        self.layer_pressures[3] = 10 ** random.uniform(
+                            np.log10(self.layer_pressures[1] * eps1),
+                            np.log10(self.P_surface_should * 1.1),
+                        )
+
+                    # self.P_center = kwargs["planetary_params"]["pres_center"]
+                    # self.T_center = kwargs["planetary_params"]["temp_center"]
+
+                else:
+                    raise KeyError(
+                        "If the initial conditions are set manually you need to pass values for temp_center and pres_center"
                     )
-                    self.layer_pressures[1] = self.layer_pressures[0]
-                    print("updated layer pressures =", self.layer_pressures)
-
-                # aqua planets
-                elif self.label == "aqua":
-                    self.layer_constraints[0] = 3
-                    self.layer_constraints[1] = 3
-                    self.layer_constraints[3] = 3
-
-                    self.layer_pressures[0] = 10 ** random.uniform(
-                        np.log10(self.P_center * eps1),
-                        np.log10(self.P_center * eps2),
-                    )
-                    self.layer_pressures[1] = self.layer_pressures[0]
-                    self.layer_pressures[3] = 10 ** random.uniform(
-                        np.log10(self.layer_pressures[1] * eps1),
-                        np.log10(self.P_surface_should * 1.1),
-                    )
-
-                # self.P_center = kwargs["planetary_params"]["pres_center"]
-                # self.T_center = kwargs["planetary_params"]["temp_center"]
 
             else:
                 raise KeyError(
-                    "If the initial conditions are set manually you need to pass values for temp_center and pres_center"
+                    "If predictor_type=man, values for the central pressure and temperature need to be passed to the planetary_params argument."
                 )
 
         self.Si_number_layers = [
@@ -483,10 +506,28 @@ class Planet:
     def update_values(self):
         self.default_values = copy.deepcopy(self.__dict__)
 
+    def get_hydrosphere_props(self, mode="basic"):
+        """
+        Extracts the structure and basic properties of the hydrosphere. These
+        include: the total thickness, the layering into different phase regions,
+        the liquid water mass fraction.
+
+        Parameters:
+        mode (str, optional): Specifies the amount of information to be extracted
+        for the hydrosphere. Defaults to "basic".
+        """
+        raise NotImplementedError("Patience, young one!")
+
     def compute_ocean_depth(self):
+        """
+        Computes the depth thickness of the hydrosphere.
+        """
         self.ocean_depth = self.R_surface_is - self.layer_properties[3]["R_outer"]
-    
+
     def compute_oxide_fractions(self):
+        """
+        Computes the mole fractions of different oxides in the mantle from the atomic mantle composition. The planet needs to be constracted first.
+        """
         # Compute mole fractions of oxides in the mantle
         if self.Fe_number_mantle > 0.0:
             self.xi_FeO_mantle = 1.0 - self.Si_number_mantle
@@ -580,7 +621,7 @@ class Planet:
         ) / m_earth
         self.core_mass_fraction_is = self.M_core_is * m_earth / self.M_surface_is
         self.core_radius = self.layer_properties[1]["R_outer"]
-        
+
         try:
             self.M_ocean_is = self.layer_properties[4]["indigenous_mass"] / m_earth
 

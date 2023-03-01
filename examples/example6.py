@@ -6,8 +6,8 @@ network on to predict the initial conditions for given boundary conditions.
 
 from pics.interiors import planet_workbench
 from pics.physicalparams import m_earth
-from pics.utils import internal_data as id
-from pics.utils import plot_tools
+from pics.utils.file_tools import internal_data as id
+from pics.utils.plot_tools import plot_tools
 import numpy as np
 
 # Create an instance of the workbench toolkit

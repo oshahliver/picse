@@ -7,7 +7,7 @@ Created on Fri Jan 18 14:26:56 2019
 """
 import time
 import sys
-from pics.utils import PIMPtools
+from pics.utils.function_tools import PIMPtools
 from pics.materials import eosTablesUse as eosTab
 import numpy as np
 from matplotlib import pyplot as plt
@@ -18,7 +18,7 @@ from pics.materials import eoswater
 from pics.materials import phaseCheck
 from pics.materials import hydration
 from pics.materials import brucite_phase as bruce
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from pics.physicalparams import (
     T0_list,
     K0_list,
@@ -870,7 +870,7 @@ def K0prime_silicates(
         return K0_prime_silicates + 2 * delta * (SiMg - 0.5)
 
 
-def Compute(
+def compute(
     ll=0,
     what="all",
     P=None,
@@ -892,10 +892,30 @@ def Compute(
     x_H=0.0,
     **kwargs,
 ):
-    """Employs the EOS for the given material and computes the specified
-    quantity at a given Pressure P (Pa) and temperature T (K). Additional
-    parameters are iron content (mol%) and hydration level (wt%).
     """
+    Employs the EOS for the given material and computes the specified
+    quantity at a given conditions.
+    
+    Parameters:
+
+    ll (int, optional): The material signature. Defaults to 0.
+    P (float, optional): The pressure in Pa. Defaults to None.
+    T (float, optional): The temperature in K. Defaults to None.
+    d (float, optional): The density in kg/m³. Defaults to None.
+
+    Outputs:
+        Tuple[Optional[float], Optional[float], Optional[float], Optional[float], Optional[float], Optional[int], Optional[float], Optional[float], Optional[float]]: 
+        - Element 1: Density. Defaults to None.
+        - Element 2: Temperature. Defaults to None.
+        - Element 3: Pressure. Defaults to None.
+        - Element 4: Pressure derivative of temperature at constant entropy. Defaults to None.
+        - Element 5: Density derivative of pressure at constant temperature. Defaults to None.
+        - Element 6: Phase tag. Defaults to None.
+        - Element 7: Water equivalent content for hydrated or hydrogenated compounds. Defaults to None.
+        - Element 8: Thermal expansion. Defaults to None.
+        - Element 9: Al content for silicates. Defaults to None.
+    """
+
     Fe_number = min(Fe_number, 100.0 - 1.0e-10)
     FeMg = Fe_number / (100.0 - Fe_number)
 
@@ -1819,7 +1839,7 @@ def dTdP_ad(
     saturation=False,
     gamma=1,
 ):
-    stuff = Compute(
+    stuff = compute(
         ll=ll, T=T, P=P, Fe_number=Fe_number, saturation=saturation, phase=phase
     )
 
@@ -1828,213 +1848,213 @@ def dTdP_ad(
     return gamma * T / (1.0 + gamma * stuff[7] * T) / KT
 
 
-def PlotCmap(
-    ll=1,
-    Tmin=300,
-    Tmax=2400,
-    Pmin=0,
-    Pmax=30,
-    res=4,
-    params=[0],
-    Fe_numbers=[0.0, 25.0],
-):
-    """Plots parameter as function of pressure and temperature in a colormap.
-    Pressure and temperature ranges are defined via Pmin, Pmax and Tmin, Tmax
-    in units of GPa and K. The PT-grid is given by a 2**res x 2**res array.
-    """
+# def PlotCmap(
+#     ll=1,
+#     Tmin=300,
+#     Tmax=2400,
+#     Pmin=0,
+#     Pmax=30,
+#     res=4,
+#     params=[0],
+#     Fe_numbers=[0.0, 25.0],
+# ):
+#     """Plots parameter as function of pressure and temperature in a colormap.
+#     Pressure and temperature ranges are defined via Pmin, Pmax and Tmin, Tmax
+#     in units of GPa and K. The PT-grid is given by a 2**res x 2**res array.
+#     """
 
-    # Compute grid resolution
-    N = 2**res
+#     # Compute grid resolution
+#     N = 2**res
 
-    ticklabel_fontsize = 8
-    label_fontsize = 10
+#     ticklabel_fontsize = 8
+#     label_fontsize = 10
 
-    nxticks = 4
-    nyticks = 6
+#     nxticks = 4
+#     nyticks = 6
 
-    param_labels = [
-        r"$\rho \ [\rm kg /m^3]$",
-        "T",
-        "P",
-        r"$d T/dP_S$",
-        r"$d P/d \rho \ [\rm GPa \ m³ /kg]$",
-        "phase",
-        r"$\rm log(X_{\rm H_2 O}) \ \rm [wt \%]$",
-        r"$\alpha_T \ [10^{-5} K^{-1}]$",
-        r"$\xi_{\rm Al}$",
-    ]
+#     param_labels = [
+#         r"$\rho \ [\rm kg /m^3]$",
+#         "T",
+#         "P",
+#         r"$d T/dP_S$",
+#         r"$d P/d \rho \ [\rm GPa \ m³ /kg]$",
+#         "phase",
+#         r"$\rm log(X_{\rm H_2 O}) \ \rm [wt \%]$",
+#         r"$\alpha_T \ [10^{-5} K^{-1}]$",
+#         r"$\xi_{\rm Al}$",
+#     ]
 
-    cmaps = ["rainbow", "viridis", "seismic", "PuOr"]
-    params_scalings = [1.0, 1.0, 1.0, 1.0e-9, 1.0, 1.0, 1.0, 1.0e5, 1.0]
-    data_lims = [[3000.0, 4200.0], [-2, 1], [0.0, 10.0], [0, 10]]
+#     cmaps = ["rainbow", "viridis", "seismic", "PuOr"]
+#     params_scalings = [1.0, 1.0, 1.0, 1.0e-9, 1.0, 1.0, 1.0, 1.0e5, 1.0]
+#     data_lims = [[3000.0, 4200.0], [-2, 1], [0.0, 10.0], [0, 10]]
 
-    border_colors = [
-        [0.1, 0, 0],
-        [0.2, 0, 0],
-        [0.25, 0, 0],
-        [0.5, 0, 0],
-        # [.6, 0, 0],
-        # [.75, 0, 0],
-        # [.9, 0, 0],
-        [1, 0, 0],
-        [1, 0.25, 0],
-        [1, 0.5, 0],
-        [1, 1, 0],
-        [0.75, 0.5, 0],
-        # [.75, .25, 0],
-        [0.7, 0.3, 0],
-        [0.6, 0.4, 0],
-        [0.5, 0.5, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-        [1, 1, 1],
-    ]
+#     border_colors = [
+#         [0.1, 0, 0],
+#         [0.2, 0, 0],
+#         [0.25, 0, 0],
+#         [0.5, 0, 0],
+#         # [.6, 0, 0],
+#         # [.75, 0, 0],
+#         # [.9, 0, 0],
+#         [1, 0, 0],
+#         [1, 0.25, 0],
+#         [1, 0.5, 0],
+#         [1, 1, 0],
+#         [0.75, 0.5, 0],
+#         # [.75, .25, 0],
+#         [0.7, 0.3, 0],
+#         [0.6, 0.4, 0],
+#         [0.5, 0.5, 0],
+#         [0, 1, 0],
+#         [0, 0, 1],
+#         [1, 1, 1],
+#     ]
 
-    border_colors = list(
-        reversed(
-            [
-                (0.7, 0.2, 0.6),
-                (0.6, 0.4, 1.0),
-                (0.2, 0.4, 1.0),
-                (0.2, 0.6, 0.9),
-                (0.2, 0.8, 0.8),
-                (0.2, 0.8, 0.4),
-                (0.6, 0.8, 0.4),
-                (0.6, 0.6, 0.2),
-                (0.8, 0.4, 0.2),
-                (1.0, 0.2, 0.2),
-                (1.0, 0.5, 0.5),
-                (0.7, 0.7, 0.7),
-                (0.5, 0.5, 0.5),
-                (0.2, 0.2, 0.2),
-                (0.0, 0.0, 0.0),
-            ]
-        )
-    )
+#     border_colors = list(
+#         reversed(
+#             [
+#                 (0.7, 0.2, 0.6),
+#                 (0.6, 0.4, 1.0),
+#                 (0.2, 0.4, 1.0),
+#                 (0.2, 0.6, 0.9),
+#                 (0.2, 0.8, 0.8),
+#                 (0.2, 0.8, 0.4),
+#                 (0.6, 0.8, 0.4),
+#                 (0.6, 0.6, 0.2),
+#                 (0.8, 0.4, 0.2),
+#                 (1.0, 0.2, 0.2),
+#                 (1.0, 0.5, 0.5),
+#                 (0.7, 0.7, 0.7),
+#                 (0.5, 0.5, 0.5),
+#                 (0.2, 0.2, 0.2),
+#                 (0.0, 0.0, 0.0),
+#             ]
+#         )
+#     )
 
-    bin_refine_exponent = 4
-    n_additional_bins = 2**bin_refine_exponent
-    colors = []
+#     bin_refine_exponent = 4
+#     n_additional_bins = 2**bin_refine_exponent
+#     colors = []
 
-    xticks = np.linspace(0, N - 1, nxticks)
-    yticks = np.linspace(0, N - 1, nyticks)
+#     xticks = np.linspace(0, N - 1, nxticks)
+#     yticks = np.linspace(0, N - 1, nyticks)
 
-    xtick_labels = np.linspace(Tmin, Tmax, nxticks, dtype=int)
-    ytick_labels = np.linspace(Pmin, Pmax, nyticks, dtype=int)
+#     xtick_labels = np.linspace(Tmin, Tmax, nxticks, dtype=int)
+#     ytick_labels = np.linspace(Pmin, Pmax, nyticks, dtype=int)
 
-    for i in range(len(border_colors) - 1):
-        colors.append(border_colors[i])
-        for r in range(n_additional_bins):
-            colors.append(
-                np.asarray(border_colors[i])
-                + (r + 1)
-                / (n_additional_bins + 1)
-                * (np.asarray(border_colors[i + 1]) - np.asarray(border_colors[i]))
-            )
+#     for i in range(len(border_colors) - 1):
+#         colors.append(border_colors[i])
+#         for r in range(n_additional_bins):
+#             colors.append(
+#                 np.asarray(border_colors[i])
+#                 + (r + 1)
+#                 / (n_additional_bins + 1)
+#                 * (np.asarray(border_colors[i + 1]) - np.asarray(border_colors[i]))
+#             )
 
-    colors.append(border_colors[-1])
+#     colors.append(border_colors[-1])
 
-    newcmap = mpl.colors.ListedColormap(colors)
+#     newcmap = mpl.colors.ListedColormap(colors)
 
-    cmaps[2] = newcmap
-    cmaps = [newcmap, newcmap, newcmap, newcmap]
+#     cmaps[2] = newcmap
+#     cmaps = [newcmap, newcmap, newcmap, newcmap]
 
-    x = np.linspace(Tmin, Tmax, N)
-    y = np.linspace(Pmin, Pmax, N)
+#     x = np.linspace(Tmin, Tmax, N)
+#     y = np.linspace(Pmin, Pmax, N)
 
-    xx, yy = np.meshgrid(x, y)
+#     xx, yy = np.meshgrid(x, y)
 
-    zz = np.zeros([len(Fe_numbers), len(params), N, N])
+#     zz = np.zeros([len(Fe_numbers), len(params), N, N])
 
-    # Compute data
-    for f in range(len(Fe_numbers)):
-        for i in range(N):
-            for j in range(N):
+#     # Compute data
+#     for f in range(len(Fe_numbers)):
+#         for i in range(N):
+#             for j in range(N):
 
-                eos = Compute(
-                    ll=ll,
-                    T=x[j],
-                    P=y[i] * 1.0e9,
-                    saturation=True,
-                    Fe_number=Fe_numbers[f],
-                )
+#                 eos = Compute(
+#                     ll=ll,
+#                     T=x[j],
+#                     P=y[i] * 1.0e9,
+#                     saturation=True,
+#                     Fe_number=Fe_numbers[f],
+#                 )
 
-                dat = [eos[p] for p in params]
+#                 dat = [eos[p] for p in params]
 
-                for k in range(len(params)):
-                    zz[f][k][i][j] = dat[k] * params_scalings[params[k]]
+#                 for k in range(len(params)):
+#                     zz[f][k][i][j] = dat[k] * params_scalings[params[k]]
 
-    nrows = len(params)
-    ncols = len(Fe_numbers)
+#     nrows = len(params)
+#     ncols = len(Fe_numbers)
 
-    fig = plt.figure(figsize=(10, 8))
-    axrows = []
+#     fig = plt.figure(figsize=(10, 8))
+#     axrows = []
 
-    i = 0
-    for r in range(nrows):
+#     i = 0
+#     for r in range(nrows):
 
-        axcols = AxesGrid(
-            fig,
-            (nrows, 1, r + 1),
-            nrows_ncols=(1, ncols),
-            axes_pad=0.25,
-            share_all=True,
-            label_mode="L",
-            cbar_mode="edge",
-            cbar_location="right",
-            cbar_size="7%",
-            cbar_pad="10%",
-        )
+#         axcols = AxesGrid(
+#             fig,
+#             (nrows, 1, r + 1),
+#             nrows_ncols=(1, ncols),
+#             axes_pad=0.25,
+#             share_all=True,
+#             label_mode="L",
+#             cbar_mode="edge",
+#             cbar_location="right",
+#             cbar_size="7%",
+#             cbar_pad="10%",
+#         )
 
-        axrows.append(axcols)
+#         axrows.append(axcols)
 
-        for c in range(ncols):
-            ax = axcols[c]
-            ax.tick_params(right=True, top=True)
-            im = ax.imshow(
-                zz[c][r],
-                origin="lower",
-                cmap=cmaps[r],
-                vmin=data_lims[r][0],
-                vmax=data_lims[r][1],
-            )
+#         for c in range(ncols):
+#             ax = axcols[c]
+#             ax.tick_params(right=True, top=True)
+#             im = ax.imshow(
+#                 zz[c][r],
+#                 origin="lower",
+#                 cmap=cmaps[r],
+#                 vmin=data_lims[r][0],
+#                 vmax=data_lims[r][1],
+#             )
 
-            if r < nrows - 1:
-                ax.tick_params(labelbottom=False)
+#             if r < nrows - 1:
+#                 ax.tick_params(labelbottom=False)
 
-            else:
-                ax.set_xlabel(r"$T \ \rm [K]$", fontsize=label_fontsize)
+#             else:
+#                 ax.set_xlabel(r"$T \ \rm [K]$", fontsize=label_fontsize)
 
-            if c == 0:
-                ax.set_ylabel(r"$P \ \rm [GPa]$", fontsize=label_fontsize)
+#             if c == 0:
+#                 ax.set_ylabel(r"$P \ \rm [GPa]$", fontsize=label_fontsize)
 
-            if r == 0:
-                ax.set_title(
-                    r"$\rm {a} \ mol \% \ Fe$".format(a=str(Fe_numbers[c])),
-                    fontsize=label_fontsize,
-                )
+#             if r == 0:
+#                 ax.set_title(
+#                     r"$\rm {a} \ mol \% \ Fe$".format(a=str(Fe_numbers[c])),
+#                     fontsize=label_fontsize,
+#                 )
 
-        for rax in axcols.cbar_axes:
-            rax.colorbar(im)
-            rax.tick_params(
-                labelright=True,
-                labelleft=False,
-                left=False,
-                right=True,
-                labelsize=ticklabel_fontsize,
-            )
+#         for rax in axcols.cbar_axes:
+#             rax.colorbar(im)
+#             rax.tick_params(
+#                 labelright=True,
+#                 labelleft=False,
+#                 left=False,
+#                 right=True,
+#                 labelsize=ticklabel_fontsize,
+#             )
 
-            rax.set_ylabel(param_labels[params[r]], fontsize=label_fontsize)
+#             rax.set_ylabel(param_labels[params[r]], fontsize=label_fontsize)
 
-    for r in range(nrows):
-        for c in range(ncols):
-            ax = axrows[r][c]
+#     for r in range(nrows):
+#         for c in range(ncols):
+#             ax = axrows[r][c]
 
-            ax.set_xticks(xticks)
-            ax.set_xticklabels(xtick_labels, fontsize=ticklabel_fontsize)
+#             ax.set_xticks(xticks)
+#             ax.set_xticklabels(xtick_labels, fontsize=ticklabel_fontsize)
 
-            ax.set_yticks(yticks)
-            ax.set_yticklabels(ytick_labels, fontsize=ticklabel_fontsize)
+#             ax.set_yticks(yticks)
+#             ax.set_yticklabels(ytick_labels, fontsize=ticklabel_fontsize)
 
     # plt.savefig('/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/XH2O_Ol.pdf',
     #           format='pdf', bbox_inches='tight')
@@ -2086,375 +2106,375 @@ def PlotCmap(
     """
 
 
-def plotFancy(
-    ll=1,
-    N=10,
-    P=[10, 12],
-    isotherms=np.linspace(1e3, 5e3, 3),
-    mark="",
-    Fe_number=100,
-    phase=0,
-    presScale=1e-5,
-    **kwargs,
-):
+# def plotFancy(
+#     ll=1,
+#     N=10,
+#     P=[10, 12],
+#     isotherms=np.linspace(1e3, 5e3, 3),
+#     mark="",
+#     Fe_number=100,
+#     phase=0,
+#     presScale=1e-5,
+#     **kwargs,
+# ):
 
-    try:
-        ax = kwargs["ax"]
-    except KeyError:
-        fig, ax = plt.subplots()
-    cols = ["r", "g", "b"]
-    pres = np.logspace(P[0], P[1], N)
-    dens = np.array(
-        [
-            [
-                Compute(
-                    what="all",
-                    ll=ll,
-                    P=p,
-                    T=iso,
-                    Fe_number=Fe_number,
-                    phase=phase,
-                    **kwargs,
-                )[0]
-                for p in pres
-            ]
-            for iso in isotherms
-        ]
-    )
+#     try:
+#         ax = kwargs["ax"]
+#     except KeyError:
+#         fig, ax = plt.subplots()
+#     cols = ["r", "g", "b"]
+#     pres = np.logspace(P[0], P[1], N)
+#     dens = np.array(
+#         [
+#             [
+#                 Compute(
+#                     what="all",
+#                     ll=ll,
+#                     P=p,
+#                     T=iso,
+#                     Fe_number=Fe_number,
+#                     phase=phase,
+#                     **kwargs,
+#                 )[0]
+#                 for p in pres
+#             ]
+#             for iso in isotherms
+#         ]
+#     )
 
-    for i in range(len(dens)):
-        ax.semilogx(pres * presScale, dens[i] * 1e-3, color=cols[i])
-
-
-def plotOverview(mats=[1, 9], fnts=14, N=20):
-    fig, ax = plt.subplots(1, len(mats), figsize=(9, 3))
-    plt.subplots_adjust(wspace=0.25)
-    temps = np.linspace(1e3, 5e3, 3)
-    pres = [8, 12]
-    presScale = 11
-    for i in range(len(mats)):
-        plotFancy(
-            ll=mats[i],
-            ax=ax[i],
-            fnts=fnts,
-            isotherms=temps,
-            P=pres,
-            N=N,
-            presScale=10 ** (-presScale),
-        )
-        trafo = transforms.blended_transform_factory(ax[i].transAxes, ax[i].transAxes)
-
-        a = material_plot_list[mats[i]]
-        b = EOSstring_list[EOS_type[mats[i]]]
-        label = f"${a} \ ({b})$"
-        ax[i].text(0.1, 0.9, label, transform=trafo, fontsize=fnts)
-        ax[i].set_xlabel(r"$\rm Pressure \ [Mbar]$", fontsize=fnts)
-        ax[i].tick_params(labelsize=fnts)
-        ax[i].set_xticks(
-            np.logspace(pres[0] - presScale, pres[1] - presScale, pres[1] - pres[0] + 1)
-        )
-        ax[i].set_xlim(10 ** (pres[0] - presScale), 10 ** (pres[1] - presScale))
-
-    ax[0].set_ylabel(r"$\rm Density \ [g / cm^3]$", fontsize=fnts)
-    plots = ax[0].lines
-    u = r"\rm K"
-    ax[0].legend(plots, [f"${T:.0f} \ {u}$" for T in temps], fontsize=fnts, loc=3)
-    fig.savefig(
-        "/home/os18o068/Documents/PHD/Abbildungen/eos.pdf",
-        format="pdf",
-        bbox_inches="tight",
-    )
-    plt.close(fig)
+#     for i in range(len(dens)):
+#         ax.semilogx(pres * presScale, dens[i] * 1e-3, color=cols[i])
 
 
-def plotTable(
-    N=2,
-    off=0,
-    params=[2],
-    ll=1,
-    cmap="jet",
-    scalings=[1e-3, 1e-8, 1e5],
-    diff=False,
-    starts=[500, 1e5],
-    ends=[3000, 1e11],
-    fnts=14,
-):
-    import eosTablesTest
+# def plotOverview(mats=[1, 9], fnts=14, N=20):
+#     fig, ax = plt.subplots(1, len(mats), figsize=(9, 3))
+#     plt.subplots_adjust(wspace=0.25)
+#     temps = np.linspace(1e3, 5e3, 3)
+#     pres = [8, 12]
+#     presScale = 11
+#     for i in range(len(mats)):
+#         plotFancy(
+#             ll=mats[i],
+#             ax=ax[i],
+#             fnts=fnts,
+#             isotherms=temps,
+#             P=pres,
+#             N=N,
+#             presScale=10 ** (-presScale),
+#         )
+#         trafo = transforms.blended_transform_factory(ax[i].transAxes, ax[i].transAxes)
 
-    indexTrafo = {2: 0, 1: 3, 3: 3, 4: 4, 5: 7}
-    mpl.rc("text", usetex=True)
-    mpl.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
+#         a = material_plot_list[mats[i]]
+#         b = EOSstring_list[EOS_type[mats[i]]]
+#         label = f"${a} \ ({b})$"
+#         ax[i].text(0.1, 0.9, label, transform=trafo, fontsize=fnts)
+#         ax[i].set_xlabel(r"$\rm Pressure \ [Mbar]$", fontsize=fnts)
+#         ax[i].tick_params(labelsize=fnts)
+#         ax[i].set_xticks(
+#             np.logspace(pres[0] - presScale, pres[1] - presScale, pres[1] - pres[0] + 1)
+#         )
+#         ax[i].set_xlim(10 ** (pres[0] - presScale), 10 ** (pres[1] - presScale))
 
-    fig, ax = plt.subplots(len(params), N, figsize=(9, 9))
-
-    plt.subplots_adjust(wspace=0.25, hspace=0.5)
-    labels = [
-        r"$\rho \ \rm [g \ cm^{-3}]$",
-        r"$ dP/d\rho \ \rm [10^8 \ Pa \ g^{-1} \ cm^{3}]$",
-        r"$\alpha_{th} \ \rm [10^{-5} \ K^{-1}]$",
-    ]
-    paramLabels = [r"\rho", r"(dP/d\rho)", r"\alpha_{\rm th}"]
-    extent = [starts[0], ends[0], starts[1], ends[1]]
-    aspect = (extent[1] - extent[0]) / (extent[3] - extent[2])
-
-    # Prepare tables
-    tables = []
-    for i in range(N):
-        tab = eosTablesTest.Table(
-            starts=starts, ends=ends, scalings=["lin", "lin"], alphas=[i + off, i + off]
-        )
-        tab.construct_single_axes()
-        tab.construct_grid()
-        tab.generate(ll=ll, Fe_number=0.0)
-        tables.append(tab)
-
-    NN = 2 ** (N + off + 1)
-    # Compute relative error on table interpolation
-    if diff:
-        datDiff = []
-
-        for n in range(N):
-            tab = tables[n]
-            x = np.linspace(starts[0] * 1.001, ends[0] * 0.999, NN)
-            y = np.linspace(starts[1] * 1.001, ends[1] * 0.999, NN)
-
-            datAcc = np.empty([len(x), len(y), len(params)])
-            datInt = np.empty([len(x), len(y), len(params)])
-
-            for i in range(len(x)):
-                for j in range(len(y)):
-                    # Compute accurate data from EoS
-                    da = Compute(
-                        ll=ll, what="all", P=y[j], T=x[i], Fe_number=0.0, phase=0
-                    )
-
-                    # Compute data from table interpolation
-                    di = tab.interpolate(vals=[x[i], y[j]], params=params)
-                    print("di =", di)
-
-                    datInt[i][j][:] = di
-                    for ind in range(len(params)):
-                        datAcc[i][j][ind] = da[indexTrafo[params[ind]]]
-
-            # Compute realtive difference of accurate and interpolated data
-            datDiff.append(np.log10(abs(datAcc - datInt) / datAcc))
-
-    for r in range(len(params)):
-        for i in range(N):
-            ax[r][i].tick_params(labelsize=fnts)
-            tab = tables[i]
-            if diff:
-
-                im = ax[r][i].imshow(
-                    datDiff[i].T[r],
-                    vmin=-5,
-                    vmax=-1,
-                    cmap=cmap,
-                    origin="lower",
-                    extent=extent,
-                    aspect=aspect,
-                )
-
-                xTicks = np.linspace(starts[0], ends[0], 3)
-                yTicks = np.linspace(starts[1], ends[1], 5)
-                if scalings[0] == "log":
-                    xString = f"$log({tab.param_strings[0]})$"
-                else:
-                    xString = tab.param_strings[0]
-
-                if scalings[1] == "log":
-                    fore = r"\rm log"
-                    yString = f"${fore}({tab.param_strings[1]})$"
-                else:
-                    yString = tab.param_strings[1]
-
-                ax[r][i].set_xticklabels([f"${t:.0f}$" for t in xTicks], fontsize=fnts)
-                ax[r][i].set_yticklabels(
-                    [f"${t:.0f}$" for t in yTicks * 1e-9], fontsize=fnts
-                )
-
-                ax[r][i].set_xlabel(xString, fontsize=fnts)
-                ax[r][i].set_ylabel(yString, fontsize=fnts)
-                ax[r][i].set_xticks(xTicks)
-                ax[r][i].set_yticks(yTicks)
-                if i == N - 1:
-                    axin = ax[r][i].inset_axes([1.1, 0.0, 0.05, 1.0])
-                    cbar = plt.colorbar(im, cax=axin)
-                    cbar.set_label(
-                        f"$\log(|\Delta {paramLabels[r]}|/{paramLabels[r]})$",
-                        fontsize=fnts,
-                    )
-                    cbar.ax.tick_params(labelsize=fnts)
-
-            else:
-                if i == N - 1:
-                    addCbar = True
-                else:
-                    addCbar = False
-                tab.plot_slice(
-                    params=[params[r]],
-                    scalings=["lin", "lin"],
-                    ax=ax[r][i],
-                    fig=fig,
-                    label=labels[r],
-                    addCbar=addCbar,
-                    cmap=cmap,
-                    scale=scalings[r],
-                    fnts=fnts,
-                )
-
-            # Add label for resolution
-            trafo = transforms.blended_transform_factory(
-                ax[r][i].transAxes, ax[r][i].transAxes
-            )
-            res = 2 ** (i + off + 1)
-            ax[r][i].text(
-                0.1,
-                0.9,
-                r"$\rm Res = {a}\times{b}$".format(a=res, b=res),
-                transform=trafo,
-                color="white",
-                fontsize=fnts,
-            )
-
-    if diff:
-        fileName = "eos_grid_diff"
-    else:
-        fileName = "eos_grid"
-
-    fig.savefig(
-        r"/home/os18o068/Documents/PHD/Abbildungen/{fn}.pdf".format(fn=fileName),
-        format="pdf",
-        bbox_inches="tight",
-    )
-    plt.close(fig)
+#     ax[0].set_ylabel(r"$\rm Density \ [g / cm^3]$", fontsize=fnts)
+#     plots = ax[0].lines
+#     u = r"\rm K"
+#     ax[0].legend(plots, [f"${T:.0f} \ {u}$" for T in temps], fontsize=fnts, loc=3)
+#     fig.savefig(
+#         "/home/os18o068/Documents/PHD/Abbildungen/eos.pdf",
+#         format="pdf",
+#         bbox_inches="tight",
+#     )
+#     plt.close(fig)
 
 
-def Plot(
-    ll=1, N=5, P_min=1.0e5, P_max=1.0e12, mark="", phase=0, Fe_number=0.0, **kwargs
-):
-    """Generates simple phase diagram over a certain temperature and pressure
-    range accounting for all the implemented phases for the given material
-    """
+# def plotTable(
+#     N=2,
+#     off=0,
+#     params=[2],
+#     ll=1,
+#     cmap="jet",
+#     scalings=[1e-3, 1e-8, 1e5],
+#     diff=False,
+#     starts=[500, 1e5],
+#     ends=[3000, 1e11],
+#     fnts=14,
+# ):
+#     import eosTablesTest
 
-    # define temperature range
-    pres = np.logspace(np.log10(P_min), np.log10(P_max), N)
-    temp = np.logspace(2, 4, N)
+#     indexTrafo = {2: 0, 1: 3, 3: 3, 4: 4, 5: 7}
+#     mpl.rc("text", usetex=True)
+#     mpl.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
 
-    isotherms = np.linspace(1000, 3000, 2)
+#     fig, ax = plt.subplots(len(params), N, figsize=(9, 9))
 
-    dens = np.array(
-        [
-            [
-                Compute(
-                    what="all",
-                    ll=ll,
-                    P=p,
-                    T=iso,
-                    Fe_number=Fe_number,
-                    phase=phase,
-                    **kwargs,
-                )[0]
-                for p in pres
-            ]
-            for iso in isotherms
-        ]
-    )
+#     plt.subplots_adjust(wspace=0.25, hspace=0.5)
+#     labels = [
+#         r"$\rho \ \rm [g \ cm^{-3}]$",
+#         r"$ dP/d\rho \ \rm [10^8 \ Pa \ g^{-1} \ cm^{3}]$",
+#         r"$\alpha_{th} \ \rm [10^{-5} \ K^{-1}]$",
+#     ]
+#     paramLabels = [r"\rho", r"(dP/d\rho)", r"\alpha_{\rm th}"]
+#     extent = [starts[0], ends[0], starts[1], ends[1]]
+#     aspect = (extent[1] - extent[0]) / (extent[3] - extent[2])
 
-    if ll == 1:
-        isochores = np.linspace(rho0_list[ll], rho0_list[ll] * 1.5, 5)
+#     # Prepare tables
+#     tables = []
+#     for i in range(N):
+#         tab = eosTablesTest.Table(
+#             starts=starts, ends=ends, scalings=["lin", "lin"], alphas=[i + off, i + off]
+#         )
+#         tab.construct_single_axes()
+#         tab.construct_grid()
+#         tab.generate(ll=ll, Fe_number=0.0)
+#         tables.append(tab)
 
-    else:
-        isochores = np.linspace(rho0_list[ll], rho0_list[ll] * 1.5, 5)
+#     NN = 2 ** (N + off + 1)
+#     # Compute relative error on table interpolation
+#     if diff:
+#         datDiff = []
 
-    """
-    #to compute the pressure the phase region must be known as it can not
-    #be determined from the phase diagram which requires a PT point as input
-    pres_plot = np.array([[Compute(what='pres', ll=ll, T=t, d=iso,
-                                   phase = phase, P=1.0e9, 
-                                   Fe_number=Fe_number, **kwargs)[0]
-                        for t in temp] for iso in isochores])
-    """
-    # compute phase transition pressures for temperature range
-    phase_pres_alpha = hydration.P_alpha_beta_fit(temp) * 1.0e9
-    phase_pres_beta = hydration.P_beta_gamma_fit(temp) * 1.0e9
+#         for n in range(N):
+#             tab = tables[n]
+#             x = np.linspace(starts[0] * 1.001, ends[0] * 0.999, NN)
+#             y = np.linspace(starts[1] * 1.001, ends[1] * 0.999, NN)
 
-    plot_list1 = []
-    plot_list2 = []
+#             datAcc = np.empty([len(x), len(y), len(params)])
+#             datInt = np.empty([len(x), len(y), len(params)])
 
-    fnts = 14
-    labelsize = 12
-    lwdt = 2
+#             for i in range(len(x)):
+#                 for j in range(len(y)):
+#                     # Compute accurate data from EoS
+#                     da = Compute(
+#                         ll=ll, what="all", P=y[j], T=x[i], Fe_number=0.0, phase=0
+#                     )
 
-    # create two subfigures to plot isotherms and isochores seperately
-    fig, ax = plt.subplots(1, 2, sharey=True)
+#                     # Compute data from table interpolation
+#                     di = tab.interpolate(vals=[x[i], y[j]], params=params)
+#                     print("di =", di)
 
-    for i in range(len(dens)):
-        (plot,) = ax[0].semilogy(
-            dens[i], pres, color=color_list[i], linewidth=lwdt, marker=mark
-        )
-        plot_list1.append(plot)
-    """
-    for i in range(len(pres_plot)):
-        plot, = ax[1].loglog(temp, pres_plot[i], color=color_list[i],
-                  linewidth=lwdt, marker=mark)
-        plot_list2.append(plot)
-    """
-    """
-    #plot phase curves for Mg2SiO4
-    if ll == 1:
-        ax[1].plot(temp, phase_pres_alpha, color='grey', linestyle='--')
-        ax[1].plot(temp, phase_pres_beta, color='grey', linestyle='--')
-    """
+#                     datInt[i][j][:] = di
+#                     for ind in range(len(params)):
+#                         datAcc[i][j][ind] = da[indexTrafo[params[ind]]]
 
-    legend1 = ax[0].legend(
-        plot_list1, [str(iso) + " K" for iso in isotherms], loc=4, framealpha=0.5
-    )
+#             # Compute realtive difference of accurate and interpolated data
+#             datDiff.append(np.log10(abs(datAcc - datInt) / datAcc))
 
-    legend2 = ax[1].legend(
-        plot_list1,
-        [str(int(iso)) + r"$ \ kg \ m^{-3}$" for iso in isochores],
-        loc=3,
-        framealpha=0.5,
-    )
+#     for r in range(len(params)):
+#         for i in range(N):
+#             ax[r][i].tick_params(labelsize=fnts)
+#             tab = tables[i]
+#             if diff:
 
-    ax[0].add_artist(legend1)
-    ax[1].add_artist(legend2)
-    ax[1].tick_params(labelright=True)
-    ax[0].set_ylabel(r"$P \ [Pa]$", fontsize=labelsize)
-    ax[0].set_xlabel(r"$\rho \ [kg \ m^{-3}]$", fontsize=labelsize)
-    ax[1].set_xlabel(r"$T \ [K]$", fontsize=labelsize)
+#                 im = ax[r][i].imshow(
+#                     datDiff[i].T[r],
+#                     vmin=-5,
+#                     vmax=-1,
+#                     cmap=cmap,
+#                     origin="lower",
+#                     extent=extent,
+#                     aspect=aspect,
+#                 )
 
-    ml = MultipleLocator(100)
-    ax[0].xaxis.set_minor_locator(ml)
-    fig.suptitle(r"$ phase \ diagram \  $" + material_plot_list[ll])
+#                 xTicks = np.linspace(starts[0], ends[0], 3)
+#                 yTicks = np.linspace(starts[1], ends[1], 5)
+#                 if scalings[0] == "log":
+#                     xString = f"$log({tab.param_strings[0]})$"
+#                 else:
+#                     xString = tab.param_strings[0]
 
-    if ll == 1:
-        ax[1].text(3100, 1.1e9, r"$\alpha$", color="grey", fontsize=fnts)
-        ax[1].text(3100, 1.9e10, r"$\beta$", color="grey", fontsize=fnts)
-        ax[1].text(3100, 5.0e10, r"$\gamma$", color="grey", fontsize=fnts)
+#                 if scalings[1] == "log":
+#                     fore = r"\rm log"
+#                     yString = f"${fore}({tab.param_strings[1]})$"
+#                 else:
+#                     yString = tab.param_strings[1]
 
-    for axx in ax:
-        axx.tick_params(
-            which="both",
-            direction="in",
-            right=True,
-            top=True,
-            pad=10,
-            labelsize=labelsize,
-        )
-        axx.set_ylim(P_min, P_max)
-        # axx.grid(color=grid_color, linewidth=2)
-        # axx.grid(which='minor', color=grid_color)
+#                 ax[r][i].set_xticklabels([f"${t:.0f}$" for t in xTicks], fontsize=fnts)
+#                 ax[r][i].set_yticklabels(
+#                     [f"${t:.0f}$" for t in yTicks * 1e-9], fontsize=fnts
+#                 )
 
-    # ax[0].set_xlim(2500, 5000)
-    # ax[1].set_xlim(100, 10000)
-    fig.savefig(
-        "/home/os18o068/Documents/PHD/Abbildungen/eos.pdf",
-        format="pdf",
-        bbox_inches="tight",
-    )
-    plt.close(fig)
+#                 ax[r][i].set_xlabel(xString, fontsize=fnts)
+#                 ax[r][i].set_ylabel(yString, fontsize=fnts)
+#                 ax[r][i].set_xticks(xTicks)
+#                 ax[r][i].set_yticks(yTicks)
+#                 if i == N - 1:
+#                     axin = ax[r][i].inset_axes([1.1, 0.0, 0.05, 1.0])
+#                     cbar = plt.colorbar(im, cax=axin)
+#                     cbar.set_label(
+#                         f"$\log(|\Delta {paramLabels[r]}|/{paramLabels[r]})$",
+#                         fontsize=fnts,
+#                     )
+#                     cbar.ax.tick_params(labelsize=fnts)
+
+#             else:
+#                 if i == N - 1:
+#                     addCbar = True
+#                 else:
+#                     addCbar = False
+#                 tab.plot_slice(
+#                     params=[params[r]],
+#                     scalings=["lin", "lin"],
+#                     ax=ax[r][i],
+#                     fig=fig,
+#                     label=labels[r],
+#                     addCbar=addCbar,
+#                     cmap=cmap,
+#                     scale=scalings[r],
+#                     fnts=fnts,
+#                 )
+
+#             # Add label for resolution
+#             trafo = transforms.blended_transform_factory(
+#                 ax[r][i].transAxes, ax[r][i].transAxes
+#             )
+#             res = 2 ** (i + off + 1)
+#             ax[r][i].text(
+#                 0.1,
+#                 0.9,
+#                 r"$\rm Res = {a}\times{b}$".format(a=res, b=res),
+#                 transform=trafo,
+#                 color="white",
+#                 fontsize=fnts,
+#             )
+
+#     if diff:
+#         fileName = "eos_grid_diff"
+#     else:
+#         fileName = "eos_grid"
+
+#     fig.savefig(
+#         r"/home/os18o068/Documents/PHD/Abbildungen/{fn}.pdf".format(fn=fileName),
+#         format="pdf",
+#         bbox_inches="tight",
+#     )
+#     plt.close(fig)
+
+
+# def Plot(
+#     ll=1, N=5, P_min=1.0e5, P_max=1.0e12, mark="", phase=0, Fe_number=0.0, **kwargs
+# ):
+#     """Generates simple phase diagram over a certain temperature and pressure
+#     range accounting for all the implemented phases for the given material
+#     """
+
+#     # define temperature range
+#     pres = np.logspace(np.log10(P_min), np.log10(P_max), N)
+#     temp = np.logspace(2, 4, N)
+
+#     isotherms = np.linspace(1000, 3000, 2)
+
+#     dens = np.array(
+#         [
+#             [
+#                 Compute(
+#                     what="all",
+#                     ll=ll,
+#                     P=p,
+#                     T=iso,
+#                     Fe_number=Fe_number,
+#                     phase=phase,
+#                     **kwargs,
+#                 )[0]
+#                 for p in pres
+#             ]
+#             for iso in isotherms
+#         ]
+#     )
+
+#     if ll == 1:
+#         isochores = np.linspace(rho0_list[ll], rho0_list[ll] * 1.5, 5)
+
+#     else:
+#         isochores = np.linspace(rho0_list[ll], rho0_list[ll] * 1.5, 5)
+
+#     """
+#     #to compute the pressure the phase region must be known as it can not
+#     #be determined from the phase diagram which requires a PT point as input
+#     pres_plot = np.array([[Compute(what='pres', ll=ll, T=t, d=iso,
+#                                    phase = phase, P=1.0e9, 
+#                                    Fe_number=Fe_number, **kwargs)[0]
+#                         for t in temp] for iso in isochores])
+#     """
+#     # compute phase transition pressures for temperature range
+#     phase_pres_alpha = hydration.P_alpha_beta_fit(temp) * 1.0e9
+#     phase_pres_beta = hydration.P_beta_gamma_fit(temp) * 1.0e9
+
+#     plot_list1 = []
+#     plot_list2 = []
+
+#     fnts = 14
+#     labelsize = 12
+#     lwdt = 2
+
+#     # create two subfigures to plot isotherms and isochores seperately
+#     fig, ax = plt.subplots(1, 2, sharey=True)
+
+#     for i in range(len(dens)):
+#         (plot,) = ax[0].semilogy(
+#             dens[i], pres, color=color_list[i], linewidth=lwdt, marker=mark
+#         )
+#         plot_list1.append(plot)
+#     """
+#     for i in range(len(pres_plot)):
+#         plot, = ax[1].loglog(temp, pres_plot[i], color=color_list[i],
+#                   linewidth=lwdt, marker=mark)
+#         plot_list2.append(plot)
+#     """
+#     """
+#     #plot phase curves for Mg2SiO4
+#     if ll == 1:
+#         ax[1].plot(temp, phase_pres_alpha, color='grey', linestyle='--')
+#         ax[1].plot(temp, phase_pres_beta, color='grey', linestyle='--')
+#     """
+
+#     legend1 = ax[0].legend(
+#         plot_list1, [str(iso) + " K" for iso in isotherms], loc=4, framealpha=0.5
+#     )
+
+#     legend2 = ax[1].legend(
+#         plot_list1,
+#         [str(int(iso)) + r"$ \ kg \ m^{-3}$" for iso in isochores],
+#         loc=3,
+#         framealpha=0.5,
+#     )
+
+#     ax[0].add_artist(legend1)
+#     ax[1].add_artist(legend2)
+#     ax[1].tick_params(labelright=True)
+#     ax[0].set_ylabel(r"$P \ [Pa]$", fontsize=labelsize)
+#     ax[0].set_xlabel(r"$\rho \ [kg \ m^{-3}]$", fontsize=labelsize)
+#     ax[1].set_xlabel(r"$T \ [K]$", fontsize=labelsize)
+
+#     ml = MultipleLocator(100)
+#     ax[0].xaxis.set_minor_locator(ml)
+#     fig.suptitle(r"$ phase \ diagram \  $" + material_plot_list[ll])
+
+#     if ll == 1:
+#         ax[1].text(3100, 1.1e9, r"$\alpha$", color="grey", fontsize=fnts)
+#         ax[1].text(3100, 1.9e10, r"$\beta$", color="grey", fontsize=fnts)
+#         ax[1].text(3100, 5.0e10, r"$\gamma$", color="grey", fontsize=fnts)
+
+#     for axx in ax:
+#         axx.tick_params(
+#             which="both",
+#             direction="in",
+#             right=True,
+#             top=True,
+#             pad=10,
+#             labelsize=labelsize,
+#         )
+#         axx.set_ylim(P_min, P_max)
+#         # axx.grid(color=grid_color, linewidth=2)
+#         # axx.grid(which='minor', color=grid_color)
+
+#     # ax[0].set_xlim(2500, 5000)
+#     # ax[1].set_xlim(100, 10000)
+#     fig.savefig(
+#         "/home/os18o068/Documents/PHD/Abbildungen/eos.pdf",
+#         format="pdf",
+#         bbox_inches="tight",
+#     )
+#     plt.close(fig)
 
 
 """

@@ -10,8 +10,8 @@ Plot the data for the parameter comparison cases.
 
 import numpy as np
 from matplotlib import pyplot as plt
-from PIMPrunparams import color_list
-from PIMPphysicalparams import m_earth, r_earth, mH, mFe
+from pics.runparams import color_list
+from pics.physicalparams import m_earth, r_earth, mH, mFe
 import matplotlib
 
 matplotlib.rc("text", usetex=True)

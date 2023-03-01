@@ -13,8 +13,8 @@ range.
 """
 
 import numpy as np
-from pics.utils import PIMPtools
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import PIMPtools
+from pics.utils.function_tools import functionTools as ftool
 from scipy.integrate import quad
 from pics.physicalparams import kBcgs, kB, mH, mO, NA, Rgas
 

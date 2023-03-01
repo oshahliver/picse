@@ -7,7 +7,7 @@ Created on Fri Jan 18 14:26:56 2019
 """
 import time
 import sys
-from pics.utils import PIMPtools
+from pics.utils.function_tools import PIMPtools
 from pics.materials import eosTablesUse as eosTab
 import numpy as np
 from matplotlib import pyplot as plt
@@ -18,7 +18,7 @@ from pics.materials import eoswater
 from pics.materials import phaseCheck
 from pics.materials import hydration
 from pics.materials import brucite_phase as bruce
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 from pics.physicalparams import (
     T0_list,
     K0_list,
@@ -870,7 +870,7 @@ def K0prime_silicates(
         return K0_prime_silicates + 2 * delta * (SiMg - 0.5)
 
 
-def Compute(
+def compute(
     ll=0,
     what="all",
     P=None,

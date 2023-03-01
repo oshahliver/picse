@@ -7,7 +7,7 @@ Created on Wed Mar 16 11:55:11 2022
 """
 
 import numpy as np
-import pics.utils.functionTools as ftool
+import pics.utils.function_tools.functionTools as ftool
 import matplotlib.pyplot as plt
 from pics.physicalparams import R_solar, M_solar, m_earth, r_earth
 

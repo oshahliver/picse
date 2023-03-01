@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pics.materials import mazevet
 import time
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 
 # -----------------------------------------------------------------------------
 # functions

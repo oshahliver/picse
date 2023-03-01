@@ -8,7 +8,7 @@ Created on Fri Jan 18 14:26:56 2019
 
 import time
 import sys
-from pics.utils import PIMPtools
+from pics.utils.function_tools import PIMPtools
 import numpy as np
 from matplotlib import pyplot as plt
 from pics.utils.function_tools import functionTools as ftool
