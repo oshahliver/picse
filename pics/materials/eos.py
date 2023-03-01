@@ -11,10 +11,10 @@ from pics.utils.function_tools import PIMPtools
 from pics.materials import eosTablesUse as eosTab
 import numpy as np
 from matplotlib import pyplot as plt
-from pics.materials import Mazevet2018EOS as mazevet
+# from pics.materials import Mazevet2018EOS as mazevet
 import matplotlib.transforms as transforms
 from pics.materials import Feistel2006EOS as feistel
-from pics.materials import eoswater
+# from pics.materials import eoswater
 from pics.materials import phaseCheck
 from pics.materials import hydration
 from pics.materials import brucite_phase as bruce
@@ -744,12 +744,16 @@ def dTdP_IGL(d=0.0, ll=0):
 
 # IAPWS + Mazevet for pure water
 def rho_water_eos(P=None, T=None, **kwargs):
+    raise NotImplementedError("This feature is not available yet.")
+
     dens = eoswater.density(P=P, T=T)
     return dens
 
 
 def dPdrho_water(P=None, T=None, d=None, **kwargs):
     """This computes dPdrho_S for water"""
+    raise NotImplementedError("This feature is not available yet.")
+
     dPdrho = eoswater.dPdrho_T(P=P, d=d, T=T)
     return dPdrho
 
@@ -911,6 +915,7 @@ def compute(
         - Element 8: Thermal expansion. Defaults to None.
         - Element 9: Al content for silicates. Defaults to None.
     """
+
 
     Fe_number = min(Fe_number, 100.0 - 1.0e-10)
     FeMg = Fe_number / (100.0 - Fe_number)
@@ -1533,6 +1538,8 @@ def compute(
 
         # Water EOS
         elif whichEOS == 4 and not stopper:
+            raise NotImplementedError("This feature is not available yet.")
+
             if what == "pres":
                 P = eoswater.pressure(d=d, t=T, p0=P, **kwargs)
                 phase = eoswater.phase(t=T, p=P, **kwargs)

@@ -75,6 +75,7 @@ pics/materials/eosTablesUse.py
 pics/materials/eoswater.py
 pics/materials/hydration.py
 pics/materials/material.py
+pics/materials/metal_silicate_partitioning.py
 pics/materials/phaseCheck.py
 pics/materials/phase_transitions_water_Wagner2002.py
 pics/utils/__init__.py

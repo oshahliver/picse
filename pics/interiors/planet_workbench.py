@@ -8,7 +8,7 @@ from pics.utils.file_tools import file_manager
 from pics.utils.plot_tools.plot_tools import plot_mr
 from pics.utils.file_tools import internal_data
 from pics.physicalparams import r_earth, m_earth
-from pics.materials.material import Si_number_max, Si_number_min
+from pics.materials.material import silicon_number_max, silicon_number_min
 import sys
 import numpy as np
 import pandas as pd
@@ -149,7 +149,7 @@ class BlindSet(DataSet):
         # Just use linear sampling by default
         # TODO. add option to chose different sampling strategies here
         Si_number_mantle_all = [
-            np.random.uniform(Si_number_min(fe), Si_number_max(fe))
+            np.random.uniform(silicon_number_min(fe), silicon_number_max(fe))
             for fe in Fe_number_mantle_all
         ]
         self.planetary_params_all.update({"Si_number_mantle": Si_number_mantle_all})

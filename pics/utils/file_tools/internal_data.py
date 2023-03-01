@@ -226,7 +226,7 @@ class RenameUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         renamed_module = module
         if module == "regression":
-            renamed_module = "pics.utils.regression"
+            renamed_module = "pics.utils.calibration_tools.regression"
 
         return super(RenameUnpickler, self).find_class(renamed_module, name)
 

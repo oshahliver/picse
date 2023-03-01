@@ -663,9 +663,24 @@ def probe_mantle_comps(N=100):
     return data
 
 
-def mantle_comp(P_CS, ocmf=[]):
+def mantle_comp(P_CS, ocmf):
+    """
+    Computes the mantle composition according to the single
+    stage core-segregation model.
+
+    Parameters:
+    P_CS (float): Core segregation pressure in Pa.
+    ocmf (list): Outer core mass fractions.
+    
+    Returns:
+    tuple (real): Molar abundance of Fe and Si in the silicates.
+    """
+    # Convert to atomic abundances
     xi = mat2at_core(ocmf, xiH=0.0)
-    T_CS = T_liquidus_pyrolite(P_CS)
+    # Compute the core-segregation temperature
+    T_CS = temp_liquidus_pyrolite(P_CS)
+
+    #Compute molar abundances of Fe and Si
     fem = Fe_number_mantle(P_CS, T_CS, xi=xi)
     sim = Si_number_mantle(P_CS, T_CS, xi=xi)
 
@@ -700,62 +715,65 @@ def partition_coefficient_i(T, P, i, xi):
     Fischer et al. 2015 accounting for non-ideal effects in multi-component
     fluids. Currently only for O and Si. The effect of S on KD is not has not
     been investigated by these authors and no other sources were found.
+
+    Paramters:
+    T (float): Temperature in K.
+    P (float): Pressure in Pa.
+    i (int): Index of of species.
+    xi (float): Molar concentrations.
+
+    Returns:
+    float: Partition coefficient of species i.
     """
     P *= 1e-9
-
     KD = a_KDi[i] + b_KDi[i] / T + c_KDi[i] * P / T
-    # print ('KD =', KD)
     eps = epsilon_ki(T, i, i)
     KD += eps * np.log(1.0 - xi[i]) / 2.303
-    # print ('KD =', KD)
-    # print ('xi =', xi)
-    # print ('eps =', eps)
     for k in range(2):
         if k == i:
             pass
         else:
             eps = epsilon_ki(T, k, i)
-            #       print ('eps =', eps)
             delta = 1.0 / 2.303 * eps * xi[k]
-            #      print ('delta =', delta)
             delta *= 1.0 + np.log(1.0 - xi[k]) / xi[k] - 1.0 / (1.0 - xi[i])
-            #     print ('delta =', delta)
             KD += delta
-
-    # print ('KD =', KD)
-    # print ('-----')
-
     for k in range(2):
         if k == i:
             pass
         else:
             eps = epsilon_ki(T, k, i)
-            # print ('eps =', eps)
             delta = 1.0 / 2.303 * eps * xi[k] ** 2 * xi[i]
-            # print ('delta =', delta)
             delta *= (
                 1.0 / (1 - xi[i])
                 + 1.0 / (1.0 - xi[k])
                 + xi[i] / (2.0 * (1.0 - xi[i]) ** 2)
                 - 1.0
             )
-            # print ('delta =', delta)
             KD -= delta
-
-    # print ('KD =', KD)
     return 10**KD
 
 
 def partition_coefficient(T, P, ll):
     """Compute metal-silicate partition coefficient according to
-    Fischer et al. 2015. Currently only for O and Si
+    Fischer et al. 2015. Currently only for O and Si.
     """
     P *= 1e-9
     return 10 ** (a_KD[ll] + b_KD[ll] / T + c_KD[ll] * P / T)
 
 
 def KD_S(T, P, xi, which="suer"):
-    """Partition coefficient for S from Boujibar 2014 or Suer et al. 2017"""
+    """
+    Partition coefficient between metals and silicates for S from
+    Boujibar 2014 or Suer et al. 2017
+    
+    Parameters:
+    T (float): Temperature in K.
+    P (float): Pressure in Pa.
+    which (str, optional): Model. Defaults to 'suer'.
+
+    Returns:
+    float: Partition coefficient for sulfur.
+    """
     xiFe, xiH, xiS, xiSi, xiO = xi
     xiC = 0.0
     xiNi = 0.0
@@ -767,7 +785,6 @@ def KD_S(T, P, xi, which="suer"):
     CS = 10 ** (-5.704 + 3.15 * xiFeO + 0.12 * xiMgO)
 
     if which == "bijou":
-
         b = 405.0
         c = 136.0
         d = 32.0
@@ -799,6 +816,19 @@ def KD_S(T, P, xi, which="suer"):
 
 
 def Margules_eq(P, T, A, B, C):
+    """
+    Implements the of the Margules equation.
+
+    Parameters:
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    A (float): First Margules parameter.
+    B (flaot): Second Margules parameter.
+    C (float): Third Margules parameter.
+
+    Returns:
+    float: Margules coefficient.
+    """
     return A - B * T - C * P / 1e5
 
 
@@ -853,8 +883,8 @@ def W_FeO_Fe_prime(P, T, T0, P0, a, b):
 
 
 def coefs_Fe_FeO(P, xiFe):
-    T = T_liquidus_pyrolite(P)
-    T_trans = T_liquidus_pyrolite(P_FeO_Fe_trans)
+    T = temp_liquidus_pyrolite(P)
+    T_trans = temp_liquidus_pyrolite(P_FeO_Fe_trans)
 
     W1 = W_FeO_Fe(P_FeO_Fe_trans, T_trans)
     W2 = W_Fe_FeO(P_FeO_Fe_trans, T_trans)
@@ -885,8 +915,8 @@ def coefs_Fe_FeO(P, xiFe):
 
 
 def coefs_FeO_Fe(P, xiFeO):
-    T = T_liquidus_pyrolite(P)
-    T_trans = T_liquidus_pyrolite(P_FeO_Fe_trans)
+    T = temp_liquidus_pyrolite(P)
+    T_trans = temp_liquidus_pyrolite(P_FeO_Fe_trans)
 
     W1 = W_FeO_Fe(P_FeO_Fe_trans, T_trans)
     W2 = W_Fe_FeO(P_FeO_Fe_trans, T_trans)
@@ -930,7 +960,17 @@ def T_liquidus_pyrolite_prime(P):
 
 
 def specific_thermal_energy(T, P, C_p):
-    """Computes the specific thermal energy of a substance at temperature T and pressure P using the heat capacity function C_p(T,P)"""
+    """
+    Computes the specific thermal energy of a substance.
+
+    Parameters:
+    T (float): Temperature in K.
+    P (float): Pressure in Pa.
+    C_p (function): Function to compute specific heat in J/K/kg.
+
+    Returns:
+    float: Thermal energy.
+    """
 
     # Compute the internal energy using the heat capacity function
     U = integrate.quad(C_p, 0.0, T, args=(P,))[0]
@@ -1018,22 +1058,38 @@ def specific_heat_pyrolite(T, rho):
     return cp
 
 
-def gamma_FeO(P=None, xiFeO=0.0):
-    """Interaction parameter of FeO from Frost et al. 2010"""
-    T = T_liquidus_pyrolite(P)
+def gamma_FeO(P, x_FeO=0.0):
+    """Interaction parameter of FeO from Frost et al. 2010.
+
+    Parameters:
+    P (float): Pressure in Pa.
+    x_FeO (float, optional): Mole fraction of FeO. Defaults to 0.
+
+    Returns:
+    float: Interaction parameter.
+    """
+    T = temp_liquidus_pyrolite(P)
     W1 = W_FeO_Fe(P, T)
     W2 = W_Fe_FeO(P, T)
-    r = (1.0 - xiFeO) ** 2 * (W1 + 2.0 * (W2 - W1) * xiFeO)
+    r = (1.0 - x_FeO) ** 2 * (W1 + 2.0 * (W2 - W1) * x_FeO)
     r /= Rgas * T
     return np.exp(r)
 
 
-def gamma_Fe(P=None, xiFe=None):
-    """Interaction parameter of FeO from Frost et al. 2010"""
-    T = T_liquidus_pyrolite(P)
+def gamma_Fe(P, x_Fe=None):
+    """Interaction parameter of Fe from Frost et al. 2010.
+
+    Parameters:
+    P (float): Pressure in Pa.
+    x_Fe (float, optional): Mole fraction of Fe. Defaults to 0.
+
+    Returns:
+    float: Interaction parameter.
+    """
+    T = temp_liquidus_pyrolite(P)
     W1 = W_FeO_Fe(P, T)
     W2 = W_Fe_FeO(P, T)
-    r = (1.0 - xiFe) ** 2 * (W2 + 2.0 * (W1 - W2) * xiFe)
+    r = (1.0 - x_Fe) ** 2 * (W2 + 2.0 * (W1 - W2) * x_Fe)
     r /= Rgas * T
     return np.exp(r)
 
@@ -1058,50 +1114,64 @@ def gamma_Fe_smoothed(P, xiFe):
         return max(1.0 + K * np.exp(-Z * (P - P_FeO_Fe_trans)), 1.0)
 
 
-def plot_activity_coefficients():
-    fig, ax = plt.subplots(figsize=(4, 3))
-    # ax.set_yscale('log')
-    axin = ax.inset_axes([0.7, 0.2, 0.025, 0.4])
-    ax.tick_params(right=True, top=True, direction="in")
-    ax.set_xlabel(r"Core Segregation Pressure [GPa]")
-    ax.set_ylabel(r"Activity Coefficient")
-    ax.set_xlim(0, 80)
-    ax.set_ylim(0, 10)
-    x = np.linspace(1e9, 100e9)
-    fracs = np.linspace(1.0, 0.1, len(color_list))
-    cmap = ftool.my_cmap()
-    cbar = mpl.colorbar.ColorbarBase(axin, cmap=cmap, ticks=np.arange(0, 1.2, 0.2))
+# def plot_activity_coefficients():
+#     fig, ax = plt.subplots(figsize=(4, 3))
+#     # ax.set_yscale('log')
+#     axin = ax.inset_axes([0.7, 0.2, 0.025, 0.4])
+#     ax.tick_params(right=True, top=True, direction="in")
+#     ax.set_xlabel(r"Core Segregation Pressure [GPa]")
+#     ax.set_ylabel(r"Activity Coefficient")
+#     ax.set_xlim(0, 80)
+#     ax.set_ylim(0, 10)
+#     x = np.linspace(1e9, 100e9)
+#     fracs = np.linspace(1.0, 0.1, len(color_list))
+#     cmap = ftool.my_cmap()
+#     cbar = mpl.colorbar.ColorbarBase(axin, cmap=cmap, ticks=np.arange(0, 1.2, 0.2))
 
-    cbar.set_label(r"$X_{\rm Fe}^{\rm Metal}$ or $X_{\rm FeO}^{\rm Silicates}$")
-    cbar_ticks = np.linspace(0.0, 1.0, 6)
-    cbar.ax.set_yticklabels(np.round(cbar_ticks, 1))
+#     cbar.set_label(r"$X_{\rm Fe}^{\rm Metal}$ or $X_{\rm FeO}^{\rm Silicates}$")
+#     cbar_ticks = np.linspace(0.0, 1.0, 6)
+#     cbar.ax.set_yticklabels(np.round(cbar_ticks, 1))
 
-    plot_list = []
-    label_list = [r"$\gamma_{\rm FeO}$", r"$\gamma_{\rm Fe}$"]
+#     plot_list = []
+#     label_list = [r"$\gamma_{\rm FeO}$", r"$\gamma_{\rm Fe}$"]
 
-    for f in range(len(fracs)):
-        ff = fracs[f]
-        y1 = np.array([gamma_FeO_smoothed(xx, ff) for xx in x])
-        y2 = np.array([gamma_Fe_smoothed(xx, ff) for xx in x])
+#     for f in range(len(fracs)):
+#         ff = fracs[f]
+#         y1 = np.array([gamma_FeO_smoothed(xx, ff) for xx in x])
+#         y2 = np.array([gamma_Fe_smoothed(xx, ff) for xx in x])
 
-        (pl1,) = ax.plot(x * 1e-9, y1, linestyle="-", color=color_list[f])
-        (pl2,) = ax.plot(x * 1e-9, y2, linestyle="--", color=color_list[f])
-        if f == len(fracs) - 1:
-            plot_list.append(pl1)
-            plot_list.append(pl2)
+#         (pl1,) = ax.plot(x * 1e-9, y1, linestyle="-", color=color_list[f])
+#         (pl2,) = ax.plot(x * 1e-9, y2, linestyle="--", color=color_list[f])
+#         if f == len(fracs) - 1:
+#             plot_list.append(pl1)
+#             plot_list.append(pl2)
 
-    legend = ax.legend(plot_list, label_list)
-    ax.add_artist(legend)
-    fig.savefig(
-        "/home/os18o068/Documents/PHD/Abbildungen/activity_coeffs.pdf",
-        format="pdf",
-        bbox_inches="tight",
-    )
+#     legend = ax.legend(plot_list, label_list)
+#     ax.add_artist(legend)
+#     fig.savefig(
+#         "/home/os18o068/Documents/PHD/Abbildungen/activity_coeffs.pdf",
+#         format="pdf",
+#         bbox_inches="tight",
+#     )
 
-    plt.close("all")
+#     plt.close("all")
 
 
 def xi_S(P, T, xi):
+    """
+    Computes mol fraction of sulfur in the mantle assuming chemical
+    equilibrium between mantle and core. P, T at CMB and xiFe and xiO in core.
+    
+    Parameters
+    ----------
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    xi (list): Molar abundances in the core.
+
+    Returns
+    -------
+    float: Molar abundance of S in the silicates.
+    """
     KD = KD_S(T, P, xi)
     return xi[2] / KD
 
@@ -1110,10 +1180,19 @@ def xi_FeO(P, T, xi):
     """
     Computes mol fraction of iron oxide in the mantle assuming chemical
     equilibrium between mantle and core. P, T at CMB and xiFe and xiO in core.
+    
+    Parameters
+    ----------
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    xi (list): Molar abundances in the core.
+
+    Returns
+    -------
+    float: Molar abundance of FeO in the silicates.
     """
     xiFe, xiH, xiS, xiSi, xiO = xi
     KD = partition_coefficient_i(T, P, 1, [xi[3], xi[4]])
-    # print ('KD_O =', KD)
     return xiFe * xiO / KD
 
 
@@ -1122,14 +1201,21 @@ def xi_SiO2(P, T, xi):
     Computes mol fraction of SiO2 in the mantle assuming chemical
     equilibrium between mantle and core. P, T at CMB and xiFe, xiSi and xiO
     in core.
+
+    Parameters
+    ----------
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    xi (list): Molar abundances in the core.
+
+    Returns
+    -------
+    float: Molar abundance of SiO2 in the silicates.
     """
     xi[0] = 1.0 - (sum(xi) - xi[0])
     xiFe, xiH, xiS, xiSi, xiO = xi
     xiFeO = xi_FeO(P, T, xi)
     KD_Si = partition_coefficient_i(T, P, 0, [xi[3], xi[4]])
-    # print ('xiFeO =', xiFeO)
-    # print ('KD_Si =', KD_Si)
-
     return xiSi * xiFeO / (xiFe * KD_Si)
 
 
@@ -1151,6 +1237,14 @@ def Fe_number_mantle(P, T, xi):
     """
     Computes Fe# in the mantle assuming chemical equilibrium between mantle
     and core. P, T at CMB and xi = xiFe, xiH, xiS, xiSi, xiO in core.
+
+    Parameters:
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    xi (float): Molar abundances of the core.
+
+    Returns:
+    float: Iron number in the silicates.
     """
     xiFe, xiH, xiS, xiSi, xiO = xi
     xiSiO2 = xi_SiO2(P, T, xi)
@@ -1159,8 +1253,8 @@ def Fe_number_mantle(P, T, xi):
     # print ('P, T, xi =', P, T, xi)
     # print ('xiSiO2 =', xiSiO2)
     # print ('xiFeO =', xiFeO)
-    # if result <= 0. or result > xi_Fe_mantle_max:
-    #    result = xi_Fe_mantle_max
+    if result <= 0. or result > xi_Fe_mantle_max:
+       result = xi_Fe_mantle_max
     return result
 
 
@@ -1168,6 +1262,16 @@ def Si_number_mantle(P, T, xi):
     """
     Computes Si# in the mantle assuming chemical equilibrium between mantle
     and core. P, T at CMB and xi = xiFe, xiH, xiS, xiSi, xiO in core.
+    
+    Parameters
+    ----------
+    P (float): Pressure in Pa.
+    T (float): Temperature in K.
+    xi (float): Molar abundances of the core.
+
+    Returns
+    -------
+    float: Silicon number in the silicates.
     """
     xiFe, xiH, xiS, xiSi, xiO = xi
     xiSiO2 = xi_SiO2(P, T, xi)
@@ -1198,22 +1302,41 @@ def xi_Fe_mantle_min(MgSi):
     return 1.0 - MgSi / 2.0
 
 
-def xi_mantle(T, P, ll, xi_core=0.0, xi_Fe_core=0.0, xi_O_core=0.0):
+def xi_mantle(T, P, ll, x_core=0.0, x_Fe_core=0.0, x_O_core=0.0):
+    """
+    Computes the composition of the silicates from the core composition
+    according to the single stage core-segregation model.
+
+    Parameters:
+    T (float): Temperature in K.
+    P (float): Pressure in Pa.
+    x_core (float):
+    x_Fe_core (float): Molar Fe concentration in metals.
+    x_O_core (float): Molar O concentration in metals.
+
+    Returns:
+    tuple: Molar abundance of oxygen and iron in the silicates.
+    """
     KD = partition_coefficient(T, P, ll)
-    print("log KD =", np.log10(KD))
 
-    # Oxygen
-    if ll == 1:
-        return xi_core / KD
+    # # Oxygen
+    # if ll == 1:
+    #     return xi_core / KD
 
-    else:
+    # else:
 
-        # Compute FeO content in mantle first
-        KD_FeO = partition_coefficient(T, P, 1)
-        xi_FeO_mantle = xi_Fe_core * xi_O_core / KD_FeO
-        print("log KD_FeO =", np.log10(KD_FeO))
-        print("xi_FeO_mantle =", xi_FeO_mantle)
-        return xi_core / xi_Fe_core * xi_FeO_mantle / KD
+    #     # Compute FeO content in mantle first
+    #     KD_FeO = partition_coefficient(T, P, 1)
+    #     xi_FeO_mantle = xi_Fe_core * xi_O_core / KD_FeO
+    #     # print("log KD_FeO =", np.log10(KD_FeO))
+    #     # print("xi_FeO_mantle =", xi_FeO_mantle)
+    #     return xi_core / xi_Fe_core * xi_FeO_mantle / KD
+
+    # Compute FeO content in mantle first
+    KD_FeO = partition_coefficient(T, P, 1)
+    xi_FeO_mantle = x_Fe_core * x_O_core / KD_FeO
+    return x_core / KD, x_core / x_Fe_core * xi_FeO_mantle / KD
+
 
 
 def T_melt_MgSiO3(P):
@@ -1244,112 +1367,126 @@ def P_CS(M, a=1.5, P0=40e9):
     return P0 * M**a
 
 
-def xSievert(
-    P=1e5,
-    T=300,
-    P0=1e5,
-    mSolv=2 * mH,
-    mSubs=mMg + mSi + 3 * mO,
-    x=0.1,
-    rhoBulk=3e3,
-    rhoSubs=4e3,
-    llSubs=1,
-    deltaH=-31.8,
-    deltaS=+38.1,
-):
-    # Compute wt fraction of solvent
-    mTilde = x * mSolv + (1.0 - x) * mSubs
-    w = x * mSolv / mTilde
+# def xSievert(
+#     P=1e5,
+#     T=300,
+#     P0=1e5,
+#     mSolv=2 * mH,
+#     mSubs=mMg + mSi + 3 * mO,
+#     x=0.1,
+#     rhoBulk=3e3,
+#     rhoSubs=4e3,
+#     llSubs=1,
+#     deltaH=-31.8,
+#     deltaS=+38.1,
+# ):
+#     # Compute wt fraction of solvent
+#     mTilde = x * mSolv + (1.0 - x) * mSubs
+#     w = x * mSolv / mTilde
 
-    # Compute density of pure solvent
-    rhoSolv = w / (1.0 / rhoBulk - (1.0 - w) / rhoSubs)  # P * mSolv / (NA * kB * T)
+#     # Compute density of pure solvent
+#     rhoSolv = w / (1.0 / rhoBulk - (1.0 - w) / rhoSubs)  # P * mSolv / (NA * kB * T)
 
-    # print ('rhoSolv =', rhoSolv)
-    # Use ideal gas to compute partial pressure of solvent in substrate
-    partialP = rhoSolv / mSolv * Rgas * T
-    # print ('partial pressure IGL (MPa) =', partialP * 1e-6)
-    # Use van der waasl EoS to compute partial pressure of solvent in substrate
-    partialP = (
-        rhoSolv * Rgas * T / (mSolv - rhoSolv * 26.61e-6)
-        - rhoSolv**2 * 24.76e-3 / (mSolv) ** 2
-    )
+#     # print ('rhoSolv =', rhoSolv)
+#     # Use ideal gas to compute partial pressure of solvent in substrate
+#     partialP = rhoSolv / mSolv * Rgas * T
+#     # print ('partial pressure IGL (MPa) =', partialP * 1e-6)
+#     # Use van der waasl EoS to compute partial pressure of solvent in substrate
+#     partialP = (
+#         rhoSolv * Rgas * T / (mSolv - rhoSolv * 26.61e-6)
+#         - rhoSolv**2 * 24.76e-3 / (mSolv) ** 2
+#     )
 
-    # print ('partial pressure VDW (MPa) =', partialP * 1e-6)
+#     # print ('partial pressure VDW (MPa) =', partialP * 1e-6)
 
-    return (partialP / P0) ** (1 / 2) * np.exp((deltaH - T * deltaS) / (Rgas * T))
-
-
-def plotSievert(res=3, xlims=[1e-3, 1e-1], ylims=[0, 1]):
-    fig, ax = plt.subplots(2, 2, sharex=True, sharey=True)
-    bulkDensities = [2000, 3000]
-    subsDensities = [4000, 5000]
-    temps = np.linspace(1000, 5000, 5)
-    moleFractions = np.logspace(-3, -1, 2**res)
-    cols = ["r", "g", "b", "k", "gray"]
-
-    data = np.empty([len(bulkDensities), len(subsDensities), len(temps), 2**res])
-    for i in range(len(bulkDensities)):
-        for j in range(len(subsDensities)):
-            for k in range(len(temps)):
-                data[i][j][k][:] = xSievert(
-                    rhoBulk=bulkDensities[i],
-                    rhoSubs=subsDensities[j],
-                    T=temps[k],
-                    x=moleFractions,
-                )
-
-                ax[i][j].semilogx(moleFractions, data[i][j][k], color=cols[k])
-
-    for i in range(len(ax)):
-        for j in range(len(ax[i])):
-            ax[i][j].set_xlim(xlims)
-            ax[i][j].set_ylim(ylims)
-            ax[i][j].tick_params(top=True, right=True, which="both")
-            trafo = transforms.blended_transform_factory(
-                ax[i][j].transAxes, ax[i][j].transAxes
-            )
-
-            d = r"$\rho_{\rm bulk}$"
-            a = r"${}\ \rm kg / m^3$".format(str(bulkDensities[i]))
-            ax[i][j].text(0.1, 0.9, f"{d} ={a}", transform=trafo)
-            d = r"$\rho_{\rm subs}$"
-            a = r"${} \ \rm kg / m^3$".format(str(subsDensities[j]))
-            ax[i][j].text(0.1, 0.8, f"{d} ={a}", transform=trafo)
-
-    for i in range(len(ax)):
-        ax[i][0].set_ylabel(r"$\rm H_2 \ mole \ fraction \ in \ metal$")
-
-    for i in range(len(ax)):
-        ax[1][i].set_xlabel(r"$\rm H_2 \ mole \ fraction \ in \ substrate$")
-
-    lines = ax[0][0].lines
-    labels = [r"${} \ \rm K$".format(int(t)) for t in temps]
-    ax[0][0].legend(lines, labels, loc=3)
-
-    fig.savefig(plotPath + "siverts_law.pdf", format="pdf", bbox_inches="tight")
-    plt.close(fig)
+#     return (partialP / P0) ** (1 / 2) * np.exp((deltaH - T * deltaS) / (Rgas * T))
 
 
-def plot_logfO2():
-    xFeO = np.logspace(-3, -1)
-    xFe = 0.9
+# def plotSievert(res=3, xlims=[1e-3, 1e-1], ylims=[0, 1]):
+#     fig, ax = plt.subplots(2, 2, sharex=True, sharey=True)
+#     bulkDensities = [2000, 3000]
+#     subsDensities = [4000, 5000]
+#     temps = np.linspace(1000, 5000, 5)
+#     moleFractions = np.logspace(-3, -1, 2**res)
+#     cols = ["r", "g", "b", "k", "gray"]
 
-    pres = [1e9, 10e9, 1e11]
-    fig, ax = plt.subplots()
-    for i in range(len(pres)):
-        y = []
-        for j in range(len(xFeO)):
-            y.append(logfO2(pres[i], xFe, xFeO[j]))
+#     data = np.empty([len(bulkDensities), len(subsDensities), len(temps), 2**res])
+#     for i in range(len(bulkDensities)):
+#         for j in range(len(subsDensities)):
+#             for k in range(len(temps)):
+#                 data[i][j][k][:] = xSievert(
+#                     rhoBulk=bulkDensities[i],
+#                     rhoSubs=subsDensities[j],
+#                     T=temps[k],
+#                     x=moleFractions,
+#                 )
 
-        ax.semilogx(xFeO, y)
+#                 ax[i][j].semilogx(moleFractions, data[i][j][k], color=cols[k])
 
-    fig.savefig(plotPath + "oxygen_fug.pdf", format="pdf", bbox_inches="tight")
-    plt.close(fig)
+#     for i in range(len(ax)):
+#         for j in range(len(ax[i])):
+#             ax[i][j].set_xlim(xlims)
+#             ax[i][j].set_ylim(ylims)
+#             ax[i][j].tick_params(top=True, right=True, which="both")
+#             trafo = transforms.blended_transform_factory(
+#                 ax[i][j].transAxes, ax[i][j].transAxes
+#             )
+
+#             d = r"$\rho_{\rm bulk}$"
+#             a = r"${}\ \rm kg / m^3$".format(str(bulkDensities[i]))
+#             ax[i][j].text(0.1, 0.9, f"{d} ={a}", transform=trafo)
+#             d = r"$\rho_{\rm subs}$"
+#             a = r"${} \ \rm kg / m^3$".format(str(subsDensities[j]))
+#             ax[i][j].text(0.1, 0.8, f"{d} ={a}", transform=trafo)
+
+#     for i in range(len(ax)):
+#         ax[i][0].set_ylabel(r"$\rm H_2 \ mole \ fraction \ in \ metal$")
+
+#     for i in range(len(ax)):
+#         ax[1][i].set_xlabel(r"$\rm H_2 \ mole \ fraction \ in \ substrate$")
+
+#     lines = ax[0][0].lines
+#     labels = [r"${} \ \rm K$".format(int(t)) for t in temps]
+#     ax[0][0].legend(lines, labels, loc=3)
+
+#     fig.savefig(plotPath + "siverts_law.pdf", format="pdf", bbox_inches="tight")
+#     plt.close(fig)
 
 
-def T_melt_Fe(P, X_Si, X_O, X_S):
+# def plot_logfO2():
+#     xFeO = np.logspace(-3, -1)
+#     xFe = 0.9
+
+#     pres = [1e9, 10e9, 1e11]
+#     fig, ax = plt.subplots()
+#     for i in range(len(pres)):
+#         y = []
+#         for j in range(len(xFeO)):
+#             y.append(logfO2(pres[i], xFe, xFeO[j]))
+
+#         ax.semilogx(xFeO, y)
+
+#     fig.savefig(plotPath + "oxygen_fug.pdf", format="pdf", bbox_inches="tight")
+#     plt.close(fig)
+
+
+def temp_melt_iron(P, X_Si, X_O, X_S):
+    """
+    Computes melting temperature of iron alloys according
+    to Li et al. 2020. The effect of O, Si, and S are accounted
+    for according to Andrault et al. 2016.
+    
+    Parameters:
+    P (float): Pressure in Pa.
+    X_Si (float): Molar concentration of silicon.
+    X_S (float): Molar concentration of sulfur.
+    X_O (float): Molar concentration of oxygen.
+
+    Returns:
+    float: melting temperature in K.
+    """
     # Li et al. 2020, fit for static + present shock experiments  between
-    # 50 and 256 GPs (see page 7)
+    # 50 and 256 GPs (see their page 7)
     T = 1811.0 * ((P - 1.0e5) / 23e9 + 1.0) ** (1.0 / 2.26)
 
     # Account for impurities (Andrault et al. 2016)
@@ -1362,7 +1499,17 @@ def T_melt_Fe_new(P):
     return 6500 * (P / 340e9) ** 0.515
 
 
-def T_solidus_pyrolite(P):
+def temp_solidus_pyrolite(P):
+    """
+    Compute solidus temperature of a pyrolite composition
+    according to Andrault et al. 2016.
+    
+    Parameters:
+    P (float): Pressure in Pa.
+
+    Returns:
+    float: Solidus temperature in K.
+    """
     # Andrault 2011
     T0 = 2045
     a = 92e9
@@ -1371,7 +1518,17 @@ def T_solidus_pyrolite(P):
     return T0 * (1.0 + P / a) ** (1.0 / c)
 
 
-def T_liquidus_pyrolite(P):
+def temp_liquidus_pyrolite(P):
+    """
+    Compute liquidus temperature of a pyrolite composition
+    according to Andrault et al. 2016.
+    
+    Parameters:
+    P (float): Pressure in Pa.
+
+    Returns:
+    float: Liquidus temperature in K.
+    """
     # Andrault 2011
     T0 = 1940
     a = 29e9
@@ -1420,11 +1577,11 @@ def eta(xi, m1, m2):
     return xi * m2 / ((1.0 - xi) * m1 + xi * m2)
 
 
-def compute_oxide_fractions(Si_number, xi_Fe):
+def compute_oxide_fractions(Si_number, x_Fe):
     """Computes oxide fractions of MgO, SiO2, FeO from Si# = [Si] / [Mg + Si] and
     the iron number xi_Fe = [Fe] / [Mg + Fe] in the mantle.
     """
-    xiFeO = (1.0 - Si_number) / ((1.0 - xi_Fe) / xi_Fe + 1.0 - Si_number)
+    xiFeO = (1.0 - Si_number) / ((1.0 - x_Fe) / x_Fe + 1.0 - Si_number)
     xiSiO2 = Si_number * (1.0 - xiFeO)
     xiMgO = 1.0 - xiFeO - xiSiO2
     return xiMgO, xiSiO2, xiFeO
@@ -3060,6 +3217,55 @@ class Mixture:
             # update density list
             self.update_volumetric_props()
             self.update_mean_volumetric_props()
+
+
+class ThermodynamicSystem:
+    def __init__(self, mix_props, connectivity=None):
+        self.components = [Mixture(**mp) for mp in mix_props]
+
+        # Set up connections between components.
+        # Use linear connectivity by default.
+        if connectivity is None:
+            pass
+        else:
+            if not len(connectivity) == len(mix_props):
+                raise ValueError(
+                    "The conncetivity and mixtures properties are inconsistent."
+                )
+            else:
+                self.connectivity = connectivity
+
+    def set_up(self):
+        pass
+
+    def compute(self):
+        pass
+
+    def update(self):
+        pass
+
+    def equilibriate(self):
+        pass
+
+
+class MetalSilicateSystem(ThermodynamicSystem):
+    def __init__(self, temp, pres):
+        # Mixture properties of the metals and the silicates
+        mix_props = [
+            {
+                "pres": pres,
+                "temp": temp,
+                "contents": [1, 2, 3],
+                "fractions": [0.5, 0.3, 1.0],
+            },
+            {
+                "pres": pres,
+                "temp": temp,
+                "contents": [1, 2, 3],
+                "fractions": [0.4, 0.3, 1.0],
+            },
+        ]
+        ThermodynamicSystem.__init__(mix_props)
 
 
 # def HydVsMix(temps=[500, 1000, 1500], log=False, start=0.5e9, end=3.0e10, N=25):

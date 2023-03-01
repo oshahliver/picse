@@ -91,6 +91,18 @@ Compute the mean thermal expansion coefficient from the individual densities and
 
 Compute the mean density derivative of the pressure of a mixture using a linear mixing law.
 
+### ```Material.temp_melt_iron()```:
+
+Computes melting temperature of iron alloys according to Li et al. 2020. The effect of O, Si, and S are accounted for according to Andrault et al. 2016.
+
+### ```Material.temp_solidus_pyrolite()```:
+
+Computes solidus temperature of a pyrolite composition according to Andrault et al. 2016.
+
+### ```Material.temp_liquidus_pyrolite()```:
+
+Computes liquidus temperature of a pyrolite composition according to Andrault et al. 2016.
+
 ### ```Material.specific_heat_iron()```:
 
 Computes the specific heat capacity at a given temperature and pressure using the parametrization given by Stacey et al. 2001.
@@ -111,14 +123,18 @@ Computes max Si# that is allowed at given Mg# for pure per + ol composition.
 
 Computes min Si# that is allowed at given Mg# for pure per + ol composition.
 
-### ```Si2Mg()```:
+### ```Material.Si2Mg()```:
 
 Computes ratio of Si to Mg for given magnesium and silicon numbers.
 
-### ```at2mat()```:
+### ```Material.at2mat()```:
 
 Converts atomic mole fractions into material mole fractions. The composition
 of the different materials is given by the matrix N.
+
+### ```Material.mantle_composition()```:
+
+Computes the mantle composition according to the single stage core-segregation model.
 
 ### The ```Material.Unit``` class
 
@@ -300,15 +316,15 @@ Computes the density using the Vinet-Rydberg equation of state.
 
 Computes the density derivative of the pressure using the Vinet-Rydberg equation of state.
 
-## The ```pics.materials.eosTables``` module
+## The ```pics.materials.eos_tables``` module
 
 Not ready!
 
-## The ```pics.materials.Hydration``` module
+## The ```pics.materials.hydration``` module
 
 Not ready!
 
-## The ```pics.materials.MetalSilicatePartitioning``` module
+## The ```pics.materials.metal_silicate_partitioning``` module
 
 Not ready!
 
