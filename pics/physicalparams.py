@@ -605,7 +605,7 @@ material_list = [
     "Fe2SiO4",  # 3
     "Fe2Si2O6",  # 4
     "MgO",  # 5
-    "(Mg,Fe)SiO3",  # 6
+    "MgSiO3",  # 6
     "FeO",  # 7
     "FeSiO3",  # 8
     "Fe",  # 9

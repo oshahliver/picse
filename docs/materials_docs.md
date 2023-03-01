@@ -18,21 +18,30 @@ The ```pics.materials``` lets you play around with different planetary building 
 The following list contains all compounds for which an equation of state implementation is available.
 
 
-| Compound | Name | ID  | EoS      | Pressure range (GPa) | Temperature range (K) | Table | Literature |
-|----------|------|-----|----------|----------------------|-----------------------|-----|------------|
-| $\rm (Mg,Fe)_2Si O_4$  | Olivine | 001 | SRK      | 1-100                | 50-200                | Yes | Ref 1      |
-| $\rm (Mg,Fe)_2Si_2O_6$  | Pyroxene | 002 | PR       | 10-500               | 100-300               | Yes | Ref 2      |
-| $\rm (Mg,Fe)SiO_3$  | Perovskite | 003 | RK       | 50-1000              | 150-400               | Yes | Ref 3      |
-| $\rm (Mg,Fe)O$   | Periclase | 004 | Redlich | 100-2000             | 200-500               | Yes | Ref 4      |
-| $\rm Mg(OH)_2$   | Brucite | 004 | Redlich | 100-2000             | 200-500               | Yes | Ref 4      |
-| $\rm SiO_2$  | Stishovit | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm Fe$  | Iron | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm FeS$  | Iron sulfid | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm FeSi$  | Ferrosilicon | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm FeO$  | Iron oxide |  005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm FeH_x$  | Iron hydride | 005 | Peng-Robinson | 500-5000        | 250-600               | Yes | Ref 5      |
-| $\rm Fe_3 C$  | Iron carbide | 005 | Ab-Initio | 500-5000        | 250-600               | No | Ref 5      |
-| $\rm H_2O$  | Water | 005 | FEF | 500-5000        | 250-600               | Yes | Ref 5      |
+| Compound             | ID  | EoS            | Pressure range (GPa) | Temperature range (K) | Literature |
+|----------------------|-----|----------------|----------------------|-----------------------|------------|
+| $\rm H_2O$           | 000 | FEF            | 1-100                | 50-200                | Ref 1      |
+| $\rm Mg_2SiO_4$      | 001 | BM3             | 10-500               | 100-300               | Ref 2      |
+| $\rm Mg_2Si_2O_6$    | 002 | BM3             | 50-1000              | 150-400               | Ref 3      |
+| $\rm Fe_2SiO_4$      | 003 | BM3        | 100-2000             | 200-500               | Ref 4      |
+| $\rm Fe_2Si_2O_6$    | 004 | BM3  | 500-5000             | 250-600               | Ref 5      |
+| $\rm MgO$            | 005 | MGD               |                      |                       |            |
+| $\rm MgSiO_3$        | 006 | MGD               |                      |                       |            |
+| $\rm FeO$            | 007 | MGD               |                      |                       |            |
+| $\rm FeSiO_3$        | 008 | MGD               |                      |                       |            |
+| $\rm Fe(s)$             | 009 |   Bel             |                      |                       |            |
+| $\rm FeS$            | 010 |      MGD          |                      |                       |            |
+| $\rm Mg(OH)_2$            | 011 |    BM3            |                      |                       |            |
+| $\rm \alpha-(Mg,Fe)_2Si_4$            | 012 |   BM3             |                      |                       |            |
+| $\rm \beta-(Mg,Fe)_2Si_4$            | 013 |       BM3         |                      |                       |            |
+| $\rm \gamma-(Mg,Fe)_2Si_4$            | 014 |       BM3         |                      |                       |            |
+| $\rm \post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |            |
+| $\rm SiO_2$            | 016 |                |      MGD                |                       |            |
+| $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |            |
+| $\rm FeSi$            | 018 |                |       MGD               |                       |            |
+| $\rm Fe(l)$            | 019 |                |      Bel                |                       |            |
+| $\rm Fe_3C$            | 020 |                |      MGD                |                       |            |
+
 
 The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
 
