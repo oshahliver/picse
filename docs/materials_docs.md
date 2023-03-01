@@ -20,11 +20,11 @@ The following list contains all compounds for which an equation of state impleme
 
 | Compound             | ID  | EoS            | Pressure range (GPa) | Temperature range (K) | Reference |
 |----------------------|-----|----------------|----------------------|-----------------------|------------|
-| $\rm H_2O$           | 000 | FEF            |                |               |  [[1]](#1)
-| $\rm Mg_2SiO_4$      | 001 | BM3             |                |               |  [[2]](#2)
-| $\rm Mg_2Si_2O_6$    | 002 | BM3             |              |               | [[2]](#2)
-| $\rm Fe_2SiO_4$      | 003 | BM3        |              |                | [[2]](#2)
-| $\rm Fe_2Si_2O_6$    | 004 | BM3  |            |                | [[2]](#2)
+| $\rm H_2O$           | 000 | FEF            |                |               |  [[1]](#1) |
+| $\rm Mg_2SiO_4$      | 001 | BM3             |                |               |  [[2]](#2) |
+| $\rm Mg_2Si_2O_6$    | 002 | BM3             |              |               | [[2]](#2) |
+| $\rm Fe_2SiO_4$      | 003 | BM3        |              |                | [[2]](#2) |
+| $\rm Fe_2Si_2O_6$    | 004 | BM3  |            |                | [[2]](#2) |
 | $\rm MgO$            | 005 | MGD               |                      |                       |   [[2]](#2)         |
 | $\rm MgSiO_3$        | 006 | MGD               |                      |                       |   [[2]](#2)         |
 | $\rm FeO$            | 007 | MGD               |                      |                       |   [[2]](#2)         |
