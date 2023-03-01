@@ -320,7 +320,7 @@ plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 #     plt.close(fig)
 
 
-def rho_mean(densities, fractions):
+def density_mean(densities, fractions):
     """
     Compute the mean density of a mixture using the linear mixing law.
 
@@ -356,12 +356,12 @@ def bulk_modulus_mean(densities, bulks, fractions, dens=None):
 
     else:
         return 1 / (
-            rho_mean(densities, fractions)
+            density_mean(densities, fractions)
             * sum([f / d / k for (f, d, k) in zip(fractions, densities, bulks)])
         )
 
 
-def alpha_mean(densities, alphas, fractions, dens=None):
+def thermal_expansion_mean(densities, alphas, fractions, dens=None):
     """
     Compute the mean thermal expansion coefficient of a mixture using the linear mixing law.
 
@@ -375,11 +375,13 @@ def alpha_mean(densities, alphas, fractions, dens=None):
     float: Mean thermal expansion coefficient of the mixture.
     """
     if not dens is None:
-        return dens * sum([a * f / d for a, f, d in zip(alphas, fractions, densities)])
+        return dens * sum(
+            [a * f / d for (a, f, d) in zip(alphas, fractions, densities)]
+        )
 
     else:
-        return rho_mean(densities, fractions) * sum(
-            [a * f / d for a, f, d in zip(alphas, fractions, densities)]
+        return density_mean(densities, fractions) * sum(
+            [a * f / d for (a, f, d) in zip(alphas, fractions, densities)]
         )
 
 
@@ -408,7 +410,7 @@ def dPdrho_mean(densities, dPdrhos, fractions, dens=None):
         )
     else:
         return 1.0 / (
-            rho_mean(densities, fractions) ** 2
+            density_mean(densities, fractions) ** 2
             * sum(
                 [
                     1 / d**2 * f / dp
@@ -422,6 +424,22 @@ def xi_general(eta, m):
     dummy = sum([eta[i] / m[i] for i in range(len(m))])
     y = np.array([eta[i] / m[i] / dummy for i in range(len(m))])
     print("sum =", sum(y))
+    return y
+
+
+def x_general(w, m):
+    """
+    Computes the mole fractions from the weight fractions and the molar masses.
+
+    Parameters:
+    w (list): weight fractions.
+    m (list): molar masses.
+
+    Returns:
+    list: mole fractions.
+    """
+    dummy = sum([w[i] / m[i] for i in range(len(m))])
+    y = np.array([eta[i] / m[i] / dummy for i in range(len(m))])
     return y
 
 
@@ -455,7 +473,8 @@ def wt2mol_oxides(wt=bulk_DMM_lower_Workmann, replace=True):
 
 def at2mat(at):
     """Converts atomic mole fractions into material mole fractions. The composition
-    of the different materials is given by the matrix N.
+    of the different materials is given by the matrix N. This function is only valid
+    for a composition of Fe, S, O, Si for the cores.
     """
 
     N = [
@@ -653,22 +672,22 @@ def mantle_comp(P_CS, ocmf=[]):
     return fem, sim
 
 
-def plot_core_content(xiH=np.linspace(0.0, 0.5)):
-    y = np.empty([len(xiH), 5])
-    labels = ["Fe", "H", "S", "Si", "O"]
-    for i in range(len(y)):
-        bla = xi_tot_core(wt=[0.02, 0.06, 0.025], xiH=xiH[i])
-        for j in range(len(bla)):
-            y[i][j] = bla[j]
+# def plot_core_content(xiH=np.linspace(0.0, 0.5)):
+#     y = np.empty([len(xiH), 5])
+#     labels = ["Fe", "H", "S", "Si", "O"]
+#     for i in range(len(y)):
+#         bla = xi_tot_core(wt=[0.02, 0.06, 0.025], xiH=xiH[i])
+#         for j in range(len(bla)):
+#             y[i][j] = bla[j]
 
-    fig, ax = plt.subplots()
-    ax.set_xlabel("H concentration in iron hydride")
-    ax.set_ylabel("total element concentration in outer core (%)")
-    for i in range(len(y.T)):
-        ax.semilogy(xiH, y.T[i] * 100, label=labels[i])
+#     fig, ax = plt.subplots()
+#     ax.set_xlabel("H concentration in iron hydride")
+#     ax.set_ylabel("total element concentration in outer core (%)")
+#     for i in range(len(y.T)):
+#         ax.semilogy(xiH, y.T[i] * 100, label=labels[i])
 
-    ax.text(0.05, 1, "nominal case (Zhang et al. 2016):\n6 wt% Si, 2 wt% S, 2.5 wt% O")
-    ax.legend(loc=2)
+#     ax.text(0.05, 1, "nominal case (Zhang et al. 2016):\n6 wt% Si, 2 wt% S, 2.5 wt% O")
+#     ax.legend(loc=2)
 
 
 def epsilon_ki(T, k, i):
@@ -922,7 +941,7 @@ def specific_thermal_energy(T, P, C_p):
     return E_therm
 
 
-def iron_heat_capacity(T, P):
+def specific_heat_iron(T, P):
     """Computes the heat capacity of iron at a given temperature and pressure from Stacey et al. 2001.
 
     Parameters:
@@ -961,7 +980,7 @@ def iron_heat_capacity(T, P):
     return cp
 
 
-def pyrolite_heat_capacity(T, rho):
+def specific_heat_pyrolite(T, rho):
     """Computes the heat capacity of pyrolite at a given temperature and density from Stixrude and Lithgow-Bertelloni 2011.
 
     Parameters:
@@ -1411,21 +1430,21 @@ def compute_oxide_fractions(Si_number, xi_Fe):
     return xiMgO, xiSiO2, xiFeO
 
 
-def Si_number_max(xi_Fe):
+def silicon_number_max(x_Fe):
     """Computes max Si# that is allowed at given Mg# for pure per + ol
     composition
     """
-    return 1.0 / (2.0 - xi_Fe)
+    return 1.0 / (2.0 - x_Fe)
 
 
-def Si_number_min(xi_Fe):
+def silicon_number_min(x_Fe):
     """Computes min Si# that is allowed at given Mg# for pure per + ol
     composition
     """
-    return 1.0 / (3.0 - 2.0 * xi_Fe)
+    return 1.0 / (3.0 - 2.0 * x_Fe)
 
 
-def SiMg_UM(xiOl=1.0, xiPyr=0.0, xiStv=0.0, xiFe=0.0):
+def Si2Mg_UM(xiOl=1.0, xiPyr=0.0, xiStv=0.0, xiFe=0.0):
 
     if not xiOl + xiPyr + xiStv == 1.0:
         return 0.0
@@ -1434,7 +1453,7 @@ def SiMg_UM(xiOl=1.0, xiPyr=0.0, xiStv=0.0, xiFe=0.0):
         return (2.0 * xiPyr + xiOl + xiStv) / (2.0 * (xiPyr - 2.0 * xiFe + xiOl))
 
 
-def SiMg(Mg_number=Mg_number_solar, Si_number=Si_number_solar):
+def Si2Mg(Mg_number=Mg_number_solar, Si_number=Si_number_solar):
     """Computes ratio Mg/Si for given Mg# and Si#. Note that for a pure
     per + ol mantle Mg/Si <= 0.5
     """
@@ -1471,9 +1490,16 @@ def xi_Stv_bounds(xi_Fe=0.0, Si_number=0.0):
     return max(xi3, x4), min(x1, x2)
 
 
-def FeMg_max(SiMg, lay=None):
+def Fe2Mg_max(SiMg, lay=None):
     """Compute maximum FeMg ratio allowed for given SiMg ratio in lower or
-    upper mantle
+    upper mantle.
+
+    Parameters:
+    SiMg (float): Si to Mg ratio.
+    lay (int, optional): Layer. Defaults to None.
+
+    Returns:
+    float: Fe to Mg ratio.
     """
     # upper mantle
     if lay == 2:
@@ -1488,9 +1514,16 @@ def FeMg_max(SiMg, lay=None):
         return 10.0
 
 
-def FeMg_min(SiMg, lay=None):
+def Fe2Mg_min(SiMg, lay=None):
     """Compute minimum FeMg ratio allowed for given SiMg ratio in lower or
-    upper mantle
+    upper mantle.
+
+    Parameters:
+    SiMg (float): Si to Mg ratio.
+    lay (int, optional): Layer. Defaults to None.
+
+    Returns:
+    float: Fe to Mg ratio.
     """
     # lower mantle
     if lay == 2:
@@ -1504,10 +1537,14 @@ def FeMg_min(SiMg, lay=None):
         return 0.0
 
 
-def Si_number(SiMg=None, Mg_number=None):
+def silicon_number(SiMg, Mg_number):
     """Computes Si# from Si/Mg ratio at given Mg#. Note that this calculation
     is independant on the mineral composition at hand but is simply dictated
-    by the given molar ratios for Si, Mg and Fe
+    by the given molar ratios for Si, Mg and Fe.
+
+    Parameters:
+    SiMg (float): Si to Mg ratio.
+    Mg_number (float): Magnesium number.
     """
     if SiMg > 0.0:
         return 1.0 / (1.0 + 1.0 / SiMg * (1.0 / Mg_number - 1))
@@ -1522,12 +1559,12 @@ def xi_Ws(SiMg=None, FeMg=None, xi_H2O_Ws=0.0, lay=1):
     consists of MgO + FeO and H2O if MgO is hydrated
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1563,12 +1600,12 @@ def xi_Ol(SiMg=None, FeMg=None, xi_H2O_Ol=0.0, lay=1):
     for hydration model type 1
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
         print("given: ", FeMg)
 
@@ -1592,12 +1629,12 @@ def xi_Ol(SiMg=None, FeMg=None, xi_H2O_Ol=0.0, lay=1):
 def xi_Perov(SiMg=None, FeMg=None, xi_H2O_Ws=0.0, lay=1):
     """Compute mole fraction of Perovskite for given values of Si/Mg and Fe/Mg"""
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1609,6 +1646,71 @@ def xi_Perov(SiMg=None, FeMg=None, xi_H2O_Ws=0.0, lay=1):
             SiMg * (1 - xi_Fe) * xi_H2O_Ws - xi_H2O_Ws - 1
         )
 
+    # def plot_abundance_change(SiMg=None, FeMg=None, lay=1):
+    #     """Visualize how the relative abundances xi_Ol vs. xi_En changes as a
+    #     function of the hydration level. This gives the range within which the
+    #     abundances have to be updated in each shell.
+    #     """
+
+    #     fig, ax = plt.subplots()
+
+    #     # Create range of hydration in mol% (not physical!!!)
+    #     xiH2O = np.logspace(-3, -1)
+    #     FeMg_list = np.linspace(0.0, 0.5, 6)
+
+    #     for FeMg in FeMg_list:
+    #         xiOl_dry = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=0.0, lay=lay)
+    #         xiFe = xi_Fe(FeMg=FeMg, SiMg=SiMg)
+    #         print(xiFe)
+    #         SiMg_list = (2.0 - xiOl_dry * (1.0 + xiH2O)) / (
+    #             2 * (1 - xiFe) * (1.0 - xiOl_dry * xiH2O)
+    #         )
+
+    #         xiOl = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=xiH2O, lay=lay)
+
+    #         ax.semilogy(xiH2O, (SiMg_list - SiMg) / SiMg)
+
+    # def plot_molarmass(SiMg=[], xmin=0.0, xmax=0.2):
+    #     """ """
+    #     fig, ax = plt.subplots()
+    #     ax.set_xlim(xmin * 100, xmax * 100)
+
+    #     ax.set_xlabel(r"$X_{H_2 O} \ in  \ Olivine \ [wt \%]$")
+    #     ax.set_ylabel(r"$\rm molar \ mass \ [kg]$")
+
+    #     substances = [mH2O, mBr, mPer, mOl]
+    #     substances_names = [r"$H_2 O$", r"$Mg(OH)_2$", r"$MgO$", r"$Mg_2 Si O_4$"]
+
+    #     for i in range(len(substances)):
+    #         sub = substances[i]
+    #         name = substances_names[i]
+    #         ax.plot([xmin * 100, xmax * 100], [sub, sub], color="k", linestyle=":")
+    #         ax.text(5.0, sub * 1.01, name)
+
+    #     x = np.linspace(xmin, xmax, 100)
+
+    #     for SM in SiMg:
+    #         y = N_tot(M=1.0, SiMg=SM, ph_per=2, ph_ol=0, X_H2O_ol=x, lay=2)
+
+    #         ax.plot(x * 100, 1 / y, label="Si/Mg = " + str(round(SM, 3)))
+
+    #     ax.legend()
+
+    # def plot_abundance(MgSi=[]):
+    #     """ """
+    #     fig, ax = plt.subplots()
+    #     ax.set_xlabel(r"$Mg \#$")
+    #     ax.set_ylabel(r"$Si \#$")
+
+    #     x = np.linspace(0.0, 1.0)
+    #     y = []
+
+    #     for MS in range(len(MgSi)):
+    #         y.append(1.0 / (1.0 + 1.0 / SiMg[MS] * (1.0 / x - 1.0)))
+
+    #         ax.plot(x, y[MS], label="Mg/Si =" + str(MgSi[MS]))
+
+    #     ax.legend(frameon=False)
     # upper mantle
     # No Perovskite in upper mantle
     elif lay == 3:
@@ -1620,12 +1722,12 @@ def xi_Fe(SiMg=None, FeMg=0.0, lay=1):
     Fe/Mg ratios
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1717,12 +1819,12 @@ def xi_En(SiMg=None, FeMg=0.0, xi_H2O_Ol=0.0, lay=1):
     for hydration model type 1
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1812,12 +1914,12 @@ def N_all(M=1.0, FeMg=0.0, SiMg=None, X_H2O_Ol=0.0, X_H2O_Ws=0.0, lay=1, **kwarg
     """
 
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1869,12 +1971,12 @@ def N_tot(M=None, SiMg=None, lay=1, X_H2O_Ol=0.0, X_H2O_En=0.0, FeMg=0.0, **kwar
     X_H2O_ol is the water content in Mg2SiO4 in wt%
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -1937,12 +2039,12 @@ def N_Mg(M=None, SiMg=None, lay=1, X_H2O_Ol=0.0, X_H2O_En=0.0, FeMg=0.0, **kwarg
     in weight fraction (NOT wt%)
     """
     # check consistency if FeMg and SiMg in given mantel
-    if FeMg < FeMg_min(SiMg, lay=lay) or FeMg > FeMg_max(SiMg, lay=lay):
+    if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")
         print(
             "Fe/Mg must be in the interval",
-            FeMg_min(SiMg, lay=lay),
-            FeMg_max(SiMg, lay=lay),
+            Fe2Mg_min(SiMg, lay=lay),
+            Fe2Mg_max(SiMg, lay=lay),
         )
 
         return None
@@ -2006,73 +2108,73 @@ def N_Mg(M=None, SiMg=None, lay=1, X_H2O_Ol=0.0, X_H2O_En=0.0, FeMg=0.0, **kwarg
             )
 
 
-def plot_abundance_change(SiMg=None, FeMg=None, lay=1):
-    """Visualize how the relative abundances xi_Ol vs. xi_En changes as a
-    function of the hydration level. This gives the range within which the
-    abundances have to be updated in each shell.
-    """
+# def plot_abundance_change(SiMg=None, FeMg=None, lay=1):
+#     """Visualize how the relative abundances xi_Ol vs. xi_En changes as a
+#     function of the hydration level. This gives the range within which the
+#     abundances have to be updated in each shell.
+#     """
 
-    fig, ax = plt.subplots()
+#     fig, ax = plt.subplots()
 
-    # Create range of hydration in mol% (not physical!!!)
-    xiH2O = np.logspace(-3, -1)
-    FeMg_list = np.linspace(0.0, 0.5, 6)
+#     # Create range of hydration in mol% (not physical!!!)
+#     xiH2O = np.logspace(-3, -1)
+#     FeMg_list = np.linspace(0.0, 0.5, 6)
 
-    for FeMg in FeMg_list:
-        xiOl_dry = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=0.0, lay=lay)
-        xiFe = xi_Fe(FeMg=FeMg, SiMg=SiMg)
-        print(xiFe)
-        SiMg_list = (2.0 - xiOl_dry * (1.0 + xiH2O)) / (
-            2 * (1 - xiFe) * (1.0 - xiOl_dry * xiH2O)
-        )
+#     for FeMg in FeMg_list:
+#         xiOl_dry = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=0.0, lay=lay)
+#         xiFe = xi_Fe(FeMg=FeMg, SiMg=SiMg)
+#         print(xiFe)
+#         SiMg_list = (2.0 - xiOl_dry * (1.0 + xiH2O)) / (
+#             2 * (1 - xiFe) * (1.0 - xiOl_dry * xiH2O)
+#         )
 
-        xiOl = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=xiH2O, lay=lay)
+#         xiOl = xi_Ol(SiMg=SiMg, FeMg=FeMg, xi_H2O_Ol=xiH2O, lay=lay)
 
-        ax.semilogy(xiH2O, (SiMg_list - SiMg) / SiMg)
-
-
-def plot_molarmass(SiMg=[], xmin=0.0, xmax=0.2):
-    """ """
-    fig, ax = plt.subplots()
-    ax.set_xlim(xmin * 100, xmax * 100)
-
-    ax.set_xlabel(r"$X_{H_2 O} \ in  \ Olivine \ [wt \%]$")
-    ax.set_ylabel(r"$\rm molar \ mass \ [kg]$")
-
-    substances = [mH2O, mBr, mPer, mOl]
-    substances_names = [r"$H_2 O$", r"$Mg(OH)_2$", r"$MgO$", r"$Mg_2 Si O_4$"]
-
-    for i in range(len(substances)):
-        sub = substances[i]
-        name = substances_names[i]
-        ax.plot([xmin * 100, xmax * 100], [sub, sub], color="k", linestyle=":")
-        ax.text(5.0, sub * 1.01, name)
-
-    x = np.linspace(xmin, xmax, 100)
-
-    for SM in SiMg:
-        y = N_tot(M=1.0, SiMg=SM, ph_per=2, ph_ol=0, X_H2O_ol=x, lay=2)
-
-        ax.plot(x * 100, 1 / y, label="Si/Mg = " + str(round(SM, 3)))
-
-    ax.legend()
+#         ax.semilogy(xiH2O, (SiMg_list - SiMg) / SiMg)
 
 
-def plot_abundance(MgSi=[]):
-    """ """
-    fig, ax = plt.subplots()
-    ax.set_xlabel(r"$Mg \#$")
-    ax.set_ylabel(r"$Si \#$")
+# def plot_molarmass(SiMg=[], xmin=0.0, xmax=0.2):
+#     """ """
+#     fig, ax = plt.subplots()
+#     ax.set_xlim(xmin * 100, xmax * 100)
 
-    x = np.linspace(0.0, 1.0)
-    y = []
+#     ax.set_xlabel(r"$X_{H_2 O} \ in  \ Olivine \ [wt \%]$")
+#     ax.set_ylabel(r"$\rm molar \ mass \ [kg]$")
 
-    for MS in range(len(MgSi)):
-        y.append(1.0 / (1.0 + 1.0 / SiMg[MS] * (1.0 / x - 1.0)))
+#     substances = [mH2O, mBr, mPer, mOl]
+#     substances_names = [r"$H_2 O$", r"$Mg(OH)_2$", r"$MgO$", r"$Mg_2 Si O_4$"]
 
-        ax.plot(x, y[MS], label="Mg/Si =" + str(MgSi[MS]))
+#     for i in range(len(substances)):
+#         sub = substances[i]
+#         name = substances_names[i]
+#         ax.plot([xmin * 100, xmax * 100], [sub, sub], color="k", linestyle=":")
+#         ax.text(5.0, sub * 1.01, name)
 
-    ax.legend(frameon=False)
+#     x = np.linspace(xmin, xmax, 100)
+
+#     for SM in SiMg:
+#         y = N_tot(M=1.0, SiMg=SM, ph_per=2, ph_ol=0, X_H2O_ol=x, lay=2)
+
+#         ax.plot(x * 100, 1 / y, label="Si/Mg = " + str(round(SM, 3)))
+
+#     ax.legend()
+
+
+# def plot_abundance(MgSi=[]):
+#     """ """
+#     fig, ax = plt.subplots()
+#     ax.set_xlabel(r"$Mg \#$")
+#     ax.set_ylabel(r"$Si \#$")
+
+#     x = np.linspace(0.0, 1.0)
+#     y = []
+
+#     for MS in range(len(MgSi)):
+#         y.append(1.0 / (1.0 + 1.0 / SiMg[MS] * (1.0 / x - 1.0)))
+
+#         ax.plot(x, y[MS], label="Mg/Si =" + str(MgSi[MS]))
+
+#     ax.legend(frameon=False)
 
 
 def brucite_dissoc(layer, what="out"):
@@ -2303,25 +2405,22 @@ class Unit:
     def __init__(
         self,
         ll=None,
-        P="not computed",
-        T="not computed",
-        d="not computed",
+        pres=None,
+        temp=None,
+        dens=None,
         Fe_number=0.0,
-        X_H2O=0.0,
         saturation=False,
-   
         **kwargs,
     ):
 
-        self.pres = P
-        self.temp = T
-        self.dens = d
+        self.pres = pres
+        self.temp = temp
+        self.dens = dens
         self.ll = ll  # material id
         self.material = material_list[ll]
         self.Fe_number = Fe_number
-        self.FeMg = Fe_number / (100.0 - Fe_number)
+        # self.FeMg = Fe_number / (100.0 - Fe_number)
         self.saturation = saturation
-        self.X_H2O = 0.0
 
         self.phase = 0
         self.whichEOS = EOS_type[ll]
@@ -2339,10 +2438,9 @@ class Unit:
         # detected (e.g. high density follow low density, negative pressure,
         # mass, density or temoerature etc.)
         self.force_bisection = False
-        self.K_isoth = "not computed"
-        self.dPdrho = "not computed"
-        self.fraction = 1.0
-        # specify here additional properties if you want
+        self.K_isoth = None
+        self.dPdrho = None
+        self.x_H2O = None
 
     def print(self, digits=4, level=0):
         """Prints out selection of basic properties of the material unit for
@@ -2418,13 +2516,13 @@ class Unit:
             #     dT0,
             # )
 
-    def compute(self, d=None, T=None, P=None, phase=None, eos_table = False, **kwargs):
+    def compute(self, d=None, T=None, P=None, phase=None, eos_table=False, **kwargs):
         """
         Here the material paremeters are computed. At least two of the parameters
         d, T, and P need to be passed. The phase region in which the EoS is to be
         evaluated can be specified. If it is not, the phase region will be determined
         from the specified conditions.
-        
+
         Parameters:
         d (float, optional): Density in kg/m³. Defaults to None.
         T (float, optional): Temperature in K. Defaults to None.
@@ -2432,7 +2530,7 @@ class Unit:
         phase (int, optional): Phase region. Defaults to None.
         eos_tables (bool, optional): Enable use of EoS tables. Defaults to False.
         """
-        
+
         if not eos_table is False:
             raise NotImplementedError("This option is not available yet.")
 
@@ -2458,8 +2556,6 @@ class Unit:
 
         if not phase == None:
             self.phase = phase
-
-        X_H2O = self.X_H2O
 
         # check if temperature and pressure are given, then compute
         # corresponding density and pressure derivative in one go
@@ -2538,7 +2634,7 @@ class Unit:
         self.temp = temp
         self.alpha = alpha
         self.dPdrho = dPdrho
-        self.X_H2O = X_H2O
+        self.x_H2O = X_H2O
 
 
 class Mixture:
@@ -2594,9 +2690,9 @@ class Mixture:
         self.pres = pres
         self.temp = temp
         self.dens = dens
-        self.densities = None,
-        self.dPdrho = None,
-        self.K_isoth = None,
+        self.densities = (None,)
+        self.dPdrho = (None,)
+        self.K_isoth = (None,)
         self.alphas = None
         self.force_bisection = False
 
@@ -2811,10 +2907,9 @@ class Mixture:
         self.mix = [
             Unit(
                 ll=self.contents[l],
-                P=self.pres,
-                T=self.temp,
+                pres=self.pres,
+                temp=self.temp,
                 Fe_number=self.Fe_number[l],
-                X_H2O=self.X_H2O[l],
                 eos_table=self.eos_table,
                 saturation=self.saturation[l],
                 **kwargs,
@@ -2838,7 +2933,7 @@ class Mixture:
                 self.force_bisection = True
 
         # Update water content
-        self.X_H2O = [self.mix[ll].X_H2O for ll in range(len(self.contents))]
+        self.X_H2O = [self.mix[ll].x_H2O for ll in range(len(self.contents))]
 
         # if a unit has detected a problem, do not proceed with the
         # calculations
@@ -2854,10 +2949,9 @@ class Mixture:
             #                   nmat=len(self.fractions))
 
             # Compute mean properties
-            self.dens = rho_mean(self.densities, self.weight_fractions)
-            self.alpha = alpha_mean(self.densities, self.alphas, self.weight_fractions, dens = self.dens)
-            self.dPdrho = dPdrho_mean(self.densities, self.dPdrhos, self.weight_fractions, dens = self.dens)
-            self.K_isoth = self.dPdrho * self.dens
+            self.update_volumetric_props()
+            self.update_mean_volumetric_props()
+
             # self.dens = 0.0
             # self.dPdrho = 0.0
             # self.alpha = 0.0
@@ -2892,28 +2986,33 @@ class Mixture:
                     nmat = len(self.fractions))
             """
 
-    def UpdateFractions(self, newfractions):
+    def update_volumetric_props(self):
+        """
+        Updates the individual volumetric properties.
+        """
+        self.densities = [mm.dens for mm in self.mix]
+        self.alphas = [self.mix[m].alpha for m in range(len(self.contents))]
+        self.dPdrhos = [self.mix[m].dPdrho for m in range(len(self.contents))]
+
+    def update_mean_volumetric_props(self):
+        """
+        Updates the bulk volumetric properties from the individual properties.
+        """
+        self.dens = density_mean(self.densities, self.weight_fractions)
+        self.alpha = thermal_expansion_mean(
+            self.densities, self.alphas, self.weight_fractions, dens=self.dens
+        )
+        self.dPdrho = dPdrho_mean(
+            self.densities, self.dPdrhos, self.weight_fractions, dens=self.dens
+        )
+        self.K_isoth = self.dPdrho * self.dens
+
+    def update_fractions(self, newfractions):
         """Changes the relative abundance of the individual components at
         fixed P and T and computes new mean parameters
         """
         self.fractions = newfractions
-
-        # compute mean density of the mixture using an adequate mixing rule
-        self.dens = rho_mean(self.densities, self.weight_fractions)
-
-        # update mean pressure derivative using an adequate mixing rule
-        self.dPdrho = 0.0
-
-        for m in range(len(self.materials)):
-            self.dPdrho += (
-                self.fractions[m] / self.mix[m].dPdrho / self.densities[m] ** 2
-            )
-
-        self.dPdrho *= self.dens**2
-        self.dPdrho = 1.0 / self.dPdrho
-
-        # compute mean isothermal bulk modulus
-        self.K_isoth = self.dPdrho * self.dens
+        self.update_mean_volumetric_props()
 
     def update(self, P=None, T=None, d=None, dPdrho=None, **kwargs):
         """This method updates the material instance of each component of the
@@ -2959,124 +3058,108 @@ class Mixture:
             self.X_H2O = self.mix[ll].X_H2O
 
             # update density list
-            self.densities = [mm.dens for mm in self.mix]
-
-            # compute mean density of the mixture using an adequate mixing rule
-            self.dens = rho_mean(self.densities, self.weight_fractions)
-
-            # update mean pressure derivative using an adequate mixing rule
-            self.dPdrho = 0.0
-
-            for m in range(len(self.materials)):
-                self.dPdrho += (
-                    self.fractions[m] / self.mix[m].dPdrho / self.densities[m] ** 2
-                )
-
-            self.dPdrho *= self.dens**2
-            self.dPdrho = 1.0 / self.dPdrho
-
-            # compute mean isothermal bulk modulus
-            self.K_isoth = self.dPdrho * self.dens
+            self.update_volumetric_props()
+            self.update_mean_volumetric_props()
 
 
-def HydVsMix(temps=[500, 1000, 1500], log=False, start=0.5e9, end=3.0e10, N=25):
+# def HydVsMix(temps=[500, 1000, 1500], log=False, start=0.5e9, end=3.0e10, N=25):
 
-    if log:
-        pres = np.logspace(start, end, N)
+#     if log:
+#         pres = np.logspace(start, end, N)
 
-    else:
-        pres = np.linspace(start, end, N)
+#     else:
+#         pres = np.linspace(start, end, N)
 
-    dens1 = np.zeros([len(temps), N])
-    dens2 = np.zeros([len(temps), N])
+#     dens1 = np.zeros([len(temps), N])
+#     dens2 = np.zeros([len(temps), N])
 
-    mix1 = Mixture(contents=[12], eos_table=False, saturation=[True])
-    mix2 = Mixture(contents=[12, 0], eos_table=False, saturation=[False, False])
-    mix1.Compute(T=temps[0], P=pres[0])
-    mix2.Compute(T=temps[0], P=pres[0])
+#     mix1 = Mixture(contents=[12], eos_table=False, saturation=[True])
+#     mix2 = Mixture(contents=[12, 0], eos_table=False, saturation=[False, False])
+#     mix1.Compute(T=temps[0], P=pres[0])
+#     mix2.Compute(T=temps[0], P=pres[0])
 
-    for i in range(len(temps)):
-        for j in range(len(pres)):
-            t = temps[i]
-            p = pres[j]
+#     for i in range(len(temps)):
+#         for j in range(len(pres)):
+#             t = temps[i]
+#             p = pres[j]
 
-            mix1.Compute(T=t, P=p)
-            print(mix1.mix[0].X_H2O)
-            xi_H2O = xi(eta=mix1.mix[0].X_H2O, m1=mOl, m2=mH2O)
+#             mix1.Compute(T=t, P=p)
+#             print(mix1.mix[0].X_H2O)
+#             xi_H2O = xi(eta=mix1.mix[0].X_H2O, m1=mOl, m2=mH2O)
 
-            mix2.UpdateFractions(newfractions=[1 - xi_H2O, xi_H2O])
-            mix2.Compute(T=t, P=p)
+#             mix2.UpdateFractions(newfractions=[1 - xi_H2O, xi_H2O])
+#             mix2.Compute(T=t, P=p)
 
-            dens1[i][j] = mix1.dens
-            dens2[i][j] = mix2.dens
+#             dens1[i][j] = mix1.dens
+#             dens2[i][j] = mix2.dens
 
-    plots = plotTools.Plot(
-        col=1,
-        row=2,
-        axis_labels=[
-            [[r"$P \ \rm [GPa]$", r"$\rho \rm \ [kg \ m^{-3}]$"]],
-            [[r"$P \ \rm [GPa]$", r"$\delta \rho \rm \ [\%]$"]],
-        ],
-        sharey=False,
-        sharex=True,
-        majorlocatorx=[[5], [5]],
-        majorlocatory=[[500], [10]],
-        minorlocatorx=[[1], [1]],
-        minorlocatory=[[100], [5]],
-        axis_limits=[[[[0, 30], [2500, 4000]]], [[[0.0, 30], [-30, 0]]]],
-        wspace=0.1,
-        hspace=0.1,
-        axislabelsize=16,
-        figsize=(10, 5),
-    )
+#     plots = plotTools.Plot(
+#         col=1,
+#         row=2,
+#         axis_labels=[
+#             [[r"$P \ \rm [GPa]$", r"$\rho \rm \ [kg \ m^{-3}]$"]],
+#             [[r"$P \ \rm [GPa]$", r"$\delta \rho \rm \ [\%]$"]],
+#         ],
+#         sharey=False,
+#         sharex=True,
+#         majorlocatorx=[[5], [5]],
+#         majorlocatory=[[500], [10]],
+#         minorlocatorx=[[1], [1]],
+#         minorlocatory=[[100], [5]],
+#         axis_limits=[[[[0, 30], [2500, 4000]]], [[[0.0, 30], [-30, 0]]]],
+#         wspace=0.1,
+#         hspace=0.1,
+#         axislabelsize=16,
+#         figsize=(10, 5),
+#     )
 
-    lwdth = 2
-    plot_list1 = []
-    plot_list2 = []
-    legend_list2 = []
-    for i in range(len(temps)):
-        (pl1,) = plots.ax[0][0].plot(
-            pres * 1.0e-9,
-            dens1[i],
-            linestyle="-",
-            color=((i) / (len(temps) - 1), 0, 0),
-            linewidth=lwdth,
-            label=str(temps[i]) + " K",
-        )
-        (pl2,) = plots.ax[0][0].plot(
-            pres * 1.0e-9,
-            dens2[i],
-            linestyle="--",
-            color=((i) / (len(temps) - 1), 0, 0),
-            linewidth=lwdth,
-        )
+#     lwdth = 2
+#     plot_list1 = []
+#     plot_list2 = []
+#     legend_list2 = []
+#     for i in range(len(temps)):
+#         (pl1,) = plots.ax[0][0].plot(
+#             pres * 1.0e-9,
+#             dens1[i],
+#             linestyle="-",
+#             color=((i) / (len(temps) - 1), 0, 0),
+#             linewidth=lwdth,
+#             label=str(temps[i]) + " K",
+#         )
+#         (pl2,) = plots.ax[0][0].plot(
+#             pres * 1.0e-9,
+#             dens2[i],
+#             linestyle="--",
+#             color=((i) / (len(temps) - 1), 0, 0),
+#             linewidth=lwdth,
+#         )
 
-        plots.ax[1][0].plot(
-            pres * 1.0e-9,
-            (dens2[i] - dens1[i]) / dens1[i] * 100,
-            color=((i) / (len(temps) - 1), 0, 0),
-            linewidth=lwdth,
-        )
+#         plots.ax[1][0].plot(
+#             pres * 1.0e-9,
+#             (dens2[i] - dens1[i]) / dens1[i] * 100,
+#             color=((i) / (len(temps) - 1), 0, 0),
+#             linewidth=lwdth,
+#         )
 
-        plot_list2.append(pl1)
-        legend_list2.append(str(temps[i]) + " K")
+#         plot_list2.append(pl1)
+#         legend_list2.append(str(temps[i]) + " K")
 
-        if i == 0:
-            plot_list1.append(pl1)
-            plot_list1.append(pl2)
+#         if i == 0:
+#             plot_list1.append(pl1)
+#             plot_list1.append(pl2)
 
-    legend1 = plots.ax[0][0].legend(
-        plot_list1, ["linear hydration", "linear mixing"], loc=2, fontsize=12
-    )
+#     legend1 = plots.ax[0][0].legend(
+#         plot_list1, ["linear hydration", "linear mixing"], loc=2, fontsize=12
+#     )
 
-    legend2 = plots.ax[0][0].legend(plot_list2, legend_list2, loc=4, fontsize=12)
-    plots.ax[0][0].add_artist(legend1)
-    plots.ax[0][0].add_artist(legend2)
-    plots.fig.align_xlabels(plots.ax[:])
-    plots.fig.align_ylabels(plots.ax[:])
+#     legend2 = plots.ax[0][0].legend(plot_list2, legend_list2, loc=4, fontsize=12)
+#     plots.ax[0][0].add_artist(legend1)
+#     plots.ax[0][0].add_artist(legend2)
+#     plots.fig.align_xlabels(plots.ax[:])
+#     plots.fig.align_ylabels(plots.ax[:])
 
-    plots.fig.savefig(
-        "/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/hyd_vs_mix.pdf",
-        format="pdf",
-        bbox_inches="tight",
-    )
+#     plots.fig.savefig(
+#         "/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/hyd_vs_mix.pdf",
+#         format="pdf",
+#         bbox_inches="tight",
+#     )

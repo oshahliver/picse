@@ -4,7 +4,7 @@ from PIMPphysicalparams import material_list
 import numpy as np
 import os
 import eosTables
-import Material
+import pics.materials.material as material
 from matplotlib import pyplot as plt
 import Feistel2006EOS
 import French2015EOS
@@ -470,7 +470,7 @@ class Table:
                     self.tab = tab
 
             if mix:
-                self.mix = Material.Mixture(contents=[ll, ll_plus], eos_table=False)
+                self.mix = material.Mixture(contents=[ll, ll_plus], eos_table=False)
 
             self.it_counter = 0
 

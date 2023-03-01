@@ -75,6 +75,51 @@ print(all_props)
 
 ## The ```pics.materials.Material``` module
 
+### ```Material.density_mean()```:
+
+Compute the mean density of a mixture from the individual densities using a linear mixing law.
+
+### ```Material.bulk_modulus_mean()```:
+
+Compute the mean isothermal bulk modulus from the individual densities and bulk modulii of a mixture using a linear mixing law.
+
+### ```Material.thermal_expansion_mean()```:
+
+Compute the mean thermal expansion coefficient from the individual densities and thermal expansions using a linear mixing law.
+
+### ```Material.dPdrho_mean()```:
+
+Compute the mean density derivative of the pressure of a mixture using a linear mixing law.
+
+### ```Material.specific_heat_iron()```:
+
+Computes the specific heat capacity at a given temperature and pressure using the parametrization given by Stacey et al. 2001.
+
+### ```Material.specific_heat_pyrolite()```:
+
+Computes the specific heat capacity at a given temperature and density using the parametrization given by Stixtude and Lithgow-Bertelloni 2011.
+
+### ```Material.silicon_number()```:
+
+Computes the silicon number from the Si to Mg ratio at a given magnesium number. This calculation is independant on the mineral composition.
+
+### ```Material.silicon_number_max()```:
+
+Computes max Si# that is allowed at given Mg# for pure per + ol composition.
+
+### ```Material.silicon_number_min()```:
+
+Computes min Si# that is allowed at given Mg# for pure per + ol composition.
+
+### ```Si2Mg()```:
+
+Computes ratio of Si to Mg for given magnesium and silicon numbers.
+
+### ```at2mat()```:
+
+Converts atomic mole fractions into material mole fractions. The composition
+of the different materials is given by the matrix N.
+
 ### The ```Material.Unit``` class
 
 The ```Mixture``` class is a useful tool for investigating and visualizing the properties of isolated planetary building blocks and to create equation of state tables.
@@ -98,7 +143,7 @@ mix.compute()
 mix.print()
 ```
 
-### ```Mixture.compute()```:
+#### ```Mixture.compute()```:
 
 Initializes a new material instance for each of the
 compontents in the mixture and computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture. Uses simple mixing laws to compute the bulk properties of the mixture from the individual components. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
@@ -110,7 +155,7 @@ Parameters:
 ```int: phase=None```: Phase region signature.
 
 
-### ```Mixture.update_fractions(new_fractions)```:
+#### ```Mixture.update_fractions(new_fractions)```:
 
 Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
 
@@ -118,11 +163,11 @@ Parameters:
 
 ```list: new_fractions```: list containing the new molar abundances of each component of the mixture.
 
-### ```Mixture.update_weight_fractions()```:
+#### ```Mixture.update_weight_fractions()```:
 
 Computes the mass fraction of each component of the mixture from their mole fractions and the molar masses.
 
-### ```Mixture.update()```:
+#### ```Mixture.update()```:
 
 This method updates the material instance of each component of the
 mixture individually and then computes the new mean density in the cell
@@ -136,13 +181,22 @@ Parameters:
 ```float: d=None```: density in kilogram per cubic meter.\
 ```float: dPdrho=None```: density derivative of pressure.
 
-### ```Mixture.plot()```:
+#### ```Mixture.plot()```:
 
 Simple plotting routine to visualize basic volumetric and thermodynamic properties of the mixture.
 
-### ```Mixture.print()```:
+#### ```Mixture.print()```:
 
 Prints basic volumetric and thermodynamic properties of the mixture to standard output.
+
+
+#### ```Mixture.update_volumetric_props()```:
+
+Updates the individual volumetric properties.
+
+#### ```Mixture.update_mean_volumetric_props()```:
+
+Updates the mean volumetric properties from the individual properties.
 
 ## The ```pics.materials.eos``` module
 
