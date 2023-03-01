@@ -7,7 +7,7 @@ Created on Thu Apr  4 16:03:10 2019
 """
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-import pics.materials.Material as Material
+import pics.materials.material as material
 import pics.interiors.Planet as Planet
 from pics.interiors import PlanetTest
 import pics.interiors.PlanetFort as PlanetFort
@@ -112,7 +112,7 @@ class Workbench:
         # With the core and mantle compositions defined the core size can be computed to match the
         # the bulk composition of the planet (Only for simple models!).
         print("Estimating the core mass fraction...")
-        xi_all_core = Material.mat2at_core(
+        xi_all_core = material.mat2at_core(
             xi=self.planetary_params.fractions[1], xiH=0.0
         )
         SiMg = self.planetary_params.Si_number_mantle / (
@@ -1524,7 +1524,7 @@ class Toolkit:
         M_mantle = M
 
         # estimate M_core in earth masses
-        M_core = Material.estimate_Mcore(M_mantle=M_mantle, Mg_number=Mg_number_should)
+        M_core = material.estimate_Mcore(M_mantle=M_mantle, Mg_number=Mg_number_should)
 
         # estimate core pressure to ensure that surface pressure is reached
         P_center = 7.5e11 * (1.0 + M)
@@ -1854,7 +1854,7 @@ class Toolkit:
         # conditions
         if initial_predictor == 0:
             print("estimating core frac here...")
-            xi_all_core = Material.mat2at_core(xi=outer_core_mat_fracs, xiH=0.0)
+            xi_all_core = material.mat2at_core(xi=outer_core_mat_fracs, xiH=0.0)
 
             # Note that the Si# in the mantle is taken here. The core mass
             # is estimated assuming uniform distribution of lighter elements

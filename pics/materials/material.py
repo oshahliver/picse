@@ -75,7 +75,7 @@ import matplotlib.transforms as transforms
 import time
 
 # from pics.materials import phaseCheck
-from pics.utils import functionTools as ftool
+from pics.utils.function_tools import functionTools as ftool
 
 # from pics.materials import eos
 from matplotlib import pyplot as plt
@@ -83,8 +83,9 @@ from matplotlib import pyplot as plt
 # from pics.materials import brucite_phase
 # from pics.materials import hydration
 from decimal import Decimal
-from pics.utils import plotTools
+from pics.utils.plot_tools import plotTools
 import scipy.integrate as integrate
+from pics.materials import eos
 
 import warnings
 
@@ -96,227 +97,325 @@ warnings.filterwarnings("ignore")
 plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 
 
-class Sotin:
+# class Sotin:
+#     """
+#     Basic implementation of the composition model by Sotin et al. 2007.
+#     """
+
+#     def __init__(self, MgSi=1.131, FeSi=0.986, Mg_number_Si=0.9):
+#         self.MgSi = MgSi
+#         self.Mg_number_Si = Mg_number_Si
+#         self.Mg = None
+#         self.Fe = None
+#         self.Si = None
+#         self.O = None
+#         self.FeMg_Si = (1.0 - Mg_number_Si) / Mg_number_Si
+#         self.FeMg = None
+#         self.FeSi = FeSi
+#         self.Fe_number_Si = (
+#             (1 - Mg_number_Si)
+#             / (Mg_number_Si)
+#             / (1 + (1 - Mg_number_Si) / Mg_number_Si)
+#         )
+#         self.x3 = 2.0 * (1.0 - Mg_number_Si / MgSi)
+#         self.y3 = 1.0 - Mg_number_Si
+
+#     def getAbundances(self):
+#         """Computes molar abundances of Mg, Si, Fe and O as a function of
+#         the input ratio Mg/Si and the Mg# in the Silicates according to
+#         Sotin 2007
+#         """
+#         Mg = 2 * (1.0 - self.y3)
+#         Fe = 2 * self.y3
+#         Si = 2.0 - self.x3
+#         O = 6.0 - 2.0 * self.x3
+
+#         tot = Mg + Fe + Si + O
+
+#         self.Mg = Mg / tot
+#         self.Fe = Fe / tot
+#         self.Si = Si / tot
+#         self.O = O / tot
+#         self.FeMg = self.FeSi / self.MgSi
+
+#         print("\n Mantle:")
+#         print("\n Mg:", self.Mg, "\n Fe:", self.Fe, "\n Si:", self.Si, "\n O:", self.O)
+
+#         print(" Fe/Mg silicates: ", self.FeMg_Si)
+#         print(" Si/Mg silicates: ", 1.0 / self.MgSi)
+#         print(" Fe# silicates:", self.Fe_number_Si)
+#         print(" Si# silicates:", 1.0 / self.MgSi / (1.0 + 1.0 / self.MgSi))
+
+#         print(" x3 =", self.x3)
+#         print(" y3 =", self.y3)
+
+#         print("\n Planet:")
+#         print("\n Fe/Mg in planet:", self.FeMg)
+#         print(" Mg# tot:", 1.0 / self.FeMg / (1.0 + 1.0 / self.FeMg))
+
+
+# def plot_mantle_content(N=50):
+#     path = "/home/os18o068/Documents/PHD/Abbildungen/"
+#     pres = np.linspace(30e9, 70e9, N)
+
+#     X_S = np.linspace(0.0, 0.1, 3)
+#     X_Si = np.array([0.005, 0.0075, 0.01])
+#     X_O = np.array([0.0005, 0.001, 0.002, 0.003, 0.004, 0.005])
+#     linestyles = ["-", "--", "-.", ":"]
+
+#     data = np.empty([len(X_S), len(X_Si), len(X_O), 2, len(pres)])
+
+#     # prepare data
+#     for i in range(len(X_S)):
+#         for j in range(len(X_Si)):
+#             for k in range(len(X_O)):
+#                 for p in range(len(pres)):
+#                     # convert material fractions to atomic abundances in the core
+#                     xi = mat2at_core(
+#                         xi=wt2mol(wt=[X_S[i], X_Si[j], X_O[k]], xiH=0.0), xiH=0.0
+#                     )
+
+#                     # compute Fe and Si content of the silicates from the
+#                     # chemical partitioning model
+#                     f = Fe_number_mantle(pres[p], T_liquidus_pyrolite(pres[p]), xi)
+#                     s = Si_number_mantle(pres[p], T_liquidus_pyrolite(pres[p]), xi)
+
+#                     if f <= 0.0 or f == xi_Fe_mantle_max:
+#                         f = None
+
+#                     data[i][j][k][0][p] = f
+#                     data[i][j][k][1][p] = s
+
+#     fig, ax = plt.subplots(len(X_S), 2, figsize=(10, 8))
+#     fig.subplots_adjust(wspace=0.25)
+#     plot_list1 = []
+#     label_list1 = []
+#     plot_list2 = []
+#     label_list2 = []
+
+#     bbox_props = dict(edgecolor="k", facecolor="white", linewidth=0.5)
+
+#     ax[0][1].text(
+#         0.4,
+#         1.0,
+#         r"$\rm Mantle \ composition$",
+#         fontsize=20,
+#         transform=ax[0][1].transAxes,
+#         bbox=bbox_props,
+#     )
+
+#     fnts1 = 12
+#     fnts2 = 14
+#     for i in range(len(X_S)):
+#         # ax[i][0].set_ylim(0., xi_Fe_mantle_max)
+#         trafo = transforms.blended_transform_factory(
+#             ax[i][0].transAxes, ax[i][0].transAxes
+#         )
+
+#         ax[i][0].set_ylabel(r"$\rm [FeO]/[FeO+MgO]$", fontsize=fnts2)
+#         ax[i][1].set_ylabel(r"$\rm [SiO_2]/[SiO_2+MgO]$", fontsize=fnts2)
+#         ax[i][0].text(
+#             0.95,
+#             0.85,
+#             r"${}$".format(int(X_S[i] * 100)) + r"$\ {\rm wt}\% \ \rm S \ in \ core$",
+#             transform=trafo,
+#             bbox=bbox_props,
+#             ha="right",
+#             size=fnts2,
+#         )
+
+#         for j in range(len(X_Si)):
+#             for k in range(len(X_O)):
+#                 for l in range(2):
+#                     ax[i][l].set_xlim(pres[0] * 1e-9, pres[-1] * 1e-9)
+#                     ax[i][l].tick_params(labelsize=fnts2)
+#                     color = color_list[-k * 2]
+#                     try:
+#                         if l == 0:
+#                             (pl,) = ax[i][l].semilogy(
+#                                 pres * 1e-9,
+#                                 data[i][j][k][l],
+#                                 color=color,
+#                                 linestyle=linestyles[j],
+#                             )
+#                             # ax[i][0].set_ylim(0., .25)
+#                             ax[i][l].set_ylim(0.003, 0.5)
+
+#                         else:
+#                             (pl,) = ax[i][l].plot(
+#                                 pres * 1e-9,
+#                                 data[i][j][k][l],
+#                                 color=color,
+#                                 linestyle=linestyles[j],
+#                             )
+
+#                             # ax[i][0].set_ylim(0., .25)
+#                             ax[i][l].set_ylim(0.3, 0.6)
+
+#                     except TypeError:
+#                         if l == 0:
+#                             (pl,) = ax[i][l].semilogy(
+#                                 pres * 1e-9,
+#                                 data[i][j][k][l],
+#                                 color=color,
+#                                 linestyle=linestyles[j],
+#                             )
+#                             # ax[i][0].set_ylim(0., .25)
+#                             ax[i][l].set_ylim(0.003, 0.5)
+
+#                         else:
+#                             (pl,) = ax[i][l].plot(
+#                                 pres * 1e-9,
+#                                 data[i][j][k][l],
+#                                 color=color,
+#                                 linestyle=linestyles[j],
+#                             )
+
+#                             # ax[i][0].set_ylim(0., .25)
+#                             ax[i][l].set_ylim(0.3, 0.6)
+
+#                 if k == 0 and i == 0:
+#                     plot_list2.append(pl)
+#                     label_list2.append(
+#                         r"${}$".format(str(round(X_Si[j] * 100, 3))) + r"$\ {\rm wt}\%$"
+#                     )
+
+#                 if j == 0 and i == 0:
+#                     plot_list1.append(pl)
+#                     label_list1.append(
+#                         r"${}$".format(str(round(X_O[k] * 100, 3))) + r"$\ {\rm wt}\%$"
+#                     )
+
+#     try:
+#         legend1 = ax[0][0].legend(
+#             plot_list1, label_list1, loc=3, title=r"$\rm O \ in \ core$", fontsize=fnts1
+#         )
+#         ax[0][0].add_artist(legend1)
+#         legend2 = ax[0][1].legend(
+#             plot_list2,
+#             label_list2,
+#             loc=3,
+#             title=r"$\rm Si \ in \ core$",
+#             fontsize=fnts1,
+#         )
+#         legend1.get_title().set_fontsize(fnts1)
+#         legend2.get_title().set_fontsize(fnts1)
+#         legend1.get_frame().set_alpha(0.5)
+#         legend2.get_frame().set_alpha(0.5)
+#         ax[0][1].add_artist(legend2)
+#         ax[-1][0].set_xlabel(
+#             r"$\rm Core \ segregation \ pressure \ [GPa]$", fontsize=fnts2
+#         )
+#         ax[-1][1].set_xlabel(
+#             r"$\rm Core \ segregation \ pressure \ [GPa]$", fontsize=fnts2
+#         )
+
+#     except TypeError:
+#         legend1 = ax[0].legend(plot_list1, label_list1, loc=3, title="oxygen")
+#         ax[0].add_artist(legend1)
+#         ax[0].set_xlabel("Core segregation pressure [GPa]", fontsize=fnts2)
+#         ax[1].set_xlabel("Core segregation pressure [GPa]", fontsize=fnts2)
+
+#     fig.savefig(path + "mantle_composition.pdf", format="pdf", bbox_inches="tight")
+#     plt.close(fig)
+
+
+def rho_mean(densities, fractions):
     """
-    Basic implementation of the composition model by Sotin et al. 2007.
+    Compute the mean density of a mixture using the linear mixing law.
+
+    Parameters:
+    densities (list): List of individual densities.
+    fractions (list): List of individual weight fractions.
+
+    Returns:
+    float: Mean density of the mixture.
     """
 
-    def __init__(self, MgSi=1.131, FeSi=0.986, Mg_number_Si=0.9):
-        self.MgSi = MgSi
-        self.Mg_number_Si = Mg_number_Si
-        self.Mg = None
-        self.Fe = None
-        self.Si = None
-        self.O = None
-        self.FeMg_Si = (1.0 - Mg_number_Si) / Mg_number_Si
-        self.FeMg = None
-        self.FeSi = FeSi
-        self.Fe_number_Si = (
-            (1 - Mg_number_Si)
-            / (Mg_number_Si)
-            / (1 + (1 - Mg_number_Si) / Mg_number_Si)
-        )
-        self.x3 = 2.0 * (1.0 - Mg_number_Si / MgSi)
-        self.y3 = 1.0 - Mg_number_Si
-
-    def getAbundances(self):
-        """Computes molar abundances of Mg, Si, Fe and O as a function of
-        the input ratio Mg/Si and the Mg# in the Silicates according to
-        Sotin 2007
-        """
-        Mg = 2 * (1.0 - self.y3)
-        Fe = 2 * self.y3
-        Si = 2.0 - self.x3
-        O = 6.0 - 2.0 * self.x3
-
-        tot = Mg + Fe + Si + O
-
-        self.Mg = Mg / tot
-        self.Fe = Fe / tot
-        self.Si = Si / tot
-        self.O = O / tot
-        self.FeMg = self.FeSi / self.MgSi
-
-        print("\n Mantle:")
-        print("\n Mg:", self.Mg, "\n Fe:", self.Fe, "\n Si:", self.Si, "\n O:", self.O)
-
-        print(" Fe/Mg silicates: ", self.FeMg_Si)
-        print(" Si/Mg silicates: ", 1.0 / self.MgSi)
-        print(" Fe# silicates:", self.Fe_number_Si)
-        print(" Si# silicates:", 1.0 / self.MgSi / (1.0 + 1.0 / self.MgSi))
-
-        print(" x3 =", self.x3)
-        print(" y3 =", self.y3)
-
-        print("\n Planet:")
-        print("\n Fe/Mg in planet:", self.FeMg)
-        print(" Mg# tot:", 1.0 / self.FeMg / (1.0 + 1.0 / self.FeMg))
+    return 1.0 / sum([f / d for d, f in zip(densities, fractions)])
 
 
-def plot_mantle_content(N=50):
-    path = "/home/os18o068/Documents/PHD/Abbildungen/"
-    pres = np.linspace(30e9, 70e9, N)
+def bulk_modulus_mean(densities, bulks, fractions, dens=None):
+    """
+    Compute the mean isothermal bulk modulus of a mixture using the linear mixing law.
 
-    X_S = np.linspace(0.0, 0.1, 3)
-    X_Si = np.array([0.005, 0.0075, 0.01])
-    X_O = np.array([0.0005, 0.001, 0.002, 0.003, 0.004, 0.005])
-    linestyles = ["-", "--", "-.", ":"]
+    Parameters:
+    densities (list): List of individual densities.
+    bulks (list): List of individual isothermal bulk moduli.
+    fractions (list): List of individual weight fractions.
+    dens (float, optional): Mean density of mixture, Defaults to None.
 
-    data = np.empty([len(X_S), len(X_Si), len(X_O), 2, len(pres)])
+    Returns:
+    float: Mean isothermal bulk modulus of the mixture.
+    """
 
-    # prepare data
-    for i in range(len(X_S)):
-        for j in range(len(X_Si)):
-            for k in range(len(X_O)):
-                for p in range(len(pres)):
-                    # convert material fractions to atomic abundances in the core
-                    xi = mat2at_core(
-                        xi=wt2mol(wt=[X_S[i], X_Si[j], X_O[k]], xiH=0.0), xiH=0.0
-                    )
-
-                    # compute Fe and Si content of the silicates from the
-                    # chemical partitioning model
-                    f = Fe_number_mantle(pres[p], T_liquidus_pyrolite(pres[p]), xi)
-                    s = Si_number_mantle(pres[p], T_liquidus_pyrolite(pres[p]), xi)
-
-                    if f <= 0.0 or f == xi_Fe_mantle_max:
-                        f = None
-
-                    data[i][j][k][0][p] = f
-                    data[i][j][k][1][p] = s
-
-    fig, ax = plt.subplots(len(X_S), 2, figsize=(10, 8))
-    fig.subplots_adjust(wspace=0.25)
-    plot_list1 = []
-    label_list1 = []
-    plot_list2 = []
-    label_list2 = []
-
-    bbox_props = dict(edgecolor="k", facecolor="white", linewidth=0.5)
-
-    ax[0][1].text(
-        0.4,
-        1.0,
-        r"$\rm Mantle \ composition$",
-        fontsize=20,
-        transform=ax[0][1].transAxes,
-        bbox=bbox_props,
-    )
-
-    fnts1 = 12
-    fnts2 = 14
-    for i in range(len(X_S)):
-        # ax[i][0].set_ylim(0., xi_Fe_mantle_max)
-        trafo = transforms.blended_transform_factory(
-            ax[i][0].transAxes, ax[i][0].transAxes
+    if not dens is None:
+        return 1 / (
+            dens * sum([f / d / k for (f, d, k) in zip(fractions, densities, bulks)])
         )
 
-        ax[i][0].set_ylabel(r"$\rm [FeO]/[FeO+MgO]$", fontsize=fnts2)
-        ax[i][1].set_ylabel(r"$\rm [SiO_2]/[SiO_2+MgO]$", fontsize=fnts2)
-        ax[i][0].text(
-            0.95,
-            0.85,
-            r"${}$".format(int(X_S[i] * 100)) + r"$\ {\rm wt}\% \ \rm S \ in \ core$",
-            transform=trafo,
-            bbox=bbox_props,
-            ha="right",
-            size=fnts2,
+    else:
+        return 1 / (
+            rho_mean(densities, fractions)
+            * sum([f / d / k for (f, d, k) in zip(fractions, densities, bulks)])
         )
 
-        for j in range(len(X_Si)):
-            for k in range(len(X_O)):
-                for l in range(2):
-                    ax[i][l].set_xlim(pres[0] * 1e-9, pres[-1] * 1e-9)
-                    ax[i][l].tick_params(labelsize=fnts2)
-                    color = color_list[-k * 2]
-                    try:
-                        if l == 0:
-                            (pl,) = ax[i][l].semilogy(
-                                pres * 1e-9,
-                                data[i][j][k][l],
-                                color=color,
-                                linestyle=linestyles[j],
-                            )
-                            # ax[i][0].set_ylim(0., .25)
-                            ax[i][l].set_ylim(0.003, 0.5)
 
-                        else:
-                            (pl,) = ax[i][l].plot(
-                                pres * 1e-9,
-                                data[i][j][k][l],
-                                color=color,
-                                linestyle=linestyles[j],
-                            )
+def alpha_mean(densities, alphas, fractions, dens=None):
+    """
+    Compute the mean thermal expansion coefficient of a mixture using the linear mixing law.
 
-                            # ax[i][0].set_ylim(0., .25)
-                            ax[i][l].set_ylim(0.3, 0.6)
+    Parameters:
+    densities (list): List of individual densities.
+    alphas (list): List of individual thermal expansion coefficients..
+    fractions (list): List of individual weight fractions.
+    dens (float, optional): Mean density of mixture, Defaults to None.
 
-                    except TypeError:
-                        if l == 0:
-                            (pl,) = ax[i][l].semilogy(
-                                pres * 1e-9,
-                                data[i][j][k][l],
-                                color=color,
-                                linestyle=linestyles[j],
-                            )
-                            # ax[i][0].set_ylim(0., .25)
-                            ax[i][l].set_ylim(0.003, 0.5)
+    Returns:
+    float: Mean thermal expansion coefficient of the mixture.
+    """
+    if not dens is None:
+        return dens * sum([a * f / d for a, f, d in zip(alphas, fractions, densities)])
 
-                        else:
-                            (pl,) = ax[i][l].plot(
-                                pres * 1e-9,
-                                data[i][j][k][l],
-                                color=color,
-                                linestyle=linestyles[j],
-                            )
-
-                            # ax[i][0].set_ylim(0., .25)
-                            ax[i][l].set_ylim(0.3, 0.6)
-
-                if k == 0 and i == 0:
-                    plot_list2.append(pl)
-                    label_list2.append(
-                        r"${}$".format(str(round(X_Si[j] * 100, 3))) + r"$\ {\rm wt}\%$"
-                    )
-
-                if j == 0 and i == 0:
-                    plot_list1.append(pl)
-                    label_list1.append(
-                        r"${}$".format(str(round(X_O[k] * 100, 3))) + r"$\ {\rm wt}\%$"
-                    )
-
-    try:
-        legend1 = ax[0][0].legend(
-            plot_list1, label_list1, loc=3, title=r"$\rm O \ in \ core$", fontsize=fnts1
-        )
-        ax[0][0].add_artist(legend1)
-        legend2 = ax[0][1].legend(
-            plot_list2,
-            label_list2,
-            loc=3,
-            title=r"$\rm Si \ in \ core$",
-            fontsize=fnts1,
-        )
-        legend1.get_title().set_fontsize(fnts1)
-        legend2.get_title().set_fontsize(fnts1)
-        legend1.get_frame().set_alpha(0.5)
-        legend2.get_frame().set_alpha(0.5)
-        ax[0][1].add_artist(legend2)
-        ax[-1][0].set_xlabel(
-            r"$\rm Core \ segregation \ pressure \ [GPa]$", fontsize=fnts2
-        )
-        ax[-1][1].set_xlabel(
-            r"$\rm Core \ segregation \ pressure \ [GPa]$", fontsize=fnts2
+    else:
+        return rho_mean(densities, fractions) * sum(
+            [a * f / d for a, f, d in zip(alphas, fractions, densities)]
         )
 
-    except TypeError:
-        legend1 = ax[0].legend(plot_list1, label_list1, loc=3, title="oxygen")
-        ax[0].add_artist(legend1)
-        ax[0].set_xlabel("Core segregation pressure [GPa]", fontsize=fnts2)
-        ax[1].set_xlabel("Core segregation pressure [GPa]", fontsize=fnts2)
 
-    fig.savefig(path + "mantle_composition.pdf", format="pdf", bbox_inches="tight")
-    plt.close(fig)
+def dPdrho_mean(densities, dPdrhos, fractions, dens=None):
+    """
+    Compute the mean density derivative of the pressure of a mixture using the linear mixing law.
+
+    Parameters:
+    densities (list): List of individual densities.
+    alphas (list): List of individual thermal expansion coefficients..
+    fractions (list): List of individual weight fractions.
+    dens (float, optional): Mean density of mixture, Defaults to None.
+
+    Returns:
+    float: Mean density derivative of the pressure of the mixture.
+    """
+    if not dens is None:
+        return 1.0 / (
+            dens**2
+            * sum(
+                [
+                    1 / d**2 * f / dp
+                    for (dp, f, d) in zip(dPdrhos, fractions, densities)
+                ]
+            )
+        )
+    else:
+        return 1.0 / (
+            rho_mean(densities, fractions) ** 2
+            * sum(
+                [
+                    1 / d**2 * f / dp
+                    for (dp, f, d) in zip(dPdrhos, fractions, densities)
+                ]
+            )
+        )
 
 
 def xi_general(eta, m):
@@ -2210,11 +2309,10 @@ class Unit:
         Fe_number=0.0,
         X_H2O=0.0,
         saturation=False,
-        eos_table=True,
+   
         **kwargs,
     ):
 
-        self.eos_table = eos_table
         self.pres = P
         self.temp = T
         self.dens = d
@@ -2246,7 +2344,7 @@ class Unit:
         self.fraction = 1.0
         # specify here additional properties if you want
 
-    def prt(self, digits=4, level=0):
+    def print(self, digits=4, level=0):
         """Prints out selection of basic properties of the material unit for
         more convenient handling and debugging purposes.
         """
@@ -2320,116 +2418,127 @@ class Unit:
             #     dT0,
             # )
 
-    # def Compute(self, d=None, T=None, P=None, phase=None, **kwargs):
-    #     """Here the material paremeters are computed. Normally values for P
-    #     and T are passed and the density and pressure derivative are computed.
-    #     Note: no argument for <what> should be passed if possible as only the
-    #     passed parameter will be updated. This option is mainly for testing
-    #     and debugging purposes"""
+    def compute(self, d=None, T=None, P=None, phase=None, eos_table = False, **kwargs):
+        """
+        Here the material paremeters are computed. At least two of the parameters
+        d, T, and P need to be passed. The phase region in which the EoS is to be
+        evaluated can be specified. If it is not, the phase region will be determined
+        from the specified conditions.
+        
+        Parameters:
+        d (float, optional): Density in kg/m³. Defaults to None.
+        T (float, optional): Temperature in K. Defaults to None.
+        P (float, optional): Pressure in Pa. Defaults to None.
+        phase (int, optional): Phase region. Defaults to None.
+        eos_tables (bool, optional): Enable use of EoS tables. Defaults to False.
+        """
+        
+        if not eos_table is False:
+            raise NotImplementedError("This option is not available yet.")
 
-    #     if d == None:
-    #         dens = self.dens
-    #     else:
-    #         dens = d
+        if d == None:
+            dens = self.dens
+        else:
+            dens = d
 
-    #     if P == None:
-    #         pres = self.pres
-    #     else:
-    #         pres = P
-    #         self.pres = P
+        if P == None:
+            pres = self.pres
+        else:
+            pres = P
+            self.pres = P
 
-    #     if T == None:
-    #         temp = self.temp
-    #     else:
-    #         temp = T
-    #         self.temp = T
+        if T == None:
+            temp = self.temp
+        else:
+            temp = T
+            self.temp = T
 
-    #     dPdrho = self.dPdrho
-    #     K_isoth = self.K_isoth
+        dPdrho = self.dPdrho
+        K_isoth = self.K_isoth
 
-    #     if not phase == None:
-    #         self.phase = phase
+        if not phase == None:
+            self.phase = phase
 
-    #     X_H2O = self.X_H2O
+        X_H2O = self.X_H2O
 
-    #     # check if temperature and pressure are given, then compute
-    #     # corresponding density and pressure derivative in one go
+        # check if temperature and pressure are given, then compute
+        # corresponding density and pressure derivative in one go
 
-    #     if self.eos_table:
-    #         dens, dPdrho, alpha, phase = eosfort.interpolate(
-    #             x=temp, y=pres, params=[3, 5, 6, 10], ll=self.ll, nparams=4
-    #         )
+        if self.eos_table:
+            dens, dPdrho, alpha, phase = eosfort.interpolate(
+                x=temp, y=pres, params=[3, 5, 6, 10], ll=self.ll, nparams=4
+            )
 
-    #         # The phases are characterized by integer numbers. In the tables
-    #         # they are however stored as floats and are interpolated as all
-    #         # the other parameters. If the interpolation points spread
-    #         # across a phase boundary, the point at which the interpolation
-    #         # is carried out is allocated to phase region which is closer
-    #         # to it in the PT-plane. This is approximately achieved by
-    #         # interpolating the phase as a float and then convert it to int
-    #         phase = int(phase)
+            # The phases are characterized by integer numbers. In the tables
+            # they are however stored as floats and are interpolated as all
+            # the other parameters. If the interpolation points spread
+            # across a phase boundary, the point at which the interpolation
+            # is carried out is allocated to phase region which is closer
+            # to it in the PT-plane. This is approximately achieved by
+            # interpolating the phase as a float and then convert it to int
+            phase = int(phase)
 
-    #     else:
-    #         # print ('in =', self.ll, self.Fe_number, self.saturation, self.phase, temp, pres)
-    #         dens, T, P, dTdP_S, dPdrho, phase, X_H2O, alpha, xi_Al = eos.Compute(
-    #             what="all",
-    #             ll=self.ll,
-    #             T=temp,
-    #             P=pres,
-    #             Fe_number=self.Fe_number,
-    #             saturation=self.saturation,
-    #             phase=self.phase,
-    #         )
+        else:
+            # print ('in =', self.ll, self.Fe_number, self.saturation, self.phase, temp, pres)
+            dens, T, P, dTdP_S, dPdrho, phase, X_H2O, alpha, xi_Al = eos.compute(
+                what="all",
+                ll=self.ll,
+                T=temp,
+                P=pres,
+                Fe_number=self.Fe_number,
+                saturation=self.saturation,
+                phase=self.phase,
+            )
 
-    #     # Compute water saturation content in (Mg,Fe)2SiO4
-    #     # NOTE: saturated Olivine is treated as a individual material with
-    #     # material code 12
-    #     if self.ll > 11:
-    #         if self.saturation:
-    #             # Convert water content into weight fraction
-    #             X_H2O = hydration.X_H2O_sat(P=self.pres, T=self.temp) * 0.01
+        # Compute water saturation content in (Mg,Fe)2SiO4
+        # NOTE: saturated Olivine is treated as a individual material with
+        # material code 12
+        if self.ll > 11:
+            if self.saturation:
+                # Convert water content into weight fraction
+                X_H2O = hydration.X_H2O_sat(P=self.pres, T=self.temp) * 0.01
 
-    #     # for Brucite the water content is constant
-    #     elif self.ll == 11:
-    #         phase = phaseCheck.getPhase(ll=self.ll, T=self.temp, P=self.pres)
-    #         if phase == 2:
-    #             self.saturation = False
-    #             X_H2O = 0.0
+        # for Brucite the water content is constant
+        elif self.ll == 11:
+            phase = phaseCheck.getPhase(ll=self.ll, T=self.temp, P=self.pres)
+            if phase == 2:
+                self.saturation = False
+                X_H2O = 0.0
 
-    #         else:
-    #             self.saturation = True
-    #             X_H2O = 0.3089
+            else:
+                self.saturation = True
+                X_H2O = 0.3089
 
-    #     elif self.ll == 6:
-    #         if phase == 0:
-    #             self.saturation = False
-    #             X_H2O = 0.0
+        elif self.ll == 6:
+            if phase == 0:
+                self.saturation = False
+                X_H2O = 0.0
 
-    #         elif phase == 1:
-    #             self.saturation = True
-    #             X_H2O = 0.03
+            elif phase == 1:
+                self.saturation = True
+                X_H2O = 0.03
 
-    #     # print (dens, dPdrho)
-    #     K_isoth = dPdrho * dens
+        # print (dens, dPdrho)
+        K_isoth = dPdrho * dens
 
-    #     # update material properties from eos outputs
-    #     self.K_isoth = K_isoth
+        # update material properties from eos outputs
+        self.K_isoth = K_isoth
 
-    #     try:
-    #         self.phase = int(phase)
+        try:
+            self.phase = int(phase)
 
-    #     except TypeError:
-    #         self.phase = phase
+        except TypeError:
+            self.phase = phase
 
-    #     except ValueError:
-    #         self.phase = phase
+        except ValueError:
+            self.phase = phase
 
-    #     self.dens = dens
-    #     self.pres = pres
-    #     self.temp = temp
-    #     self.alpha = alpha
-    #     self.dPdrho = dPdrho
-    #     self.X_H2O = X_H2O
+        self.dens = dens
+        self.pres = pres
+        self.temp = temp
+        self.alpha = alpha
+        self.dPdrho = dPdrho
+        self.X_H2O = X_H2O
 
 
 class Mixture:
@@ -2453,10 +2562,10 @@ class Mixture:
             to unity. If one of those conditions is not met, an error message
             will be promted.
 
-        T (kwarg, type=float, default=300 K):
+        T (kwarg, type=float, default=300):
             Temperature of the mixture in the unit cell in K
 
-        P (kwarg, type=float, default=1.0e5 Pa):
+        P (kwarg, type=float, default=1.0e5):
             Pressure of the mixture in the unit cell in Pa
     """
 
@@ -2464,9 +2573,9 @@ class Mixture:
         self,
         contents=[],
         fractions=[],
-        T="not computed",
-        P="not compute",
-        d="not computed",
+        temp=None,
+        pres=None,
+        dens=None,
         Fe_number=[],
         X_H2O=[],
         saturation=[],
@@ -2482,14 +2591,20 @@ class Mixture:
         self.Fe_number = Fe_number
         self.X_H2O = X_H2O
         self.saturation = saturation
-        self.pres = P
-        self.temp = T
-        self.dens = d
-        self.densities = "not computed"
-        self.dPdrho = "not computed"
-        self.K_isoth = "not computed"
-        self.alphas = "not computed"
+        self.pres = pres
+        self.temp = temp
+        self.dens = dens
+        self.densities = None,
+        self.dPdrho = None,
+        self.K_isoth = None,
+        self.alphas = None
         self.force_bisection = False
+
+        # Ensure fractions are normalized to one
+        fractions[-1] = 1 - sum(fractions[0:-1])
+
+        if fractions[-1] < 0:
+            raise ValueError("Invalid mole fractions provided.")
 
         # if no fractions have been specified, distribute the components evenly
         # over the mixture
@@ -2528,61 +2643,61 @@ class Mixture:
                 self.fractions[l] * molar_mass_list[ll] / m_tilde
             )
 
-    def Plot(
-        self,
-        temps=[500, 1000, 1500, 2000, 2500],
-        start=5,
-        end=12,
-        N=25,
-        log=True,
-        **kwargs,
-    ):
-        """Computes isotherms between 10**start and 10**end for all temperatures
-        given in temps for the given mixture and plots rho(P) for each T
-        """
+    # def plot(
+    #     self,
+    #     temps=[500, 1000, 1500, 2000, 2500],
+    #     start=5,
+    #     end=12,
+    #     N=25,
+    #     log=True,
+    #     **kwargs,
+    # ):
+    #     """Computes isotherms between 10**start and 10**end for all temperatures
+    #     given in temps for the given mixture and plots rho(P) for each T
+    #     """
 
-        dens = []
+    #     dens = []
 
-        if log:
-            pres = np.logspace(start, end, N)
+    #     if log:
+    #         pres = np.logspace(start, end, N)
 
-        else:
-            pres = np.linspace(start, end, N)
+    #     else:
+    #         pres = np.linspace(start, end, N)
 
-        for i in range(len(temps)):
-            dens.append([])
-            for j in range(len(pres)):
-                self.Update(T=temps[i], P=pres[j])
-                dens[-1].append(self.dens)
+    #     for i in range(len(temps)):
+    #         dens.append([])
+    #         for j in range(len(pres)):
+    #             self.Update(T=temps[i], P=pres[j])
+    #             dens[-1].append(self.dens)
 
-        fig, ax = plt.subplots()
+    #     fig, ax = plt.subplots()
 
-        for i in range(len(temps)):
-            if log:
-                ax.semilogx(pres, dens[i], label=str(temps[i]) + " K")
+    #     for i in range(len(temps)):
+    #         if log:
+    #             ax.semilogx(pres, dens[i], label=str(temps[i]) + " K")
 
-            else:
-                ax.plot(pres * 1.0e-9, dens[i], label=str(temps[i]) + " K")
+    #         else:
+    #             ax.plot(pres * 1.0e-9, dens[i], label=str(temps[i]) + " K")
 
-        ax.legend()
+    #     ax.legend()
 
-        if log:
-            ax.set_xlabel(r"$\rmP \ [Pa]$")
+    #     if log:
+    #         ax.set_xlabel(r"$\rmP \ [Pa]$")
 
-        else:
-            ax.set_xlabel(r"$\rmP \ [GPa]$")
+    #     else:
+    #         ax.set_xlabel(r"$\rmP \ [GPa]$")
 
-        ax.set_ylabel(r"$\rm\rho \ [kg \ m^{-3}]$")
+    #     ax.set_ylabel(r"$\rm\rho \ [kg \ m^{-3}]$")
 
-        title_string = ""
-        for i in range(len(self.materials)):
-            title_string += str(self.materials[i])
-            if i < len(self.materials) and len(self.materials) > 1:
-                title_string += ", "
+    #     title_string = ""
+    #     for i in range(len(self.materials)):
+    #         title_string += str(self.materials[i])
+    #         if i < len(self.materials) and len(self.materials) > 1:
+    #             title_string += ", "
 
-        ax.set_title(title_string)
+    #     ax.set_title(title_string)
 
-    def prt(self, individual=False, digits=5, **kwargs):
+    def print(self, individual=False, digits=5, **kwargs):
 
         try:
             d = round(self.dens, digits)
@@ -2665,12 +2780,17 @@ class Mixture:
             if len(self.mix) == 0:
                 print("\nNo material unit(s) initiated yet")
 
-    def Compute(self, T=None, P=None, phase=None, **kwargs):
+    def compute(self, T=None, P=None, phase=None, **kwargs):
         """This method initializes a new material instance for each of the
         compontents in the mixture specified by the parameter 'contents' at
         given temperature and pressure and computes the density for each
         component individually and the resulting overall density of the mixture
         according to a specified mixing rule.
+
+        Parameters:
+        T (float, optional): Temperature in K. Defaults to None.
+        P (float, optional): Pressure in Pa. Defaults to None.
+        phase (int, optional): Phase tag. Defaults to None.
         """
         # in case a pressure and/or temperature value has been passed to the
         # construct method, update these properties for the unit cell
@@ -2710,7 +2830,7 @@ class Mixture:
 
         # compute density for different components individually
         for ll in range(len(self.contents)):
-            self.mix[ll].Compute(T=self.temp, P=self.pres, phase=phase, **kwargs)
+            self.mix[ll].compute(T=self.temp, P=self.pres, phase=phase, **kwargs)
 
             # if a unit detects a problem, the force_bisection call is here
             # passed to the next level (from unit to mixture)
@@ -2733,30 +2853,35 @@ class Mixture:
             #                    fractions=self.fractions,
             #                   nmat=len(self.fractions))
 
-            self.dens = 0.0
-            self.dPdrho = 0.0
-            self.alpha = 0.0
-
-            for m in range(len(self.materials)):
-                self.dens += self.weight_fractions[m] / self.densities[m]
-                self.dPdrho += (
-                    self.weight_fractions[m]
-                    / self.mix[m].dPdrho
-                    / self.densities[m] ** 2
-                )
-                self.alpha += (
-                    self.weight_fractions[m] / self.densities[m] * self.mix[m].alpha
-                )
-
-            self.dens = 1.0 / self.dens
-
-            self.dPdrho *= self.dens**2
-            self.dPdrho = 1.0 / self.dPdrho
-
-            # compute mean isothermal bulk modulus
+            # Compute mean properties
+            self.dens = rho_mean(self.densities, self.weight_fractions)
+            self.alpha = alpha_mean(self.densities, self.alphas, self.weight_fractions, dens = self.dens)
+            self.dPdrho = dPdrho_mean(self.densities, self.dPdrhos, self.weight_fractions, dens = self.dens)
             self.K_isoth = self.dPdrho * self.dens
+            # self.dens = 0.0
+            # self.dPdrho = 0.0
+            # self.alpha = 0.0
 
-            self.alpha *= self.dens
+            # for m in range(len(self.materials)):
+            #     self.dens += self.weight_fractions[m] / self.densities[m]
+            #     self.dPdrho += (
+            #         self.weight_fractions[m]
+            #         / self.mix[m].dPdrho
+            #         / self.densities[m] ** 2
+            #     )
+            #     self.alpha += (
+            #         self.weight_fractions[m] / self.densities[m] * self.mix[m].alpha
+            #     )
+
+            # self.dens = 1.0 / self.dens
+
+            # self.dPdrho *= self.dens**2
+            # self.dPdrho = 1.0 / self.dPdrho
+
+            # # compute mean isothermal bulk modulus
+            # self.K_isoth = self.dPdrho * self.dens
+
+            # self.alpha *= self.dens
 
             """
             self.dens, self.alpha, self.dPdrho = eosfort.all_mean(
@@ -2774,9 +2899,7 @@ class Mixture:
         self.fractions = newfractions
 
         # compute mean density of the mixture using an adequate mixing rule
-        self.dens = eosfort.rho_mean(
-            densities=self.densities, fractions=self.fractions, nmat=len(self.fractions)
-        )
+        self.dens = rho_mean(self.densities, self.weight_fractions)
 
         # update mean pressure derivative using an adequate mixing rule
         self.dPdrho = 0.0
@@ -2792,17 +2915,17 @@ class Mixture:
         # compute mean isothermal bulk modulus
         self.K_isoth = self.dPdrho * self.dens
 
-    def Update(self, float: P = None, T=None, d=None, dPdrho=None, **kwargs):
+    def update(self, P=None, T=None, d=None, dPdrho=None, **kwargs):
         """This method updates the material instance of each component of the
         mixture individually and then computes the new mean density in the cell
         without re-initializing any component objects. If no new pressure or
         temperature is passed, nothing will be done. If d and or dPdrho are
         passed the individual d and dPdrho contributions for each material will
         be reconstructed without calling the eos which is more efficient.
-        
+
         Parameters:
         P (float, optional): Pressure in Pa. Defaults to None.
-        T (float, optional): Temperature in K. Defaults to None. 
+        T (float, optional): Temperature in K. Defaults to None.
         d (float, optional): Density in kg per cubic meter. Defaults to None.
         dPdrho (float, optional): Density derivative of pressure. Defaults to None.
 
@@ -2825,7 +2948,7 @@ class Mixture:
 
         # compute density for different components individually
         for ll in range(len(self.contents)):
-            self.mix[ll].Compute(**kwargs)
+            self.mix[ll].compute(**kwargs)
 
             # if a unit detects a problem, the force_bisection call is here
             # passed to the next level (from unit to mixture)
@@ -2839,11 +2962,7 @@ class Mixture:
             self.densities = [mm.dens for mm in self.mix]
 
             # compute mean density of the mixture using an adequate mixing rule
-            self.dens = eosfort.rho_mean(
-                densities=self.densities,
-                fractions=self.fractions,
-                nmat=len(self.fractions),
-            )
+            self.dens = rho_mean(self.densities, self.weight_fractions)
 
             # update mean pressure derivative using an adequate mixing rule
             self.dPdrho = 0.0

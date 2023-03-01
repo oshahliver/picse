@@ -215,8 +215,8 @@ def P_MGD(
         * (eta ** (7.0 / 3.0) - eta ** (5.0 / 3.0))
         * (1.0 + 3.0 / 4.0 * (K0prime - 4.0) * (eta ** (2.0 / 3.0) - 1.0))
     )
-    print("P =", P * 1e-5)
-    print("delta P =", deltaP * 1e-5)
+    # print("P =", P * 1e-5)
+    # print("delta P =", deltaP * 1e-5)
     return P + deltaP
 
 
@@ -883,19 +883,15 @@ def compute(
     whichEOS=None,
     Fe_number=0.0,
     X_H2O=0.0,
-    SiMg=None,
     saturation=False,
     phase=None,
     table=False,
-    eps_H2O=0.0,
-    eps_Al=0.0,
-    x_H=0.0,
     **kwargs,
 ):
     """
     Employs the EOS for the given material and computes the specified
     quantity at a given conditions.
-    
+
     Parameters:
 
     ll (int, optional): The material signature. Defaults to 0.
@@ -904,7 +900,7 @@ def compute(
     d (float, optional): The density in kg/m³. Defaults to None.
 
     Outputs:
-        Tuple[Optional[float], Optional[float], Optional[float], Optional[float], Optional[float], Optional[int], Optional[float], Optional[float], Optional[float]]: 
+        Tuple[Optional[float], Optional[float], Optional[float], Optional[float], Optional[float], Optional[int], Optional[float], Optional[float], Optional[float]]:
         - Element 1: Density. Defaults to None.
         - Element 2: Temperature. Defaults to None.
         - Element 3: Pressure. Defaults to None.
@@ -999,7 +995,7 @@ def compute(
                     X_H2O = hydration.X_H2O_sat(
                         P=P, T=T, Fe_number=Fe_number, phase=phase
                     )
-                    print("X_H2O =", X_H2O)
+                    # print("X_H2O =", X_H2O)
 
                 # extract parameters for the BM eos for the phase at hand
                 # compute K0 using linear dependence on water content in wt% and
@@ -1847,214 +1843,213 @@ def dTdP_ad(
 
     return gamma * T / (1.0 + gamma * stuff[7] * T) / KT
 
+    # def PlotCmap(
+    #     ll=1,
+    #     Tmin=300,
+    #     Tmax=2400,
+    #     Pmin=0,
+    #     Pmax=30,
+    #     res=4,
+    #     params=[0],
+    #     Fe_numbers=[0.0, 25.0],
+    # ):
+    #     """Plots parameter as function of pressure and temperature in a colormap.
+    #     Pressure and temperature ranges are defined via Pmin, Pmax and Tmin, Tmax
+    #     in units of GPa and K. The PT-grid is given by a 2**res x 2**res array.
+    #     """
 
-# def PlotCmap(
-#     ll=1,
-#     Tmin=300,
-#     Tmax=2400,
-#     Pmin=0,
-#     Pmax=30,
-#     res=4,
-#     params=[0],
-#     Fe_numbers=[0.0, 25.0],
-# ):
-#     """Plots parameter as function of pressure and temperature in a colormap.
-#     Pressure and temperature ranges are defined via Pmin, Pmax and Tmin, Tmax
-#     in units of GPa and K. The PT-grid is given by a 2**res x 2**res array.
-#     """
+    #     # Compute grid resolution
+    #     N = 2**res
 
-#     # Compute grid resolution
-#     N = 2**res
+    #     ticklabel_fontsize = 8
+    #     label_fontsize = 10
 
-#     ticklabel_fontsize = 8
-#     label_fontsize = 10
+    #     nxticks = 4
+    #     nyticks = 6
 
-#     nxticks = 4
-#     nyticks = 6
+    #     param_labels = [
+    #         r"$\rho \ [\rm kg /m^3]$",
+    #         "T",
+    #         "P",
+    #         r"$d T/dP_S$",
+    #         r"$d P/d \rho \ [\rm GPa \ m³ /kg]$",
+    #         "phase",
+    #         r"$\rm log(X_{\rm H_2 O}) \ \rm [wt \%]$",
+    #         r"$\alpha_T \ [10^{-5} K^{-1}]$",
+    #         r"$\xi_{\rm Al}$",
+    #     ]
 
-#     param_labels = [
-#         r"$\rho \ [\rm kg /m^3]$",
-#         "T",
-#         "P",
-#         r"$d T/dP_S$",
-#         r"$d P/d \rho \ [\rm GPa \ m³ /kg]$",
-#         "phase",
-#         r"$\rm log(X_{\rm H_2 O}) \ \rm [wt \%]$",
-#         r"$\alpha_T \ [10^{-5} K^{-1}]$",
-#         r"$\xi_{\rm Al}$",
-#     ]
+    #     cmaps = ["rainbow", "viridis", "seismic", "PuOr"]
+    #     params_scalings = [1.0, 1.0, 1.0, 1.0e-9, 1.0, 1.0, 1.0, 1.0e5, 1.0]
+    #     data_lims = [[3000.0, 4200.0], [-2, 1], [0.0, 10.0], [0, 10]]
 
-#     cmaps = ["rainbow", "viridis", "seismic", "PuOr"]
-#     params_scalings = [1.0, 1.0, 1.0, 1.0e-9, 1.0, 1.0, 1.0, 1.0e5, 1.0]
-#     data_lims = [[3000.0, 4200.0], [-2, 1], [0.0, 10.0], [0, 10]]
+    #     border_colors = [
+    #         [0.1, 0, 0],
+    #         [0.2, 0, 0],
+    #         [0.25, 0, 0],
+    #         [0.5, 0, 0],
+    #         # [.6, 0, 0],
+    #         # [.75, 0, 0],
+    #         # [.9, 0, 0],
+    #         [1, 0, 0],
+    #         [1, 0.25, 0],
+    #         [1, 0.5, 0],
+    #         [1, 1, 0],
+    #         [0.75, 0.5, 0],
+    #         # [.75, .25, 0],
+    #         [0.7, 0.3, 0],
+    #         [0.6, 0.4, 0],
+    #         [0.5, 0.5, 0],
+    #         [0, 1, 0],
+    #         [0, 0, 1],
+    #         [1, 1, 1],
+    #     ]
 
-#     border_colors = [
-#         [0.1, 0, 0],
-#         [0.2, 0, 0],
-#         [0.25, 0, 0],
-#         [0.5, 0, 0],
-#         # [.6, 0, 0],
-#         # [.75, 0, 0],
-#         # [.9, 0, 0],
-#         [1, 0, 0],
-#         [1, 0.25, 0],
-#         [1, 0.5, 0],
-#         [1, 1, 0],
-#         [0.75, 0.5, 0],
-#         # [.75, .25, 0],
-#         [0.7, 0.3, 0],
-#         [0.6, 0.4, 0],
-#         [0.5, 0.5, 0],
-#         [0, 1, 0],
-#         [0, 0, 1],
-#         [1, 1, 1],
-#     ]
+    #     border_colors = list(
+    #         reversed(
+    #             [
+    #                 (0.7, 0.2, 0.6),
+    #                 (0.6, 0.4, 1.0),
+    #                 (0.2, 0.4, 1.0),
+    #                 (0.2, 0.6, 0.9),
+    #                 (0.2, 0.8, 0.8),
+    #                 (0.2, 0.8, 0.4),
+    #                 (0.6, 0.8, 0.4),
+    #                 (0.6, 0.6, 0.2),
+    #                 (0.8, 0.4, 0.2),
+    #                 (1.0, 0.2, 0.2),
+    #                 (1.0, 0.5, 0.5),
+    #                 (0.7, 0.7, 0.7),
+    #                 (0.5, 0.5, 0.5),
+    #                 (0.2, 0.2, 0.2),
+    #                 (0.0, 0.0, 0.0),
+    #             ]
+    #         )
+    #     )
 
-#     border_colors = list(
-#         reversed(
-#             [
-#                 (0.7, 0.2, 0.6),
-#                 (0.6, 0.4, 1.0),
-#                 (0.2, 0.4, 1.0),
-#                 (0.2, 0.6, 0.9),
-#                 (0.2, 0.8, 0.8),
-#                 (0.2, 0.8, 0.4),
-#                 (0.6, 0.8, 0.4),
-#                 (0.6, 0.6, 0.2),
-#                 (0.8, 0.4, 0.2),
-#                 (1.0, 0.2, 0.2),
-#                 (1.0, 0.5, 0.5),
-#                 (0.7, 0.7, 0.7),
-#                 (0.5, 0.5, 0.5),
-#                 (0.2, 0.2, 0.2),
-#                 (0.0, 0.0, 0.0),
-#             ]
-#         )
-#     )
+    #     bin_refine_exponent = 4
+    #     n_additional_bins = 2**bin_refine_exponent
+    #     colors = []
 
-#     bin_refine_exponent = 4
-#     n_additional_bins = 2**bin_refine_exponent
-#     colors = []
+    #     xticks = np.linspace(0, N - 1, nxticks)
+    #     yticks = np.linspace(0, N - 1, nyticks)
 
-#     xticks = np.linspace(0, N - 1, nxticks)
-#     yticks = np.linspace(0, N - 1, nyticks)
+    #     xtick_labels = np.linspace(Tmin, Tmax, nxticks, dtype=int)
+    #     ytick_labels = np.linspace(Pmin, Pmax, nyticks, dtype=int)
 
-#     xtick_labels = np.linspace(Tmin, Tmax, nxticks, dtype=int)
-#     ytick_labels = np.linspace(Pmin, Pmax, nyticks, dtype=int)
+    #     for i in range(len(border_colors) - 1):
+    #         colors.append(border_colors[i])
+    #         for r in range(n_additional_bins):
+    #             colors.append(
+    #                 np.asarray(border_colors[i])
+    #                 + (r + 1)
+    #                 / (n_additional_bins + 1)
+    #                 * (np.asarray(border_colors[i + 1]) - np.asarray(border_colors[i]))
+    #             )
 
-#     for i in range(len(border_colors) - 1):
-#         colors.append(border_colors[i])
-#         for r in range(n_additional_bins):
-#             colors.append(
-#                 np.asarray(border_colors[i])
-#                 + (r + 1)
-#                 / (n_additional_bins + 1)
-#                 * (np.asarray(border_colors[i + 1]) - np.asarray(border_colors[i]))
-#             )
+    #     colors.append(border_colors[-1])
 
-#     colors.append(border_colors[-1])
+    #     newcmap = mpl.colors.ListedColormap(colors)
 
-#     newcmap = mpl.colors.ListedColormap(colors)
+    #     cmaps[2] = newcmap
+    #     cmaps = [newcmap, newcmap, newcmap, newcmap]
 
-#     cmaps[2] = newcmap
-#     cmaps = [newcmap, newcmap, newcmap, newcmap]
+    #     x = np.linspace(Tmin, Tmax, N)
+    #     y = np.linspace(Pmin, Pmax, N)
 
-#     x = np.linspace(Tmin, Tmax, N)
-#     y = np.linspace(Pmin, Pmax, N)
+    #     xx, yy = np.meshgrid(x, y)
 
-#     xx, yy = np.meshgrid(x, y)
+    #     zz = np.zeros([len(Fe_numbers), len(params), N, N])
 
-#     zz = np.zeros([len(Fe_numbers), len(params), N, N])
+    #     # Compute data
+    #     for f in range(len(Fe_numbers)):
+    #         for i in range(N):
+    #             for j in range(N):
 
-#     # Compute data
-#     for f in range(len(Fe_numbers)):
-#         for i in range(N):
-#             for j in range(N):
+    #                 eos = Compute(
+    #                     ll=ll,
+    #                     T=x[j],
+    #                     P=y[i] * 1.0e9,
+    #                     saturation=True,
+    #                     Fe_number=Fe_numbers[f],
+    #                 )
 
-#                 eos = Compute(
-#                     ll=ll,
-#                     T=x[j],
-#                     P=y[i] * 1.0e9,
-#                     saturation=True,
-#                     Fe_number=Fe_numbers[f],
-#                 )
+    #                 dat = [eos[p] for p in params]
 
-#                 dat = [eos[p] for p in params]
+    #                 for k in range(len(params)):
+    #                     zz[f][k][i][j] = dat[k] * params_scalings[params[k]]
 
-#                 for k in range(len(params)):
-#                     zz[f][k][i][j] = dat[k] * params_scalings[params[k]]
+    #     nrows = len(params)
+    #     ncols = len(Fe_numbers)
 
-#     nrows = len(params)
-#     ncols = len(Fe_numbers)
+    #     fig = plt.figure(figsize=(10, 8))
+    #     axrows = []
 
-#     fig = plt.figure(figsize=(10, 8))
-#     axrows = []
+    #     i = 0
+    #     for r in range(nrows):
 
-#     i = 0
-#     for r in range(nrows):
+    #         axcols = AxesGrid(
+    #             fig,
+    #             (nrows, 1, r + 1),
+    #             nrows_ncols=(1, ncols),
+    #             axes_pad=0.25,
+    #             share_all=True,
+    #             label_mode="L",
+    #             cbar_mode="edge",
+    #             cbar_location="right",
+    #             cbar_size="7%",
+    #             cbar_pad="10%",
+    #         )
 
-#         axcols = AxesGrid(
-#             fig,
-#             (nrows, 1, r + 1),
-#             nrows_ncols=(1, ncols),
-#             axes_pad=0.25,
-#             share_all=True,
-#             label_mode="L",
-#             cbar_mode="edge",
-#             cbar_location="right",
-#             cbar_size="7%",
-#             cbar_pad="10%",
-#         )
+    #         axrows.append(axcols)
 
-#         axrows.append(axcols)
+    #         for c in range(ncols):
+    #             ax = axcols[c]
+    #             ax.tick_params(right=True, top=True)
+    #             im = ax.imshow(
+    #                 zz[c][r],
+    #                 origin="lower",
+    #                 cmap=cmaps[r],
+    #                 vmin=data_lims[r][0],
+    #                 vmax=data_lims[r][1],
+    #             )
 
-#         for c in range(ncols):
-#             ax = axcols[c]
-#             ax.tick_params(right=True, top=True)
-#             im = ax.imshow(
-#                 zz[c][r],
-#                 origin="lower",
-#                 cmap=cmaps[r],
-#                 vmin=data_lims[r][0],
-#                 vmax=data_lims[r][1],
-#             )
+    #             if r < nrows - 1:
+    #                 ax.tick_params(labelbottom=False)
 
-#             if r < nrows - 1:
-#                 ax.tick_params(labelbottom=False)
+    #             else:
+    #                 ax.set_xlabel(r"$T \ \rm [K]$", fontsize=label_fontsize)
 
-#             else:
-#                 ax.set_xlabel(r"$T \ \rm [K]$", fontsize=label_fontsize)
+    #             if c == 0:
+    #                 ax.set_ylabel(r"$P \ \rm [GPa]$", fontsize=label_fontsize)
 
-#             if c == 0:
-#                 ax.set_ylabel(r"$P \ \rm [GPa]$", fontsize=label_fontsize)
+    #             if r == 0:
+    #                 ax.set_title(
+    #                     r"$\rm {a} \ mol \% \ Fe$".format(a=str(Fe_numbers[c])),
+    #                     fontsize=label_fontsize,
+    #                 )
 
-#             if r == 0:
-#                 ax.set_title(
-#                     r"$\rm {a} \ mol \% \ Fe$".format(a=str(Fe_numbers[c])),
-#                     fontsize=label_fontsize,
-#                 )
+    #         for rax in axcols.cbar_axes:
+    #             rax.colorbar(im)
+    #             rax.tick_params(
+    #                 labelright=True,
+    #                 labelleft=False,
+    #                 left=False,
+    #                 right=True,
+    #                 labelsize=ticklabel_fontsize,
+    #             )
 
-#         for rax in axcols.cbar_axes:
-#             rax.colorbar(im)
-#             rax.tick_params(
-#                 labelright=True,
-#                 labelleft=False,
-#                 left=False,
-#                 right=True,
-#                 labelsize=ticklabel_fontsize,
-#             )
+    #             rax.set_ylabel(param_labels[params[r]], fontsize=label_fontsize)
 
-#             rax.set_ylabel(param_labels[params[r]], fontsize=label_fontsize)
+    #     for r in range(nrows):
+    #         for c in range(ncols):
+    #             ax = axrows[r][c]
 
-#     for r in range(nrows):
-#         for c in range(ncols):
-#             ax = axrows[r][c]
+    #             ax.set_xticks(xticks)
+    #             ax.set_xticklabels(xtick_labels, fontsize=ticklabel_fontsize)
 
-#             ax.set_xticks(xticks)
-#             ax.set_xticklabels(xtick_labels, fontsize=ticklabel_fontsize)
-
-#             ax.set_yticks(yticks)
-#             ax.set_yticklabels(ytick_labels, fontsize=ticklabel_fontsize)
+    #             ax.set_yticks(yticks)
+    #             ax.set_yticklabels(ytick_labels, fontsize=ticklabel_fontsize)
 
     # plt.savefig('/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/XH2O_Ol.pdf',
     #           format='pdf', bbox_inches='tight')
@@ -2391,7 +2386,7 @@ def dTdP_ad(
 #     #to compute the pressure the phase region must be known as it can not
 #     #be determined from the phase diagram which requires a PT point as input
 #     pres_plot = np.array([[Compute(what='pres', ll=ll, T=t, d=iso,
-#                                    phase = phase, P=1.0e9, 
+#                                    phase = phase, P=1.0e9,
 #                                    Fe_number=Fe_number, **kwargs)[0]
 #                         for t in temp] for iso in isochores])
 #     """

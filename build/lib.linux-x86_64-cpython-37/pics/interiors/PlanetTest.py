@@ -73,7 +73,7 @@ from pics.atmos import Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings
-from pics.materials import Material
+from pics.materials import material
 
 # import eosfort
 from pics.utils.plot_tools.plot_tools import plotTools
@@ -530,7 +530,7 @@ class Shell:
             print ('got:', self.fractions)
             """
         # Initiate shell material as mixture using the correct abundances
-        self.mix = Material.Mixture(
+        self.mix = material.Mixture(
             T=self.temp,
             P=self.pres,
             contents=self.contents,
@@ -676,22 +676,22 @@ class Shell:
             else:
                 self.XH2O_Perov = 0.0 * self.X_H2O[2]
 
-            self.XH2O_Per = Material.eta_H2O_Ws(
+            self.XH2O_Per = material.eta_H2O_Ws(
                 xi_H2O_Per=self.xiH2O_Per, FeMg=self.FeMg
             )  # self.mix.mix[0].X_H2O*self.X_H2O[0]
 
             # Compute water content in Perovskite as mole fraction
-            self.xiH2O_Perov = Material.xi_H2O_Perov(
+            self.xiH2O_Perov = material.xi_H2O_Perov(
                 X_H2O_Perov=self.XH2O_Perov, FeMg=self.FeMg, lay=self.layer
             )
 
             # Compute water content in Wuestite as mole fraction
-            self.xiH2O_Ws = Material.xi_H2O_Ws(
+            self.xiH2O_Ws = material.xi_H2O_Ws(
                 X_H2O_Per=self.XH2O_Per, FeMg=self.FeMg, lay=self.layer
             )
 
             # Compute mole fraction of Wuestite
-            self.xiWs = Material.xi_Ws(
+            self.xiWs = material.xi_Ws(
                 SiMg=self.SiMg, FeMg=self.FeMg, xi_H2O_Ws=self.xiH2O_Ws, lay=self.layer
             )
 
@@ -723,12 +723,12 @@ class Shell:
             self.XH2O_Ol = self.mix.mix[0].X_H2O * self.X_H2O[0]
 
             # Compute water content in Olivine as mole fraction
-            self.xiH2O_Ol = Material.xi_H2O_Ol(
+            self.xiH2O_Ol = material.xi_H2O_Ol(
                 X_H2O_Ol=self.XH2O_Ol, FeMg=self.FeMg, lay=self.layer
             )
 
             # Compute mole fraction of Olivine
-            self.xiOl = Material.xi_Ol(
+            self.xiOl = material.xi_Ol(
                 SiMg=self.SiMg, FeMg=self.FeMg, xi_H2O_Ol=self.xiH2O_Ol, lay=self.layer
             )
 
@@ -762,8 +762,8 @@ class Shell:
         # composition is (Mg,Fe)O + (Mg,Fe)SiO3
         elif self.layer == 2:
             # Compute particle mass at given iron content
-            m_wuestite = Material.m_Ws(xi_Fe=self.xiFe_mantle)
-            m_perovskite = Material.m_Perov(xi_Fe=self.xiFe_mantle)
+            m_wuestite = material.m_Ws(xi_Fe=self.xiFe_mantle)
+            m_perovskite = material.m_Perov(xi_Fe=self.xiFe_mantle)
 
             # Compute total amount of moles in the shell
             self.N_tot = self.indigenous_mass / (
@@ -783,8 +783,8 @@ class Shell:
         # composition is (Mg,Fe)2SiO4 + (Mg,Fe)2Si2O6
         elif self.layer == 3:
             # Compute particle mass at given iron content
-            m_enstatite = Material.m_En(xi_Fe=self.xiFe_mantle)
-            m_olivine = Material.m_Ol(xi_Fe=self.xiFe_mantle)
+            m_enstatite = material.m_En(xi_Fe=self.xiFe_mantle)
+            m_olivine = material.m_Ol(xi_Fe=self.xiFe_mantle)
 
             # Compute total amount of moles in the shell
             self.N_tot = self.indigenous_mass / (
@@ -1548,7 +1548,7 @@ class Planet:
         self.Mg_number_is = 0.0
         self.Mg_number_should = Mg_number_should
         self.Si_number_is = 0.0
-        self.Si_number_should = Material.Si_number(SiMg, Mg_number_should)
+        self.Si_number_should = material.Si_number(SiMg, Mg_number_should)
         self.SiMg = SiMg
         self.FeMg_mantle = FeMg_mantle
         self.echo = echo
@@ -1667,12 +1667,12 @@ class Planet:
         # if modelType = 1 compute material fractions in the mantle from
         # the given values for Mg# and Si#
         if self.modelType == 1:
-            xi_per = Material.xi_per(self.SiMg, lay=1)
-            xi_ol = Material.xi_ol(self.SiMg, lay=1)
+            xi_per = material.xi_per(self.SiMg, lay=1)
+            xi_ol = material.xi_ol(self.SiMg, lay=1)
             self.fractions[1] = [xi_per, xi_ol, xi_ol]
 
-            xi_per = Material.xi_per(self.SiMg, lay=2)
-            xi_ol = Material.xi_ol(self.SiMg, lay=2)
+            xi_per = material.xi_per(self.SiMg, lay=2)
+            xi_ol = material.xi_ol(self.SiMg, lay=2)
             self.fractions[2] = [xi_per, xi_ol]
 
             self.contents[1] = [11, 5, 6]
@@ -1716,7 +1716,7 @@ class Planet:
                 else:
                     self.saturation[l].append(False)
 
-            mix = Material.Mixture(
+            mix = material.Mixture(
                 contents=self.contents[l],
                 Fe_number=[FeMg_mantle for ll in range(len(self.contents[l]))],
                 saturation=self.saturation[l],
@@ -1730,7 +1730,7 @@ class Planet:
         # print ('-> completed')
         # initalize core seed for integration
         # print ('generating seed...')
-        self.seed_material = Material.Mixture(
+        self.seed_material = material.Mixture(
             contents=self.contents[0],
             fractions=self.fractions[0],
             P=self.P_center,
@@ -2835,7 +2835,7 @@ class Planet:
             self.X_H2O = [lay.X_H2O for lay in self.layers]
             self.Fe_number = [lay.Fe_number for lay in self.layers]
 
-            self.Mg_number_is = Material.Mg_number(
+            self.Mg_number_is = material.Mg_number(
                 contents=self.contents, layers=self.layers, X_H2O=self.X_H2O
             )
 

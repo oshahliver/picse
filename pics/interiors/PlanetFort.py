@@ -85,7 +85,7 @@ import warnings
 from pics.utils.plot_tools.plot_tools import plotTools
 from pics.utils import fortplanet
 from pics.utils import fortfunctions
-from pics.materials import Material
+from pics.materials import material
 from pics.utils import readPREM
 
 fortplanet.wrapper.load_eos_tables(table_dir="{}/data/EoS_tables/".format("."))
@@ -178,7 +178,7 @@ def convert_X_ice_to_xi_ice(Si_number=None, xi_Fe=None, X_ice=None, contents=[6,
     )
 
     # Compute mole fraction of water at given composition
-    xi = Material.xi(eta=X_ice, m1=m_tilde, m2=mH2O)
+    xi = material.xi(eta=X_ice, m1=m_tilde, m2=mH2O)
 
     return xi
 
@@ -243,7 +243,7 @@ def convert_X_impurity_to_xi_impurity(
     )
 
     # Compute mole fraction of impurity at given composition
-    xi = Material.xi(eta=X, m1=m_tilde, m2=m)
+    xi = material.xi(eta=X, m1=m_tilde, m2=m)
 
     return xi
 
@@ -563,11 +563,11 @@ class Planet:
         self.M_mantle_is = 0.0
 
         try:
-            self.xi_all_core = Material.mat2at_core(
+            self.xi_all_core = material.mat2at_core(
                 xi=self.fractions[1], xiH=self.xi_H_core
             )
 
-            self.X_all_core = Material.at2wt_core(self.xi_all_core)
+            self.X_all_core = material.at2wt_core(self.xi_all_core)
 
         except IndexError:
             self.xi_all_core = None
@@ -1255,13 +1255,13 @@ class Planet:
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
 
         # Update oxygen fugacity
-        self.logfO2 = Material.logfO2(
+        self.logfO2 = material.logfO2(
             self.P_CS, self.xi_all_core[0], self.xi_FeO_mantle
         )
 
     def compute_sulfur_in_mantle(self, **kwargs):
         # Compute mole fraction of sulfur in mantle from S partitioning
-        self.xi_S_mantle = Material.xi_S(self.T_CS, self.P_CS, self.xi_all_core)
+        self.xi_S_mantle = material.xi_S(self.T_CS, self.P_CS, self.xi_all_core)
 
         # Update total sulfur content
         N_mantle = self.xi_FeO_mantle * (mO + mFe)
@@ -1634,10 +1634,10 @@ class Planet:
         # Update mean density of the planet
         self.rho_mean = self.M_surface_is / (4.0 / 3.0 * np.pi * self.R_surface_is**3)
         # Compute mol and wt fractions of the core composition
-        self.xi_all_core = Material.mat2at_core(
+        self.xi_all_core = material.mat2at_core(
             xi=self.fractions[1], xiH=self.xi_H_core
         )
-        self.X_all_core = Material.at2wt_core(self.xi_all_core)
+        self.X_all_core = material.at2wt_core(self.xi_all_core)
         # Compute mol fractions of different oxides in the mantle and the
         # oxygen fugacity of the mantle
         self.update_oxide_fractions()
@@ -1780,9 +1780,9 @@ class Planet:
         X_Si = self.X_all_core[3]
         X_S = self.X_all_core[2]
         X_O = self.X_all_core[4]
-        T_melt_Fe = Material.T_melt_Fe(self.profiles[2], X_Si, X_O, X_S)
-        T_melt_MgSiO3 = Material.T_liquidus_pyrolite(self.profiles[2])
-        T_melt_CaSiO3 = Material.T_melt_MgSiO3(self.profiles[2])
+        T_melt_Fe = material.T_melt_Fe(self.profiles[2], X_Si, X_O, X_S)
+        T_melt_MgSiO3 = material.T_liquidus_pyrolite(self.profiles[2])
+        T_melt_CaSiO3 = material.T_melt_MgSiO3(self.profiles[2])
 
         axis[0][0].plot(
             self.profiles[0] * 1e-3, self.profiles[1], linewidth=lwdth, color=color

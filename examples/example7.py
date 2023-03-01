@@ -6,5 +6,5 @@ mix.compute()
 mix.update(temp=350.0, pres=3e10)
 mix.print()
 
-all_props = eos.compute(ll = 3, pres = 2e10, temp = 300.)
-dens = eos.compute(ll = 3, what = "dens", pres = 2e10, temp = 300.)
+all_props = eos.compute(ll=3, pres=2e10, temp=300.0)
+dens = eos.compute(ll=3, what="dens", pres=2e10, temp=300.0)

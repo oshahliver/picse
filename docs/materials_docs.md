@@ -2,8 +2,6 @@
 
 The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. Note that the actual implementation of the equations of state in the structure code uses pre-generated equation of state tables and table interpolation algorithms to boost performance.
 
-Note: The following examples do not work yet as names of the classes and methods in the source files is not compatible with the naming convention of PICSE. So if you value your sanity stay away from them for the time being...
-
 ## Basic Usage
 
 ### Availbale thermal equations of state
@@ -47,7 +45,7 @@ from pics.materials import material, eos
 mix_specs = {"contents": [3, 5], "fractions": [0.25, 0.75], "temp": 300.0, "pres": 2e10}
 
 # Create instance of Mixture class
-mix = material.Mixture(specs=mix_specs)
+mix = material.Mixture(**mix_specs)
 
 # Compute the mixture properties
 mix.compute()
@@ -86,7 +84,7 @@ Example:
 from pics.meterials import material
 
 mix_specs = {"contents": [3, 5], "fractions": [0.25, 0.75], "temp": 300.0, "pres": 2e10}
-mix = material.Mixture(specs=mix_specs)
+mix = material.Mixture(**mix_specs)
 mix.compute()
 mix.print()
 ```
@@ -157,6 +155,7 @@ print(params)
 Output:
 
 ```pyhton
+# density, temperature, pressure, dTdP_S, dPdrho, phase, x_H2O, alpha_th, x_Al
 (930.1989519862619, 250, 100000000.0, 1.835892480225174e-08, 10031472.1821997, 0, 0.0, 0.00013061068220559486, 0.0)
 
 ```

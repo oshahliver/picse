@@ -53,7 +53,7 @@ from pics.physicalparams import (
     sigmaSB,
     V_ocean_earth,
 )
-from pics.materials import Material
+from pics.materials import material
 from pics.utils import readPREM
 from pics.interiors import PlanetFort
 from pics.runparams import color_list, xi_Fe_mantle_max
@@ -355,7 +355,7 @@ def convert_X_impurity_to_xi_impurity(
     )
 
     # Compute mole fraction of impurity at given composition
-    xi = Material.xi(eta=X, m1=m_tilde, m2=m)
+    xi = material.xi(eta=X, m1=m_tilde, m2=m)
 
     return xi
 
@@ -885,15 +885,15 @@ def create_input():
 
         # check if Si# and Fe# are in allowed range and resample if not
         ocmf = [0.0, inputs[2], inputs[3], inputs[4]]
-        xi = Material.mat2at_core(ocmf, xiH=0.0)
-        T_CS = Material.T_liquidus_pyrolite(inputs[1])
-        fem = Material.Fe_number_mantle(inputs[1], T_CS, xi=xi)
-        sim = Material.Si_number_mantle(inputs[1], T_CS, xi=xi)
+        xi = material.mat2at_core(ocmf, xiH=0.0)
+        T_CS = material.T_liquidus_pyrolite(inputs[1])
+        fem = material.Fe_number_mantle(inputs[1], T_CS, xi=xi)
+        sim = material.Si_number_mantle(inputs[1], T_CS, xi=xi)
 
         margin = 1e-3
 
-        simmin = Material.Si_number_min(1.0 - fem)
-        simmax = Material.Si_number_max(1.0 - fem)
+        simmin = material.Si_number_min(1.0 - fem)
+        simmax = material.Si_number_max(1.0 - fem)
 
         femmin = margin
         femmax = xi_Fe_mantle_max * (1.0 + margin)
@@ -1507,19 +1507,19 @@ def run_sample(
             # print ("\nocmf =", ocmf)
             # print ("pcs =", inputs[i][1]*1e-9)
             icmf = [1.0]
-            xi = Material.mat2at_core(ocmf, xiH=0.0)
+            xi = material.mat2at_core(ocmf, xiH=0.0)
             # print ("xi =", xi)
-            T_CS = Material.T_liquidus_pyrolite(inputs[i][1])
-            fem = Material.Fe_number_mantle(inputs[i][1], T_CS, xi=xi)
-            sim = Material.Si_number_mantle(inputs[i][1], T_CS, xi=xi)
+            T_CS = material.T_liquidus_pyrolite(inputs[i][1])
+            fem = material.Fe_number_mantle(inputs[i][1], T_CS, xi=xi)
+            sim = material.Si_number_mantle(inputs[i][1], T_CS, xi=xi)
             # print ('P_CS, fem, sim =', inputs[i][1]*1e-9, fem, sim)
             Fe_numbers_mantle[i] = fem
             Si_numbers_mantle[i] = sim
             margin = 1e-4
             # oxide_fracs = Material.compute_oxide_fractions(sim, fem)
 
-            simmin = Material.Si_number_min(fem)
-            simmax = Material.Si_number_max(fem)
+            simmin = material.Si_number_min(fem)
+            simmax = material.Si_number_max(fem)
 
             femmin = margin
             femmax = xi_Fe_mantle_max * (1.0 + margin)
@@ -1605,8 +1605,8 @@ def run_sample(
             p = random.random()
             slope = Fe_number_mantle_range[1] - Fe_number_mantle_range[0]
             fem = Fe_number_mantle_range[0] + slope * p
-            simmin = Material.Si_number_min(fem)
-            simmax = Material.Si_number_max(fem)
+            simmin = material.Si_number_min(fem)
+            simmax = material.Si_number_max(fem)
 
             if Si_number_mantle == None:
                 # Sample Si# in mantle within allowed range

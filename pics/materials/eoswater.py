@@ -33,8 +33,8 @@ from pics.materials.phase_transitions_water_Wagner2002 import data_schwager
 
 T_triple = 273.16  # triple point temperature
 P_triple = 611.657  # triple point pressure in Pa
-T_critical = 647.096 # temperature at critical point
-P_critical = 22.064e6 # pressure at critical point
+T_critical = 647.096  # temperature at critical point
+P_critical = 22.064e6  # pressure at critical point
 
 # -----------------------------------------------------------------------------
 # main
@@ -56,12 +56,12 @@ def phase(P=None, T=None, d=None, **kwargs):
 
 
 def get_phase(P, T):
-   
+
     phh = phaseTrans.phaseCheck(p=P, t=T)
     ph = phh
     phase_strings = ["Ih", "Mazevet", "French", "V", "VI", "II", "III", "Wagner"]
     if type(ph) is str:
-        
+
         if ph == "Ih":
             ph = 0
 
@@ -87,8 +87,9 @@ def get_phase(P, T):
             ph = 7
 
     else:
-        phh = phase_strings[ph]   
+        phh = phase_strings[ph]
     return ph, phh
+
 
 def together(T=None, P=None, ph=None):
     """Computes all relevant parameters for eos table"""
@@ -344,7 +345,7 @@ def together(T=None, P=None, ph=None):
 #                 print ('weird value encountered at T=', str(round(T_list[i],2))+' P='+
 #                        str(round(P_list[j]/(10**int(np.log10(P_list[j]))),2))+'e'+
 #                        str(int(np.log10(P_list[j]))),
-#                        ': table=', round(dat_table[i][j],2), 
+#                        ': table=', round(dat_table[i][j],2),
 #                        'analytical=', round(dat_analytical[i][j],2))
 #             """
 
@@ -702,7 +703,6 @@ def together(T=None, P=None, ph=None):
 #     )
 
 
-
 # #plot comparison between iapws, ideal gas and van der waals
 # temp=np.linspace(410.5, 1000, 50)
 # pres_igl=1.0e3
@@ -778,7 +778,7 @@ def together(T=None, P=None, ph=None):
 #     for pres in pres_list:
 #         dens = Mazevet2018EOS.density(P = pres, T = temp)
 #         dens_list.append(dens)
-        
+
 #     plot, = ax1.loglog(dens_list, pres_list, linewidth = lwdth1, zorder = 2,
 #                  color = color_list[ii], linestyle = '--')
 #     #ax1plot_list[0].append(plot)
@@ -799,10 +799,10 @@ def together(T=None, P=None, ph=None):
 #         dsat = iapws.IAPWS95(T = temp, P = psat*1.0e-6).rho
 #         dsat_list.append(dsat)
 #         psat_list.append(psat)
-        
+
 #         if temp > 400:
 #             satcurve_list.append([temp, psat])
-            
+
 #     except NotImplementedError:
 #         pass
 
@@ -810,20 +810,20 @@ def together(T=None, P=None, ph=None):
 #         try:
 #             if pres < 1.0e10:
 #                 dens = iapws.IAPWS95(T = temp, P = pres*1.0e-6).rho
-                
+
 #             else:
 #                 dens = None
 #             dens_list.append(dens)
-            
+
 #         except OverflowError:
 #             pass
-        
+
 #         except TypeError:
 #             pass
 #     #np.sort(pres_list)
-#     #np.sort(np.asarray(dens_list))  
+#     #np.sort(np.asarray(dens_list))
 #     plot, = ax1.plot(dens_list, pres_list, linewidth = lwdth1, zorder = 2,
-#                  color = color_list[ii], linestyle = '-', markersize = 10, 
+#                  color = color_list[ii], linestyle = '-', markersize = 10,
 #                  marker = '', markevery=2)
 #     ax1plot_list[0].append(plot)
 #     ax1label_list[0].append('T = '+str(int(temp))+' K')
@@ -859,19 +859,19 @@ def together(T=None, P=None, ph=None):
 #                                acc = 1.0e-6)
 
 #         state = phaseTrans.phaseCheck(pres, temp)
-        
+
 #         #print ('dens:', dens, 'pres:',  round(pres*1.0e-9,4), 'temp=', temp, state)
 #         if state == 'ice Ih' or state == 'high pressure French':
 #             pass
-        
+
 #         else:
 #             pres = None
-            
+
 #         pres_list[ii].append(pres)
-        
-#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = ':', 
+
+#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = ':',
 #                      color = plot_color, linewidth = lwdth)
-    
+
 #     if ii == 0:
 #         ax2plot_list.append(plot)
 #         ax2label_list.append('Feistel 2006')
@@ -879,15 +879,15 @@ def together(T=None, P=None, ph=None):
 # for i in range(len(posy_list)):
 #     dens = dens_list[i]
 #     dens_str = str(dens)
-#     ax2.text(posx_list[i], posy_list[i], s = dens_str, fontdict = font3)    
+#     ax2.text(posx_list[i], posy_list[i], s = dens_str, fontdict = font3)
 
 # #------------------------------------------------------------------------------
 # #liquid and vapor according to Wagner 2009
-    
+
 # dens_list = [.001, .01, .1, 1, 10, 100, 600, 800, 1000, 1200, 1500, 2000]
 # posx_list = [2.0e4, 2.0e4, 2.0e4, 2.0e4, 2.0e4, 2.0e4, 9.0e2, 6.0e2, 3.6e2,
 #              4.0e2, 1.0e3, 2.0e3]
-# posy_list = [5.0e3, 5.0e4, 5.0e5, 5.0e6, 5.0e7, 5.0e8, 1.0e8, 2.0e8, 3.0e8, 
+# posy_list = [5.0e3, 5.0e4, 5.0e5, 5.0e6, 5.0e7, 5.0e8, 1.0e8, 2.0e8, 3.0e8,
 #              8.0e8, 0.6e10, 2.0e10]
 
 # temp_list = np.logspace(np.log10(273.16), 5, N)
@@ -898,18 +898,18 @@ def together(T=None, P=None, ph=None):
 #     for temp in temp_list:
 #         pres = iapws.IAPWS95(T = temp, rho = dens).P*1.0e6
 #         state = phaseTrans.phaseCheck(pres, temp)
-        
+
 #         if state == 'ice Ih' or state == 'high pressure French':
 #             pres = None
-            
+
 #         pres_list[ii].append(pres)
-        
+
 #     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = '-', label = str(dens),
 #     color = plot_color, linewidth = lwdth)
 #     if ii == 0:
 #         ax2plot_list.append(plot)
 #         ax2label_list.append('Wagner 2009')
-        
+
 # for i in range(len(posy_list)):
 #     dens = dens_list[i]
 #     dens_str = str(dens)
@@ -917,10 +917,10 @@ def together(T=None, P=None, ph=None):
 
 # #------------------------------------------------------------------------------
 # #high pressure regime according to Mazevet 2018
-    
-# dens_list = [1, 10, 100, 600, 800, 1000, 1200, 1500, 2000, 3000, 4000, 6000, 8000, 
+
+# dens_list = [1, 10, 100, 600, 800, 1000, 1200, 1500, 2000, 3000, 4000, 6000, 8000,
 #              10000, 20000]
-# posx_list = [None, None, None, None, None, None, None, None, None, 3.0e3, 3.0e3, 
+# posx_list = [None, None, None, None, None, None, None, None, None, 3.0e3, 3.0e3,
 #              3.0e3, 3.0e3, 3.0e3, 3.0e3]
 # posy_list = [None, None, None, None, None, None, None, None, None, 1.0e11, 2.0e11,
 #              7.1e11, 1.6e12, 3.0e12, 1.5e13]
@@ -933,13 +933,13 @@ def together(T=None, P=None, ph=None):
 #     for temp in temp_list:
 #         pres = Mazevet2018EOS.compute('pres', d = dens, T = temp)
 #         state = phaseTrans.phaseCheck(pres, temp)
-            
+
 #         if not state == 'high pressure Mazevet':
 #             pres = None
-            
+
 #         pres_list[ii].append(pres)
-        
-#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = '--', 
+
+#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = '--',
 #                      color = plot_color, linewidth = lwdth)
 #     if ii == 0:
 #         ax2plot_list.append(plot)
@@ -956,7 +956,7 @@ def together(T=None, P=None, ph=None):
 
 # #------------------------------------------------------------------------------
 # #French 2015
-        
+
 # dens_list = [1420, 1430, 1440, 1450, 1500, 1600, 1800, 2000, 2500, 3000, 4000]
 # posx_list = [150., 100, 50, 30, 20, 20, 20, 20, 300, 300, 300]
 # posy_list = [3.0e8, 3.2e8, 4.0e8, 5.0e8, 1.5e9, 3.0e9, 6.0e9, 1.0e10, 3.5e10,
@@ -971,13 +971,13 @@ def together(T=None, P=None, ph=None):
 #     for temp in temp_list:
 #         pres = French2015EOS.Pressure(d = dens, T = temp)
 #         state = phaseTrans.phaseCheck(pres, temp)
-            
+
 #         if not state == 'high pressure French':
 #             pres = None
-            
+
 #         pres_list[ii].append(pres)
-        
-#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = '-.', 
+
+#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = '-.',
 #                      color = plot_color, linewidth = lwdth)
 #     if ii == 0:
 #         ax2plot_list.append(plot)
@@ -993,7 +993,7 @@ def together(T=None, P=None, ph=None):
 
 # #------------------------------------------------------------------------------
 # #VDW eos for comparison
-        
+
 # dens_list = [0.001, .01, .1, 1, 10, 100]
 # temp_list = np.logspace(2, 5, 20)
 # pres_list = []
@@ -1004,12 +1004,12 @@ def together(T=None, P=None, ph=None):
 #         pres = anfct.P_VDW(d = dens, T = temp, ll=5)
 #         state = phaseTrans.phaseCheck(pres, temp)
 #         if state == 'ice Ih':
-#             pres = None         
-            
+#             pres = None
+
 #         pres_list[ii].append(pres)
 
-#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = 'none', 
-#                      color = plot_color, linewidth = lwdth, marker='s', 
+#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = 'none',
+#                      color = plot_color, linewidth = lwdth, marker='s',
 #                      markersize=3, markevery=1, markerfacecolor='None')
 #     if ii == 0:
 #         ax2plot_list.append(plot)
@@ -1017,7 +1017,7 @@ def together(T=None, P=None, ph=None):
 
 # #------------------------------------------------------------------------------
 # #ideal gas for comparison
-        
+
 # temp_list = np.logspace(2, 5, 21)
 # pres_list = []
 # for dens in dens_list:
@@ -1028,11 +1028,11 @@ def together(T=None, P=None, ph=None):
 #         state = phaseTrans.phaseCheck(pres, temp)
 #         if state == 'ice Ih':
 #             pres = None
-            
+
 #         pres_list[ii].append(pres)
-        
-#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = 'none', 
-#                      color = plot_color, linewidth = lwdth, marker='v', 
+
+#     plot, = ax2.plot(temp_list, pres_list[ii], linestyle = 'none',
+#                      color = plot_color, linewidth = lwdth, marker='v',
 #                      markersize=3, markevery=1)
 #     if ii == 0:
 #         ax2plot_list.append(plot)
@@ -1040,7 +1040,7 @@ def together(T=None, P=None, ph=None):
 
 # #------------------------------------------------------------------------------
 # #phase boundaries
-        
+
 # tosolid_list = phaseTrans.solidLine(log = True, N = 100)
 # tovapor_list = phaseTrans.vaporLine(log = True, N = 100)
 
@@ -1069,7 +1069,7 @@ def together(T=None, P=None, ph=None):
 #     if s == 0:
 #         ax2plot_list.append(sc)
 #         ax2label_list.append('saturation points')
-        
+
 # ax2.text(50., 1.0e8, s = 'solid (ice Ih)', fontdict = font1)
 # ax2.text(50., 1.0e10, s = 'solid (ices VII & X)', fontdict = font1)
 # ax2.text(300., 1.0e8, s = 'liquid', fontdict = font1)
@@ -1082,15 +1082,15 @@ def together(T=None, P=None, ph=None):
 
 # ax2.plot([0., 251.], [2.08e8, 2.086e8], color=phase_color)
 
-# ax2.plot([T_critical, T_critical], [1.0, P_critical], 
+# ax2.plot([T_critical, T_critical], [1.0, P_critical],
 #         [0., T_critical], [P_critical, P_critical],
 #         color = (.8, .8, .8), linestyle = '--', zorder = 1)
 
-# ax2.plot([T_critical, T_critical], [P_critical, 1.2e10], 
+# ax2.plot([T_critical, T_critical], [P_critical, 1.2e10],
 #         [T_critical, 1.0e5], [P_critical, P_critical],
 #         color = (1, .6, .6), linestyle = '--', zorder = 1)
 
-# legend1a = ax1.legend(ax1plot_list[0], ax1label_list[0], loc = 4, 
+# legend1a = ax1.legend(ax1plot_list[0], ax1label_list[0], loc = 4,
 #                       frameon = False)
 
 # ax1.add_artist(legend1a)
@@ -1108,18 +1108,18 @@ def together(T=None, P=None, ph=None):
 
 # ax2.add_artist(legend2)
 
-# #ax2.loglog(tosolid_list[0], tosolid_list[1], color = phase_color, 
-#  #          linestyle = '-', 
+# #ax2.loglog(tosolid_list[0], tosolid_list[1], color = phase_color,
+#  #          linestyle = '-',
 #   #       zorder = 3)
 
-# ax2.plot(tovapor_list[0], tovapor_list[1], color = phase_color, 
-#          linestyle = '-', 
+# ax2.plot(tovapor_list[0], tovapor_list[1], color = phase_color,
+#          linestyle = '-',
 #          zorder = 3)
 
-# ax2.scatter(phaseTrans.T_critical, phaseTrans.P_critical, color = phase_color, 
+# ax2.scatter(phaseTrans.T_critical, phaseTrans.P_critical, color = phase_color,
 #             zorder = 3)
 
-# ax2.scatter(phaseTrans.t_triple_list, phaseTrans.p_triple_list, 
+# ax2.scatter(phaseTrans.t_triple_list, phaseTrans.p_triple_list,
 #             color = phase_color)
 
 # ax1.set_title(r'$\rm H_2 O\ isotherms$', fontdict = font2)
@@ -1157,4 +1157,3 @@ def together(T=None, P=None, ph=None):
 
 # plt.show()
 # fig.savefig('/mnt/c/Users/os18o068/Documents/PHD/Abbildungen/test.png')
-

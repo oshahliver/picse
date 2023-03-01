@@ -64,7 +64,6 @@ pics/interiors/planet_workbench.py
 pics/materials/Choukround2007EOS.py
 pics/materials/Feistel2006EOS.py
 pics/materials/French2015EOS.py
-pics/materials/Material.py
 pics/materials/Mazevet2018EOS.py
 pics/materials/Wagner2002EOS.py
 pics/materials/__init__.py
@@ -75,6 +74,7 @@ pics/materials/eosTablesTest.py
 pics/materials/eosTablesUse.py
 pics/materials/eoswater.py
 pics/materials/hydration.py
+pics/materials/material.py
 pics/materials/phaseCheck.py
 pics/materials/phase_transitions_water_Wagner2002.py
 pics/utils/__init__.py

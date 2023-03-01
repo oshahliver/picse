@@ -11,6 +11,7 @@ import math
 from pics.utils.function_tools import functionTools as ftool
 from pics.utils.function_tools.functionTools import for_recursive
 
+
 class LinearSystem:
     def __init__(
         self, params, data, target=None, param_weights=None, data_weights=None

@@ -58,7 +58,7 @@ import pics.atmos.Atmosphere as Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings
-import pics.materials.Material as Material
+import pics.materials.material as material
 
 # import eosfort
 
@@ -205,7 +205,7 @@ class Shell:
             print("WARNING: invalid material fractions given")
             print("got:", self.fractions)
 
-        self.mix = Material.Mixture(
+        self.mix = material.Mixture(
             T=self.temp,
             P=self.pres,
             contents=self.contents,
@@ -965,7 +965,7 @@ class Planet:
         self.Mg_number_is = 0.0
         self.Mg_number_should = Mg_number_should
         self.Si_number_is = 0.0
-        self.Si_number_should = Material.Si_number(SiMg, Mg_number_should)
+        self.Si_number_should = material.Si_number(SiMg, Mg_number_should)
         self.SiMg = SiMg
         self.echo = echo
         self.M_H2O_should = 0.0
@@ -1034,7 +1034,7 @@ class Planet:
         # if modelType = 1 compute material fractions in the mantle from
         # the given values for Mg# and Si#
         if self.modelType == 1:
-            self.fractions[1] = [Material.xi_per(self.SiMg), Material.xi_ol(self.SiMg)]
+            self.fractions[1] = [material.xi_per(self.SiMg), material.xi_ol(self.SiMg)]
 
             print("setting up mantle fractions for modelType 1")
 
@@ -1057,7 +1057,7 @@ class Planet:
 
         # initalize core seed for integration
         # print ('generating seed...')
-        self.seed_material = Material.Mixture(
+        self.seed_material = material.Mixture(
             contents=self.contents[0], P=self.P_center, T=self.T_center
         )
         self.seed_material.Compute()
@@ -2025,7 +2025,7 @@ class Planet:
                 self.M_H2O_is = layer.indigenous_mass / m_earth
 
         if not self.Mg_number_layer:
-            self.Mg_number_is = Material.Mg_number(
+            self.Mg_number_is = material.Mg_number(
                 contents=self.contents, layers=self.layers, X_H2O=self.X_H2O
             )
 
@@ -2117,7 +2117,7 @@ class Planet:
             self.X_H2O = [lay.X_H2O for lay in self.layers]
             self.Fe_number = [lay.Fe_number for lay in self.layers]
 
-            self.Mg_number_is = Material.Mg_number(
+            self.Mg_number_is = material.Mg_number(
                 contents=self.contents, layers=self.layers, X_H2O=self.X_H2O
             )
 

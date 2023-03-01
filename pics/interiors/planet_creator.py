@@ -27,7 +27,7 @@ from pics.runparams import (
 from pics.utils.calibration_tools.initial_conditions import predict_initials
 from pics.utils.file_tools.internal_data import get_predictor_model
 from pics.utils import fortplanet, fortfunctions
-from pics.materials import Material
+from pics.materials import material
 from pics.physicalparams import (
     material_list_fort,
     material_YMg,
@@ -469,9 +469,9 @@ class Planet:
             self.layer_masses[4] = 100.0
 
         try:
-            self.x_all_core = Material.mat2at_core(xi=self.fractions[1], xiH=0.0)
+            self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
 
-            self.eta_all_core = Material.at2wt_core(self.x_all_core)
+            self.eta_all_core = material.at2wt_core(self.x_all_core)
 
         except IndexError:
             self.x_all_core = None

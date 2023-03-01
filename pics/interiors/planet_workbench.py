@@ -8,7 +8,7 @@ from pics.utils.file_tools import file_manager
 from pics.utils.plot_tools.plot_tools import plot_mr
 from pics.utils.file_tools import internal_data
 from pics.physicalparams import r_earth, m_earth
-from pics.materials.Material import Si_number_max, Si_number_min
+from pics.materials.material import Si_number_max, Si_number_min
 import sys
 import numpy as np
 import pandas as pd
