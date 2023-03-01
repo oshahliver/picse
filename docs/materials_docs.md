@@ -35,7 +35,7 @@ The following list contains all compounds for which an equation of state impleme
 | $\rm \alpha-(Mg,Fe)_2Si_4$            | 012 |   BM3             |                      |                       |            |
 | $\rm \beta-(Mg,Fe)_2Si_4$            | 013 |       BM3         |                      |                       |            |
 | $\rm \gamma-(Mg,Fe)_2Si_4$            | 014 |       BM3         |                      |                       |            |
-| $\rm \post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |            |
+| $\rm post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |            |
 | $\rm SiO_2$            | 016 |                |      MGD                |                       |            |
 | $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |            |
 | $\rm FeSi$            | 018 |                |       MGD               |                       |            |
