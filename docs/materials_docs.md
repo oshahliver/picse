@@ -18,32 +18,32 @@ The ```pics.materials``` lets you play around with different planetary building 
 The following list contains all compounds for which an equation of state implementation is available.
 
 
-| Compound             | ID  | EoS            | Pressure range (GPa) | Temperature range (K) | Literature |
+| Compound             | ID  | EoS            | Pressure range (GPa) | Temperature range (K) | Reference |
 |----------------------|-----|----------------|----------------------|-----------------------|------------|
-| $\rm H_2O$           | 000 | FEF            |                |               | Ref 1      |
-| $\rm Mg_2SiO_4$      | 001 | BM3             |                |               | Ref 2      |
-| $\rm Mg_2Si_2O_6$    | 002 | BM3             |              |               | Ref 3      |
-| $\rm Fe_2SiO_4$      | 003 | BM3        |              |                | Ref 4      |
-| $\rm Fe_2Si_2O_6$    | 004 | BM3  |            |                | Ref 5      |
-| $\rm MgO$            | 005 | MGD               |                      |                       |            |
-| $\rm MgSiO_3$        | 006 | MGD               |                      |                       |            |
-| $\rm FeO$            | 007 | MGD               |                      |                       |            |
-| $\rm FeSiO_3$        | 008 | MGD               |                      |                       |            |
-| $\rm Fe(s)$             | 009 |   Bel             |                      |                       |            |
-| $\rm FeS$            | 010 |      MGD          |                      |                       |            |
-| $\rm Mg(OH)_2$            | 011 |    BM3            |                      |                       |            |
-| $\rm \alpha-(Mg,Fe)_2Si_4$            | 012 |   BM3             |                      |                       |            |
-| $\rm \beta-(Mg,Fe)_2Si_4$            | 013 |       BM3         |                      |                       |            |
-| $\rm \gamma-(Mg,Fe)_2Si_4$            | 014 |       BM3         |                      |                       |            |
-| $\rm post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |            |
-| $\rm SiO_2$            | 016 |        MGD        |                     |                       |            |
-| $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |            |
-| $\rm FeSi$            | 018 |        MGD        |                      |                       |            |
-| $\rm Fe(l)$            | 019 |      Bel          |                      |                       |            |
-| $\rm Fe_3C$            | 020 |       MGD         |                      |                       |            |
+| $\rm H_2O$           | 000 | FEF            |                |               |  [[1]](#1)
+| $\rm Mg_2SiO_4$      | 001 | BM3             |                |               |  [[2]](#2)
+| $\rm Mg_2Si_2O_6$    | 002 | BM3             |              |               | [[2]](#2)
+| $\rm Fe_2SiO_4$      | 003 | BM3        |              |                | [[2]](#2)
+| $\rm Fe_2Si_2O_6$    | 004 | BM3  |            |                | [[2]](#2)
+| $\rm MgO$            | 005 | MGD               |                      |                       |   [[2]](#2)         |
+| $\rm MgSiO_3$        | 006 | MGD               |                      |                       |   [[2]](#2)         |
+| $\rm FeO$            | 007 | MGD               |                      |                       |   [[2]](#2)         |
+| $\rm FeSiO_3$        | 008 | MGD               |                      |                       |    [[2]](#2)        |
+| $\rm Fe(s)$             | 009 |   Bel             |                      |                       |  [[2]](#2)          |
+| $\rm FeS$            | 010 |      MGD          |                      |                       |   [[2]](#2)         |
+| $\rm Mg(OH)_2$            | 011 |    BM3            |                      |                       |     [[1]](#1)       |
+| $\rm \alpha-(Mg,Fe)_2Si_4$            | 012 |   BM3             |                      |                       |    [[1]](#1)        |
+| $\rm \beta-(Mg,Fe)_2Si_4$            | 013 |       BM3         |                      |                       |      [[1]](#1)      |
+| $\rm \gamma-(Mg,Fe)_2Si_4$            | 014 |       BM3         |                      |                       |     [[1]](#1)       |
+| $\rm post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |    [[1]](#1)        |
+| $\rm SiO_2$            | 016 |        MGD        |                     |                       |            |         
+| $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |   -         |
+| $\rm FeSi$            | 018 |        MGD        |                      |                       |            | [[2]](#2)
+| $\rm Fe(l)$            | 019 |      Bel          |                      |                       |            | -
+| $\rm Fe_3C$            | 020 |       MGD         |                      |                       |            | -
 
 
-The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[1]](#1).
+The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[3]](#3).
 
 Example:
 
@@ -261,4 +261,14 @@ Not ready!
 # References
 
 <a id="1">[1]</a> 
+O. Shah, et al. (2021).
+Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation.
+A&A 646, A162
+
+<a id="2">[2]</a> 
+Oliver Shah, et al. (2022).
+Possible Chemical Composition And Interior Structure Models Of Venus Inferred From Numerical Modelling.
+ApJ 926 217
+
+<a id="3">[3]</a> 
 C. Sotin, et al. (2007).
