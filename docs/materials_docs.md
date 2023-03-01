@@ -38,9 +38,9 @@ The following list contains all compounds for which an equation of state impleme
 | $\rm post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |    [[1]](#1)        |
 | $\rm SiO_2$            | 016 |        MGD        |                     |                       |            |         
 | $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |   -         |
-| $\rm FeSi$            | 018 |        MGD        |                      |                       |            | [[2]](#2)
-| $\rm Fe(l)$            | 019 |      Bel          |                      |                       |            | -
-| $\rm Fe_3C$            | 020 |       MGD         |                      |                       |            | -
+| $\rm FeSi$            | 018 |        MGD        |                      |                       |             [[2]](#2) |
+| $\rm Fe(l)$            | 019 |      Bel          |                      |                       |             - |
+| $\rm Fe_3C$            | 020 |       MGD         |                      |                       |             - |
 
 
 The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[3]](#3).
