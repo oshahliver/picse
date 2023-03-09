@@ -91,7 +91,7 @@ contains
 !enddo
 
       do i = 1, n_tables + n_tables_hyd
-         print *, 'loading EoS table file: ', table_dir//file_names(i)
+         print *, 'loading EoS table file: ', file_names(i)
          call load(tables%objects(i), file_name=table_dir//file_names(i))
 !  print *, 'The axes_lengths are:'
 !  print *, tables%objects(i)%axes_lengths

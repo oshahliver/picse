@@ -1,13 +1,13 @@
 from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
+import subprocess
 
-
-PACKAGE_NAME = "pics"
+PACKAGE_NAME = "picse"
 LIB_DIR = "lib"
 SRC_DIR = "lib"
 
 # Generate object files for static linking:
-# TODO: Execute command to compile .f90 files
+subprocess.run(['make', 'static', 'clean'])
 
 # Specify the object files for static linking
 # Must be pre-compiled at this point
@@ -66,7 +66,7 @@ setup(
     packages=find_packages(),
     ext_modules=[ext1, ext2],
     # include_package_data=True,
-    package_dir={"pics": "pics"},
+    package_dir={"picse": "picse"},
     package_data={"": ["*.tab", "*.pkl", "*.csv"]},
     #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',

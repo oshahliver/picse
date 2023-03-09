@@ -4,10 +4,10 @@ surface pressure, and bulk composition. This data set is then used to train a si
 network on to predict the initial conditions for given boundary conditions.
 """
 
-from pics.interiors import planet_workbench
-from pics.physicalparams import m_earth
-from pics.utils.file_tools import internal_data as id
-from pics.utils.plot_tools import plot_tools
+from picse.interiors import planet_workbench
+from picse.physicalparams import m_earth
+from picse.utils.file_tools import internal_data as id
+from picse.utils.plot_tools import plot_tools
 import numpy as np
 
 # Create an instance of the workbench toolkit

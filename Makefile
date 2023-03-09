@@ -35,7 +35,7 @@ wrapper:
 	@mv ./*.so ${TARGETDIR}
 	
 clean:
-	@rm -f *.mod *.o
+	@rm -f ${SRCDIR}/*.mod ${SRCDIR}/*.o
 
 install: static wrapper clean
 	@if(${CONDAPATH}="True");then\

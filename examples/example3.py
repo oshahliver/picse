@@ -2,8 +2,8 @@
 is generated from uniform sampling within specified ranges for some of the planetary parameters
 """
 
-from pics.interiors import planet_workbench
-from pics.physicalparams import m_earth
+from picse.interiors import planet_workbench
+from picse.physicalparams import m_earth
 
 # Create an instance of the workbench toolkit
 # Note. The EoS tables are loaded internally by the workbench

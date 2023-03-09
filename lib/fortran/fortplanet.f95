@@ -478,33 +478,33 @@ contains
    END SUBROUTINE compute_E_int
 
 !#######################################################################
-   SUBROUTINE compute_MOI(self)
+   ! SUBROUTINE compute_MOI(self)
 
-      type(planet), intent(inout) :: self
-      real(8) :: dr, r1, r2, rho1, rho2, moi
-      integer :: i, j
+   !    type(planet), intent(inout) :: self
+   !    real(8) :: dr, r1, r2, rho1, rho2, moi
+   !    integer :: i, j
 
-      self%MOI_is = 2d0/5d0*self%layers(1)%shells(1)%mass* &
-                    self%layers(1)%shells(1)%radius**2
+   !    self%MOI_is = 2d0/5d0*self%layers(1)%shells(1)%mass* &
+   !                  self%layers(1)%shells(1)%radius**2
 
-      do i = 1, self%lay
-         do j = 2, self%layers(i)%shell_count
+   !    do i = 1, self%lay
+   !       do j = 2, self%layers(i)%shell_count
 
-            r1 = self%layers(i)%shells(j - 1)%radius
-            rho1 = self%layers(i)%shells(j - 1)%dens
+   !          r1 = self%layers(i)%shells(j - 1)%radius
+   !          rho1 = self%layers(i)%shells(j - 1)%dens
 
-            r2 = self%layers(i)%shells(j)%radius
-            rho2 = self%layers(i)%shells(j)%dens
+   !          r2 = self%layers(i)%shells(j)%radius
+   !          rho2 = self%layers(i)%shells(j)%dens
 
-            moi = MOI_integrand_linear(r1=r1, r2=r2, rho1=rho1, rho2=rho2)
-            self%MOI_is = self%MOI_is + 8.0d0/3.0d0*PI*moi
+   !          moi = MOI_integrand_linear(r1=r1, r2=r2, rho1=rho1, rho2=rho2)
+   !          self%MOI_is = self%MOI_is + 8.0d0/3.0d0*PI*moi
 
-         end do
-      end do
+   !       end do
+   !    end do
 
-      self%MOI_is = self%MOI_is/(self%M_surface_is*self%R_surface_is**2)
+   !    self%MOI_is = self%MOI_is/(self%M_surface_is*self%R_surface_is**2)
 
-   END SUBROUTINE compute_MOI
+   ! END SUBROUTINE compute_MOI
 
 !#######################################################################
    SUBROUTINE get_profiles(self)

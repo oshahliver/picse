@@ -274,7 +274,6 @@ contains
       n_shells_layers = pl%n_shells_layers
       Si_number_mantle = pl%Si_number_layers(3)
       xi_Fe_mantle = pl%Fe_number_layers(3)
-      
       ! print *, "Si_number_mantle =", Si_number_mantle
       ! print *, "Si_number =", Si_number_is
 

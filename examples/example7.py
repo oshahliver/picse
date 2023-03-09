@@ -1,4 +1,4 @@
-from pics.materials import material, eos
+from picse.materials import material, eos
 
 mix_specs = {"contents": [3, 5], "fractions": [0.25, 0.75], "temp": 300.0, "pres": 2e10}
 mix = material.Mixture(specs=mix_specs)
