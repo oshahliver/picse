@@ -124,7 +124,7 @@ class Toolkit:
                 "ocean_fraction_is": planet.ocean_fraction_is,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_FeS_core,
-                # "E_tot_is": planet.E_tot_is,
+                # "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
 
@@ -139,7 +139,7 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "x_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "E_tot_is": planet.E_tot_is,
+                # "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
 
@@ -153,7 +153,7 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "E_tot_is": planet.E_tot_is,
+                # "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
         try:
@@ -330,7 +330,7 @@ class Toolkit:
             if w == "M_surface" or w == "M_ocean":
                 planet.initials[w + "_should"] = specs["val_should"][i] / m_earth
 
-            elif w == "E_tot":
+            elif w == "ener_tot":
                 planet.initials[w + "_should"] = specs["val_should"][i] / (
                     G * m_earth ** 2 / r_earth * 3 / 5
                 )
@@ -496,7 +496,7 @@ class Toolkit:
                     or specs["what"][i] == "M_surface"
                     or specs["what"][i] == "M_ocean"
                     or specs["what"][i] == "ocean_frac"
-                    or specs["what"][i] == "E_tot"
+                    or specs["what"][i] == "ener_tot"
                     or specs["what"][i] == "L_int"
                 ):
                     # State dependency of target on probed parameter

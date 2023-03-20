@@ -20,7 +20,7 @@ MODULE class_shell
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
       real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv
-      real(8) :: omega, dE_grav, dr, dE_int, ener_grav, ener_int
+      real(8) :: omega, dr, indigenous_ener_grav, indigenous_ener_int
       real(8), dimension(3) :: external_temp_profile
       real(8), dimension(n_params_integration) :: gradients
       character(len=30) :: status = 'bare'
@@ -53,7 +53,6 @@ contains
       integer :: i
       real(8), dimension(3), optional :: external_temp_profile
 
-!~ print *, '        init shell'
       if (present(external_temp_profile)) then
          self%external_temp_profile = external_temp_profile
 
@@ -62,10 +61,8 @@ contains
       end if
 
       if (present(alloc)) then
-!~ print *, 'present'
          alloc_dummy = alloc
       else
-!~ print *, 'not present'
          alloc_dummy = .true.
       end if
 
@@ -82,7 +79,7 @@ contains
       end if
 
       if (alloc_dummy) then
-!~ print *, 'allocating shell'
+
          if (.not. allocated(self%contents)) then
             allocate (self%contents(n_mats))
          end if
@@ -143,16 +140,19 @@ contains
          self%lay = lay
          self%eps_T_zero = eps_T_zero
          self%adiabatType = adiabatType
-         self%indigenous_mass = 0.0d0
+         self%indigenous_mass = 0d0
          self%eps_Al = eps_Al
          self%eps_H2O = eps_H2O
          self%Fe_number = Fe_number
          self%Si_number = Si_number
          self%MOI = MOI
          self%volume = 0d0
-         self%timer = 0.0
+         self%timer = 0d0
          self%xi_Stv = xi_Stv
          self%dr = 0d0
+         self%indigenous_ener_grav = 0d0
+         self%indigenous_ener_int = 0d0
+         
 
          do i = 1, n_mats
             self%YO(i) = material_YO(self%contents(i))
@@ -176,7 +176,6 @@ contains
 
 !call get_shell_abundances(self=self)
 !~ print *, 'fractions before init_mixture =', fractions
-!~ print *, '        check 0'
          call init_mixture(self=self%mixture, contents=contents, &
                            fractions=fractions, n_mats=n_mats, T=T, P=P, eps_H2O=eps_H2O, &
                            eps_Al=eps_Al, Si_number=self%Si_number, Fe_number=self%Fe_number, &
@@ -189,7 +188,6 @@ contains
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
 !print *, '        wt in shell =', self%weight_fractions(:)
-!print *, '        check 1'
 !Compute ambient density
 !Note that the fractions at T=300 K and T=1.0d4 Pa would be in general
 !different but we want to know the ambient conditions of the given shell
@@ -235,7 +233,6 @@ contains
 !update all parameters. Just reset all parameters to their original
 !values.
       else
-!~ print *, 'not allocating shell'
          self%radius = self%initials%real_vals(1)
          self%temp = self%initials%real_vals(2)
          self%mass = self%initials%real_vals(3)
@@ -267,6 +264,8 @@ contains
          self%N_Al = 0.0d0
          self%N_S = 0.0d0
          self%N_H = 0d0 !This counts the hydrogen of hydrated substances (e.g. FeH)
+         self%indigenous_ener_grav = 0d0
+         self%indigenous_ener_int = 0d0
 
       end if
 
@@ -419,6 +418,8 @@ contains
       y(4) = self%dens
       y(5) = self%MOI
       y(6) = self%weight_fractions(n_mats)
+      y(7) = self%indigenous_ener_grav
+      y(8) = self%indigenous_ener_int
 
       call gradients(grads=self%gradients, &
                      r=self%radius, &
@@ -498,8 +499,6 @@ contains
       end if
 
       call get_shell_contents(self=self)
-      call compute_dE_grav(self=self)
-      call compute_dE_int(self=self)
 
       self%gravity = G*self%mass/self%radius**2
 
@@ -521,49 +520,6 @@ contains
       print *, 'gradients:', self%gradients
 
    END SUBROUTINE print_shell
-
-!#######################################################################
-   SUBROUTINE compute_dE_int(self)
-
-      type(shell), intent(inout) :: self
-
-!Core
-      if (self%lay < 3) then
-         self%dE_int = self%indigenous_mass*self%temp*5d2
-!Mantle
-      elseif (self%lay > 2 .and. self%lay > 5) then
-         self%dE_int = self%indigenous_mass*self%temp*1d3
-
-!Hydrosphere
-      else
-         self%dE_int = self%indigenous_mass*self%temp*5d3
-      end if
-
-   END SUBROUTINE compute_dE_int
-
-!#######################################################################
-   SUBROUTINE compute_dE_grav(self)
-!Computes gravitational energy contribution of each shell approximating the
-!dnesity as a linear function between the bottom and the top of each shell.
-!The total gravitational energy of the planet is obtained by summing up
-!all contributions of the individual shells.
-
-      type(shell), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, k
-      integer :: i, j
-
-      self%dE_grav = 0d0
-
-      rho1 = self%dens
-      r = self%radius
-      dr = self%dr
-
-      dU = rho1**2*r**4*dr
-      self%dE_grav = dU
-
-      self%dE_grav = self%dE_grav*3*G*(4*PI/3)**2
-
-   END SUBROUTINE compute_dE_grav
 
 !#######################################################################
    SUBROUTINE reset_shell(self)
@@ -611,6 +567,9 @@ contains
          else
             params(6) = 0d0
          end if
+         
+         params(7) = 0d0!self%indigenous_ener_grav
+         params(8) = 0d0!self%indigenous_ener_int
 
          r_dummy = self%radius
 !~ print *, 'contents =', self%contents
@@ -644,6 +603,8 @@ contains
                           external_temp_profile=self%external_temp_profile)
 
          self%indigenous_mass = params_dummy(2) - params(2)
+         ! self%indigenous_ener_grav = params_dummy(7) - params(7)
+         ! self%indigenous_ener_int = params_dummy(8) - params(8)
          params = params_dummy
 
          self%pres = params(1)
@@ -651,9 +612,11 @@ contains
          self%temp = params(3)
          self%dens = params(4)
          self%MOI = params(5)
-         self%ener_grav = params(7)
-         self%ener_int = params(8)
+         self%indigenous_ener_grav = params(7)
+         self%indigenous_ener_int = params(8)
+         
          print *, ""
+         print *, "mass =", params(2)
          print *, "ener grav =", params(7)
          print *, "ener int =", params(8)
          self%dr = dr

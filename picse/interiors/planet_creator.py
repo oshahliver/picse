@@ -699,8 +699,9 @@ class Planet:
         self.update_layers(self.layer_properties_dummy)
         self.trim_profiles()
         
-        self.ener_grav_is = self.profiles[7][-1]
-        self.ener_int_is = self.profiles[8][-1]
+        self.ener_grav = self.profiles[7][-1]
+        self.ener_int = self.profiles[8][-1]
+        self.ener_tot_is = self.ener_grav + self.ener_int
         self.luminosity = (self.R_surface_is/ r_earth)**2 * (self.T_surface_is / 300)**4
         self.status = "very much alive"
 
@@ -731,7 +732,7 @@ class Planet:
         self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is ** 2)
 
         # normalize gravitational energy
-        self.profiles[7]  *= 1 / (-3/5 * G * m_earth**2 / r_earth)
+        self.profiles[7]  *= 1 / (3/5 * G * m_earth**2 / r_earth)
         # normalize internal energy
         self.profiles[8]  *= 1 / (3/5 * G * m_earth**2 / r_earth)
 

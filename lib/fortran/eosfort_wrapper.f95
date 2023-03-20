@@ -284,7 +284,7 @@ contains
 ! outer_core_exists = pl%outer_core_exists
 
 !~ print *, 'eosfort_wrapper: integrated up to layer ', pl%lay
-print *, 'out_frac before update in eosfort_wrapper =', out_frac(2,:)
+! print *, 'out_frac before update in eosfort_wrapper =', out_frac(2,:)
 
 ! Update layer fractions in case composition changed
       do i = 1, pl%lay

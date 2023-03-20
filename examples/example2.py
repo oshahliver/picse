@@ -23,8 +23,8 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.0,  # desired total mass (in earth masses)
-    "T_surface_should": 300.0,  # desired surface temperature (in kelvin)
+    "M_surface_should": 1.2,  # desired total mass (in earth masses)
+    "T_surface_should": 320,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
     "Mg_number_should": 0.5,  # desired bulk magnesium number
     "Fe_number_mantle": 0.0,  # iron number of the silicates
@@ -92,12 +92,12 @@ pl.print()
 # print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
 
 # # # Plot the radial P, T, M, and rho profiles
-# file_path = os.getcwd()
-# pl.plot(
-#     file_name="structure_profiles",
-#     file_path=file_path,
-#     write_html=True,
-#     display=True,
-#     write_image=True,
-#     image_extension="pdf",
-# )
+file_path = os.getcwd()
+pl.plot(
+    file_name="structure_profiles",
+    file_path=file_path,
+    write_html=True,
+    display=True,
+    write_image=True,
+    image_extension="pdf",
+)

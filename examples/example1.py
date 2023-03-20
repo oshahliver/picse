@@ -44,7 +44,9 @@ iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 
 # Check convergence
 pl.check_convergence()
-print(pl.converged)
+
+if pl.converged:
+    print ("Planet converged properly.")
 #######################################################################
 # Model inspection
 #######################################################################

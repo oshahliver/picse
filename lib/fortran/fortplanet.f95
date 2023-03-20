@@ -23,7 +23,7 @@ MODULE class_planet
                  Si_number_is, Si_number_should, R_seed, eps_r, M_ocean_is, M_ocean_should, &
                  M_H2O_is, M_H2O_should, M_DWR_is, constraint_value_is, N_Fe, N_Mg, N_Si, &
                  N_H2O, N_Al, N_O, constraint_value_should, eps_layer, eps_Al, eps_H2O, &
-                 N_H, N_S, T_center_is, P_center_is, xi_H_core_predicted
+                 N_H, N_S, T_center_is, P_center_is, xi_H_core_predicted, ener_grav, ener_int
       integer :: tempType, rhoType, adiabatType, layerType, subphase_res
       real(8) :: inner_core_fraction, MOI_is, omega, P_H2, xi_H_core, &
                  eps_T_zero, ocean_frac_should, ocean_frac_is, gravity, &
@@ -376,6 +376,9 @@ contains
       M_seed = 4.0d0/3.0d0*PI*R_seed**3*seed_mixture%dens
       self%MOI_is = 2d0/5d0*M_seed*R_seed**2
 
+      self%ener_grav = 5/3 * G * M_seed**2 / R_seed
+      self%ener_int = 1d7 * M_seed
+
       do i = 1, self%lay
 
          call init_layer(self=self%layers(i), &
@@ -436,48 +439,6 @@ contains
    END SUBROUTINE get_integration_time
 
 !#######################################################################
-   SUBROUTINE compute_E_grav(self)
-!Computes gravitational energy contribution of each shell approximating the
-!dnesity as a linear function between the bottom and the top of each shell.
-!The total gravitational energy of the planet is obtained by summing up
-!all contributions of the individual shells.
-
-      type(planet), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, ks
-      integer :: i, j
-
-      self%E_grav = 0d0
-
-!Iterate over all layers
-      do i = 1, self%lay
-         !Iterate over individual shells within a layer
-         do j = 1, self%layers(i)%shell_count
-            self%E_grav = self%E_grav + self%layers(i)%shells(j)%dE_grav
-         end do
-      end do
-
-   END SUBROUTINE compute_E_grav
-
-!#######################################################################
-   SUBROUTINE compute_E_int(self)
-
-      type(planet), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, ks
-      integer :: i, j
-
-      self%E_int = 0d0
-
-!Iterate over all layers
-      do i = 1, self%lay
-         !Iterate over individual shells within a layer
-         do j = 1, self%layers(i)%shell_count
-            self%E_int = self%E_int + self%layers(i)%shells(j)%dE_int
-         end do
-      end do
-
-   END SUBROUTINE compute_E_int
-
-!#######################################################################
    SUBROUTINE get_profiles(self)
 
       type(planet), intent(inout) :: self
@@ -528,8 +489,14 @@ contains
             self%profiles(5, n) = self%layers(i)%shells(j)%mass
             self%profiles(6, n) = self%layers(i)%shells(j)%gravity
             self%profiles(7, n) = self%layers(i)%shells(j)%MOI
-            self%profiles(8, n) = self%layers(i)%shells(j)%ener_grav
-            self%profiles(9, n) = self%layers(i)%shells(j)%ener_int
+            self%profiles(8, n) = self%layers(i)%shells(j)%indigenous_ener_grav
+            self%profiles(9, n) = self%layers(i)%shells(j)%indigenous_ener_int
+            
+            ! Add seed contribution to cumulative parameters
+            if(n == 1) then
+               self%profiles(8, n) = self%profiles(8, n) + self%ener_grav
+               self%profiles(8, n) = self%profiles(9, n) + self%ener_int
+            endif
             
             ! Add up layer contributions for cumulative parameters
             if (n > 1) then
@@ -540,6 +507,8 @@ contains
             n = n + 1
          end do
       end do
+
+
    END SUBROUTINE get_profiles
 
 !#######################################################################
