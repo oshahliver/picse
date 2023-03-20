@@ -20,7 +20,7 @@ MODULE class_shell
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
       real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv
-      real(8) :: omega, dE_grav, dr, dE_int
+      real(8) :: omega, dE_grav, dr, dE_int, ener_grav, ener_int
       real(8), dimension(3) :: external_temp_profile
       real(8), dimension(n_params_integration) :: gradients
       character(len=30) :: status = 'bare'
@@ -651,6 +651,11 @@ contains
          self%temp = params(3)
          self%dens = params(4)
          self%MOI = params(5)
+         self%ener_grav = params(7)
+         self%ener_int = params(8)
+         print *, ""
+         print *, "ener grav =", params(7)
+         print *, "ener int =", params(8)
          self%dr = dr
 
 !~ print *, 'fractions =', self%fractions

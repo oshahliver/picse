@@ -52,13 +52,13 @@ print(pl.converged)
 # print fundamental planeatary properties to standard output
 pl.print()
 
-# Plot the radial P, T, M, and rho profiles
-# file_path = os.getcwd()
-# pl.plot(
-#     file_name="structure_profiles",
-#     file_path=file_path,
-#     write_html=True,
-#     display=True,
-#     write_image=True,
-#     image_extension="pdf",
-# )
+# Plot the radial profiles
+file_path = os.getcwd()
+pl.plot(
+    file_name="structure_profiles",
+    file_path=file_path,
+    write_html=True,
+    display=True,
+    write_image=True,
+    image_extension="pdf",
+)

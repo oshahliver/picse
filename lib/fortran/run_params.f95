@@ -13,7 +13,7 @@ MODULE run_params
    integer, parameter :: n_shells_max_planet = 5000
 
 !Number of integration parameters
-   integer, parameter :: n_params_integration = 6
+   integer, parameter :: n_params_integration = 8
 
 !Zero temperature for layertransition
    real(8) :: T_zero = -1d4

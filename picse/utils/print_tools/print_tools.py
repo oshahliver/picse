@@ -35,12 +35,12 @@ def print_planet(self, style=0, digits=3):
                 round(self.P_surface_should * 1.0e-5, digits),
                 "\nP_center [GPa]:",
                 round(self.P_center * 1.0e-9, digits),
-                "\nMOI factor:",
+                "\n\nMOI factor:",
                 round(
                     self.moment_of_inertia_is,
                     digits,
                 ),
-                "\n\nMg_number_should:",
+                "\nMg_number_should:",
                 round(self.Mg_number_should, digits),
                 "\nMg_number_is:",
                 round(self.Mg_number_is, digits),
@@ -48,6 +48,12 @@ def print_planet(self, style=0, digits=3):
                 # round(self.Si_number_should, digits),
                 "\nSi_number_is:",
                 round(self.Si_number_is, digits),
+                "\nener_grav_is:",
+                round(self.ener_grav_is, digits),
+                "\nener_int_is:",
+                round(self.ener_int_is, digits),
+                "\nluminosity:",
+                round(self.luminosity, digits),
             )
 
             try:

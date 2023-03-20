@@ -691,7 +691,6 @@ class Planet:
         self.initials = dict([key, self.__dict__[key]] for key in fortplanet_input_keys)
 
         # fortran wrapper is called here
-        # output = test_interface.interface.do_some_science_stuff(**kwargs)
         output = fortplanet.wrapper.create_planet(**kwargs)
         # update planetary output parameters
         for key, value in zip(fortplanet_output_keys, output):
@@ -699,7 +698,10 @@ class Planet:
 
         self.update_layers(self.layer_properties_dummy)
         self.trim_profiles()
-
+        
+        self.ener_grav_is = self.profiles[7][-1]
+        self.ener_int_is = self.profiles[8][-1]
+        self.luminosity = (self.R_surface_is/ r_earth)**2 * (self.T_surface_is / 300)**4
         self.status = "very much alive"
 
     def trim_profiles(self):
@@ -727,6 +729,11 @@ class Planet:
 
         # normalize moi
         self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is ** 2)
+
+        # normalize gravitational energy
+        self.profiles[7]  *= 1 / (-3/5 * G * m_earth**2 / r_earth)
+        # normalize internal energy
+        self.profiles[8]  *= 1 / (3/5 * G * m_earth**2 / r_earth)
 
     def plot(
         self,

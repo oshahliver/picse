@@ -72,5 +72,4 @@ setup(
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
 
-
 subprocess.run(["make", "clean"])

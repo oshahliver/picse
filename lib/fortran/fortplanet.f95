@@ -478,35 +478,6 @@ contains
    END SUBROUTINE compute_E_int
 
 !#######################################################################
-   ! SUBROUTINE compute_MOI(self)
-
-   !    type(planet), intent(inout) :: self
-   !    real(8) :: dr, r1, r2, rho1, rho2, moi
-   !    integer :: i, j
-
-   !    self%MOI_is = 2d0/5d0*self%layers(1)%shells(1)%mass* &
-   !                  self%layers(1)%shells(1)%radius**2
-
-   !    do i = 1, self%lay
-   !       do j = 2, self%layers(i)%shell_count
-
-   !          r1 = self%layers(i)%shells(j - 1)%radius
-   !          rho1 = self%layers(i)%shells(j - 1)%dens
-
-   !          r2 = self%layers(i)%shells(j)%radius
-   !          rho2 = self%layers(i)%shells(j)%dens
-
-   !          moi = MOI_integrand_linear(r1=r1, r2=r2, rho1=rho1, rho2=rho2)
-   !          self%MOI_is = self%MOI_is + 8.0d0/3.0d0*PI*moi
-
-   !       end do
-   !    end do
-
-   !    self%MOI_is = self%MOI_is/(self%M_surface_is*self%R_surface_is**2)
-
-   ! END SUBROUTINE compute_MOI
-
-!#######################################################################
    SUBROUTINE get_profiles(self)
 
       type(planet), intent(inout) :: self
@@ -525,7 +496,7 @@ contains
       end do
 
       if (.not. allocated(self%profiles)) then
-         allocate (self%profiles(8, n))
+         allocate (self%profiles(9, n))
       end if
 
       n = 1
@@ -545,6 +516,7 @@ contains
             self%profiles(6, n) = grav
             self%profiles(7, n) = self%layers(i)%shells(1)%initials%real_vals(16)
             self%profiles(8, n) = self%profiles(8, n - 1)
+            self%profiles(9, n) = self%profiles(9, n - 1)
             n = n + 1
          end if
 
@@ -556,10 +528,13 @@ contains
             self%profiles(5, n) = self%layers(i)%shells(j)%mass
             self%profiles(6, n) = self%layers(i)%shells(j)%gravity
             self%profiles(7, n) = self%layers(i)%shells(j)%MOI
-            self%profiles(8, n) = self%layers(i)%shells(j)%dE_grav
-
-            if (N > 1) then
+            self%profiles(8, n) = self%layers(i)%shells(j)%ener_grav
+            self%profiles(9, n) = self%layers(i)%shells(j)%ener_int
+            
+            ! Add up layer contributions for cumulative parameters
+            if (n > 1) then
                self%profiles(8, n) = self%profiles(8, n) + self%profiles(8, n - 1)
+               self%profiles(9, n) = self%profiles(9, n) + self%profiles(9, n - 1)
             end if
 
             n = n + 1
@@ -1650,7 +1625,7 @@ contains
 
          self%rho_mean = self%M_surface_is/(4.0d0/3.0d0*PI*self%R_surface_is**3)
          self%gravity = self%M_surface_is/self%R_surface_is**2*G
-
+       
          !If planet has five layers, by convention, the last one is the surface ocean
          !Update the total ocean mass fraction in log
          if (self%lay == 5) then

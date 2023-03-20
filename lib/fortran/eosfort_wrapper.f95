@@ -160,7 +160,7 @@ contains
       real(8), intent(out), dimension(10, 10) :: out_frac
       real(8), intent(out), dimension(size(layer_dims), 6) :: layer_properties
       integer, dimension(size(layer_dims)), intent(out) :: n_shells_layers
-      real(8), dimension(8, 1000), intent(out) :: profiles
+      real(8), dimension(9, 1000), intent(out) :: profiles
 
       logical, intent(out) :: mantle_exists
       logical, intent(out) :: outer_core_exists
@@ -246,10 +246,10 @@ contains
       
       call construct_planet(self=pl)
       call get_profiles(self=pl)
-      call compute_E_grav(self=pl)
-      call compute_E_int(self=pl)
+      ! call compute_E_grav(self=pl)
+      ! call compute_E_int(self=pl)
 
-      do i = 1, 8
+      do i = 1, 9
          do j = 1, pl%n_shells + pl%lay - 1
             profiles(i, j) = pl%profiles(i, j)
          end do
@@ -274,6 +274,8 @@ contains
       n_shells_layers = pl%n_shells_layers
       Si_number_mantle = pl%Si_number_layers(3)
       xi_Fe_mantle = pl%Fe_number_layers(3)
+
+
       ! print *, "Si_number_mantle =", Si_number_mantle
       ! print *, "Si_number =", Si_number_is
 
@@ -282,7 +284,7 @@ contains
 ! outer_core_exists = pl%outer_core_exists
 
 !~ print *, 'eosfort_wrapper: integrated up to layer ', pl%lay
-!~ print *, 'out_frac before update in eosfort_wrapper =', out_frac(2,:)
+print *, 'out_frac before update in eosfort_wrapper =', out_frac(2,:)
 
 ! Update layer fractions in case composition changed
       do i = 1, pl%lay
@@ -293,7 +295,7 @@ contains
          end if
       end do
 
-! !~ print*, 'out fracs in eosfort_wrapper =', out_frac(3,:)
+! print*, 'out fracs in eosfort_wrapper =', out_frac(3,:)
 
 ! Update layer properties
       do i = 1, n_layers
