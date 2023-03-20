@@ -1,19 +1,19 @@
 ![](assets/chapter_hydro.png)
 
-# The PICS Project
+# The PICSE Project
 
 ## General Information
 
 The PICSE ("pic-see") project (Planetary Interior Compositions, Structures, and Evolution) is based on the planetary structure code I developed during my joint PhD program at the University of Bern and the University of Zürich. The general objective of the project is to provide ready-to-use tools for generating interior models of terrestrial and water-rich planets and moons. These tools can help us to bridge persisting gaps between observations and theory in the context of classification and characterization of exoplanets and solar system bodies.
 
-PICS generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. Each layer is described as a multi-component chemical system that is modelled using adequate thermal equations of state and simple mixing laws. For more information about the physics of the model see [[1],[2]](#1).
+PICSE generates static, multi-layered structure and composition models of the interiors of terrestrial planets and water-worlds under the assumption of hydrostatic equilibrium and adiabatic thermal gradients. Each layer is described as a multi-component chemical system that is modelled using adequate thermal equations of state and simple mixing laws. For more information about the physics of the model see [[1],[2]](#1).
 
 ## Installation
 
 Clone the git repository to a local directory via:
 
 ```
-git clone https://github.com/oshahliver/PICS.git
+git clone https://github.com/oshahliver/picse.git
 ```
 
 Navigate to the project root. The package can be installed from the `setup.py` file as:
@@ -30,7 +30,7 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 
 ### Understanding the model
 
-The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
+The current version of the PICSE code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
 | Parameter                             | Calibration Range     |
 | ------------------------------------- | --------------------- |

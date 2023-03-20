@@ -1,16 +1,14 @@
-# Documentation for the ```pics``` package
+# Documentation for the `picse` package
 
 ## Basic Usage
 
-Bla bla
+### Interiors
 
-# Interiors
+For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
 
- For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
+### Single Planets
 
-## Single Planets
-
-To set up a simple planetary model import the ```planet_creator```, for handling of the planetary objects and their properties, and the ```planet_iterator```, for handling of the boundary conditions (For more details, see [interiors](.interiors_docs.md).).
+To set up a simple planetary model import the `planet_creator`, for handling of the planetary objects and their properties, and the `planet_iterator`, for handling of the boundary conditions (For more details, see [interiors](.interiors_docs.md).).
 
 ```python
 from pics.interiors import planet_iterator, planet_creator
@@ -19,7 +17,7 @@ from pics.interiors import planet_iterator, planet_creator
 Next, load the EoS tables into memory for subsequent use during the structure integration. If you forget this step, you'll most likely encounter a segmentation fault. (For more details, see [materials](.materials_docs.md).)
 
 ```python
-planet_creator.load_eos_tables() 
+planet_creator.load_eos_tables()
 ```
 
 Create an instance of the iterator toolkit that takes care of matching the boundary conditions of your planets.
@@ -28,19 +26,20 @@ Create an instance of the iterator toolkit that takes care of matching the bound
 iterator = planet_iterator.Toolkit()
 ```
 
-Initialize a planetary object of a certain base type (only ```TelluricPlanet``` and ```AquaPlanet``` supported so far). If no planetary properties are passed via the ```planetary_params``` argument, default values will be used.
+Initialize a planetary object of a certain base type (only `TelluricPlanet` and `AquaPlanet` supported so far). If no planetary properties are passed via the `planetary_params` argument, default values will be used.
 
 ```python
 planet_specs = dict(M_surface_should = 1.0, T_surface_should = 300.0)
 pl = planet_creator.TelluricPlanet(planetary_params = planet_specs)
 ```
+
 Perform initial structure integration.
 
 ```python
 pl.construct()
 ```
 
-Pass the planet instance to the iterator to match the boundary conditions with the desired precision. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the ```iterator_specs``` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following will iteratively adjust the central values of the pressure and temperature using a simple multi-linear predictor to match the boundary conditions with relative accuracies of 1%:
+Pass the planet instance to the iterator to match the boundary conditions with the desired precision. Planetary objects that are passed to the iterator must be constructed. If no iterator specifications are passed via the `iterator_specs` argument, a default strategy for matching the boundary conditions will be employed for the corresponding base type. The following will iteratively adjust the central values of the pressure and temperature using a simple multi-linear predictor to match the boundary conditions with relative accuracies of 1%:
 
 ```python
 iterator_specs = dict(acc=[0.01, 0.01])
@@ -53,7 +52,6 @@ If the iterator reached convergence you can inspect the planets properties:
 pl.print()
 pl.plot()
 ```
-
 
 ### Blind sets
 
@@ -111,17 +109,16 @@ new_blindset.import_file(filepath)
 print(new_blindset.data.head())
 ```
 
-
 ### Populations
 
-You can create and manipulate planetary objects on a higher level using the ```planet_workbench``` module. A useful tool is the ```Population``` class that allows you to create populations of planets based on some overall rules and parameter ranges.
+You can create and manipulate planetary objects on a higher level using the `planet_workbench` module. A useful tool is the `Population` class that allows you to create populations of planets based on some overall rules and parameter ranges.
 
 ```python
 from pics.interiors import planet_workbench
 workbench = planet_workbench.Toolkit()
 ```
 
-Create a ```Population``` instance.
+Create a `Population` instance.
 
 ```python
 pop = planet_workbench.Population()
@@ -134,13 +131,13 @@ ppr = dict(M_surface_should = [1.0, 2.0])
 pop.set_up(20, planetary_params_ranges = ppr)
 ```
 
-Create the members of the population with the ```create``` method and using the ```iterator``` instance automatically created by the ```planet_workbench.Toolkit``` instance (Note. you may also pass another iterator instance. This allows you to create the same population with different iterators and can be useful for debugging or comparison of different iterator strategies).
+Create the members of the population with the `create` method and using the `iterator` instance automatically created by the `planet_workbench.Toolkit` instance (Note. you may also pass another iterator instance. This allows you to create the same population with different iterators and can be useful for debugging or comparison of different iterator strategies).
 
 ```python
 pop.create(workbench.iterator)
 ```
 
-You can inspect members of the population by accessing the individual ```Planet``` instances:
+You can inspect members of the population by accessing the individual `Planet` instances:
 
 ```python
 which_planet = 2
@@ -150,7 +147,7 @@ pop.planets[which_planet].plot()
 
 ### Mass-Radius diagrams
 
-The ```MassRadius``` class is part of the ```planet_workbench``` module and provides a wrapper to the ```Population``` class to create simple mass-radius diagrams over a specified mass range and for adjustable bulk properties.
+The `MassRadius` class is part of the `planet_workbench` module and provides a wrapper to the `Population` class to create simple mass-radius diagrams over a specified mass range and for adjustable bulk properties.
 
 ```python
 from pics.interiors import planet_workbench
@@ -190,7 +187,6 @@ Extract the mass-radius data from the populations for subsequent investigations 
 mrd.extract_data()
 mrd.plot()
 ```
-
 
 # Materials
 
