@@ -127,10 +127,10 @@ def dTdP_S(d=None, T=None, P=None, type=1, **kwargs):
 
         # compute isobaric derivative of specific entropy with respect to
         # density at given pressure
-        dsdrho = 1.0 / (T * d**2) * (d**2 * dudrho - P)
+        dsdrho = 1.0 / (T * d ** 2) * (d ** 2 * dudrho - P)
 
         # compute dT/dP_s
-        der = -1.0 / d**2 / dsdrho
+        der = -1.0 / d ** 2 / dsdrho
         return der
 
     elif type == 1:

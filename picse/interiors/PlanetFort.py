@@ -103,7 +103,7 @@ def refine_hydro_structure(lower, upper, res=1):
     slope_P = dP / dR
     slope_M = dM / dR
 
-    N = 2**res + 1
+    N = 2 ** res + 1
     temps = np.linspace(T[0], T[1], N)
     pres = np.linspace(P[0], P[1], N)
     rads = np.linspace(R[0], R[1], N)
@@ -510,7 +510,7 @@ class Planet:
         self.M_outer_mantle = 0.0
         self.M_ocean_is = 0.0
         self.M_DWR_is = 0.0
-        self.M_ocean_should = M_surface_should * 10**ocean_frac_should
+        self.M_ocean_should = M_surface_should * 10 ** ocean_frac_should
         self.M_core_should = M_core_should
         self.M_core_is = 0.0
         self.ocean_frac_should = ocean_frac_should
@@ -529,14 +529,14 @@ class Planet:
         self.E_grav = 0e0
         self.E_int = 0e0
         self.E_tot_is = 0e0
-        self.E_tot_should = E_tot_should * G * m_earth**2 / r_earth * 3.0 / 5.0
+        self.E_tot_should = E_tot_should * G * m_earth ** 2 / r_earth * 3.0 / 5.0
         self.L_int_should = (
-            L_int_should * 4.0 * np.pi * r_earth**2 * sigmaSB * 300**4
+            L_int_should * 4.0 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4
         )
         self.L_int_is = 0e0
         self.L_eff_is = 0e0
         self.L_eff_should = (
-            L_eff_should * 4.0 * np.pi * r_earth**2 * sigmaSB * 300**4
+            L_eff_should * 4.0 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4
         )
 
         # defines the physical model that is invoked for the planet
@@ -713,11 +713,11 @@ class Planet:
             "P_CS": self.P_CS,
             "core_segregation_type": self.core_segregation_type,
             "inner_core_segregation_type": self.inner_core_segregation_type,
-            "E_tot_should": self.E_tot_should / (G * m_earth**2 / r_earth * 3 / 5),
+            "E_tot_should": self.E_tot_should / (G * m_earth ** 2 / r_earth * 3 / 5),
             "L_int_should": self.L_int_should
-            / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+            / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
             "L_eff_should": self.L_eff_should
-            / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+            / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
         }
 
         self.finals = {
@@ -950,18 +950,18 @@ class Planet:
                 #'\nP_H2_CMB [MPa]:', round(self.P_H2_CMB*1.0e-6, digits),
                 "\nL_int_should [W]:",
                 round(
-                    self.L_int_should / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+                    self.L_int_should / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
                     digits,
                 ),
                 "\nL_int_is [W]:",
                 round(
-                    self.L_int_is / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+                    self.L_int_is / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
                     digits,
                 ),
                 "\nE_tot_should [G M_E²/R_E]:",
-                round(self.E_tot_should / (G * m_earth**2 / r_earth * 3 / 5), digits),
+                round(self.E_tot_should / (G * m_earth ** 2 / r_earth * 3 / 5), digits),
                 "\nE_tot_is [G M_E²/R_E]:",
-                round(self.E_tot_is / (G * m_earth**2 / r_earth * 3 / 5), digits),
+                round(self.E_tot_is / (G * m_earth ** 2 / r_earth * 3 / 5), digits),
             )
 
             try:
@@ -983,8 +983,8 @@ class Planet:
                     "M_H2O mantle [wt%]:",
                     round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
                 )
-                print("Ocean frac is:", round(10**self.ocean_frac_is, digits))
-                print("Ocean frac should:", round(10**self.ocean_frac_should, digits))
+                print("Ocean frac is:", round(10 ** self.ocean_frac_is, digits))
+                print("Ocean frac should:", round(10 ** self.ocean_frac_should, digits))
                 print(
                     "Core mass frac:",
                     round(self.M_core_is / self.M_surface_is * m_earth, digits),
@@ -1132,7 +1132,7 @@ class Planet:
         self.phases = [ph]
 
         # enclosed masses at each phase transition
-        self.dms = [self.M_surface_is * (1.0 - 10**self.ocean_frac_is)]
+        self.dms = [self.M_surface_is * (1.0 - 10 ** self.ocean_frac_is)]
         # radius at each phase transition
         self.locs = [self.layer_properties[3]["R_outer"]]
         # pressure and temperature
@@ -1163,7 +1163,7 @@ class Planet:
                     self.pres.append(P)
                     self.dens_in.append(self.dens_out[-1])
                     self.dens_out.append(d)
-                    self.dvols.append(4 / 3 * np.pi * R**3)
+                    self.dvols.append(4 / 3 * np.pi * R ** 3)
                     self.dms.append(M)
 
                     # Update cleaned layer properties
@@ -1185,7 +1185,7 @@ class Planet:
         self.temps.append(self.T_surface_is)
         self.pres.append(self.P_surface_is)
         self.dms.append(self.M_surface_is)
-        self.dvols.append(self.R_surface_is**3 * 4 / 3 * np.pi)
+        self.dvols.append(self.R_surface_is ** 3 * 4 / 3 * np.pi)
 
         # Update cleaned layer properties
         self.cleaned_layer_properties.append(
@@ -1272,11 +1272,11 @@ class Planet:
         self.S_count += N_mantle * self.xi_S_mantle
 
     def compute_luminosity(self, S0, eps=0.0, alpha=0.0):
-        self.L_eff_is = sigmaSB * self.T_surface_is**4 * (1.0 - eps / 2.0)
+        self.L_eff_is = sigmaSB * self.T_surface_is ** 4 * (1.0 - eps / 2.0)
         self.L_eff_is -= 0.25 * S0 * (1.0 - alpha)
-        self.L_eff_is *= 4 * np.pi * self.R_surface_is**2
+        self.L_eff_is *= 4 * np.pi * self.R_surface_is ** 2
         self.L_int_is = (
-            sigmaSB * self.T_surface_is**4 * 4.0 * np.pi * self.R_surface_is**2
+            sigmaSB * self.T_surface_is ** 4 * 4.0 * np.pi * self.R_surface_is ** 2
         )
 
     def update_core_mass(self, **kwargs):
@@ -1410,11 +1410,11 @@ class Planet:
             "P_CS": self.P_CS,
             "core_segregation_type": self.core_segregation_type,
             "inner_core_segregation_type": self.inner_core_segregation_type,
-            "E_tot_should": self.E_tot_should / (G * m_earth**2 / r_earth * 3 / 5),
+            "E_tot_should": self.E_tot_should / (G * m_earth ** 2 / r_earth * 3 / 5),
             "L_int_should": self.L_int_should
-            / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+            / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
             "L_eff_should": self.L_eff_should
-            / (4 * np.pi * r_earth**2 * sigmaSB * 300**4),
+            / (4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4),
         }
 
     def Reset(self, **kwargs):
@@ -1595,7 +1595,7 @@ class Planet:
         print("Si_number is = ", self.Si_number_is)
 
         # print ('fractions after construct =', self.fractions)
-        self.MOI_is = self.MOI_is / self.M_surface_is / self.R_surface_is**2
+        self.MOI_is = self.MOI_is / self.M_surface_is / self.R_surface_is ** 2
         self.M_core_is = (
             self.layer_properties[0]["indigenous_mass"]
             + self.layer_properties[1]["indigenous_mass"]
@@ -1607,12 +1607,12 @@ class Planet:
 
         self.M_H2O_core = self.H_count / 2.0 * mH2O / self.M_surface_is
         self.M_H2O_is = (self.H2O_count + self.H_count / 2.0) * mH2O / m_earth
-        self.M_ocean = 10**self.ocean_frac_is * self.M_surface_is / m_earth
+        self.M_ocean = 10 ** self.ocean_frac_is * self.M_surface_is / m_earth
         self.M_H2O_mantle = self.M_H2O_is - self.M_H2O_core - self.M_ocean
         self.inner_core_frac = self.layer_properties[0]["indigenous_mass"] / m_earth
         self.inner_core_frac /= self.M_core_is
         self.L_int_is = (
-            4 * np.pi * sigmaSB * self.T_surface_is**4 * self.R_surface_is**2
+            4 * np.pi * sigmaSB * self.T_surface_is ** 4 * self.R_surface_is ** 2
         )
         self.E_tot_is = self.E_grav + self.E_int
 
@@ -1632,7 +1632,7 @@ class Planet:
         except IndexError:
             self.ocean_depth = 0.0
         # Update mean density of the planet
-        self.rho_mean = self.M_surface_is / (4.0 / 3.0 * np.pi * self.R_surface_is**3)
+        self.rho_mean = self.M_surface_is / (4.0 / 3.0 * np.pi * self.R_surface_is ** 3)
         # Compute mol and wt fractions of the core composition
         self.xi_all_core = material.mat2at_core(
             xi=self.fractions[1], xiH=self.xi_H_core
@@ -1684,7 +1684,7 @@ class Planet:
 
             M = self.layer_properties[i]["indigenous_mass"]
 
-            rho = 3.0 / 4.0 * M / np.pi / (R_out**3 - R_in**3)
+            rho = 3.0 / 4.0 * M / np.pi / (R_out ** 3 - R_in ** 3)
 
             if np.isnan(rho):
                 rho = 0.0
@@ -1709,12 +1709,12 @@ class Planet:
             R_out = self.layer_properties[i]["R_outer"]
 
             dMoI = (
-                8.0 / 15.0 * np.pi * self.simple_densities[i] * (R_out**5 - R_in**5)
+                8.0 / 15.0 * np.pi * self.simple_densities[i] * (R_out ** 5 - R_in ** 5)
             )
             print("dMoI =", dMoI)
             self.simple_MoI += dMoI
 
-        self.simple_MoI = self.simple_MoI / (self.M_surface_is * self.R_surface_is**2)
+        self.simple_MoI = self.simple_MoI / (self.M_surface_is * self.R_surface_is ** 2)
 
     def average_profiles(self, N, equiv="mass"):
         """
@@ -1810,7 +1810,7 @@ class Planet:
         )
         axis[1][2].plot(
             self.profiles[0] * 1e-3,
-            self.profiles[7] / (G * m_earth**2) * r_earth,
+            self.profiles[7] / (G * m_earth ** 2) * r_earth,
             linewidth=lwdth,
             color=color,
         )

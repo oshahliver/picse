@@ -37,8 +37,7 @@ def print_planet(self, style=0, digits=3):
                 round(self.P_center * 1.0e-9, digits),
                 "\nMOI factor:",
                 round(
-                    self.moment_of_inertia_is
-                  ,
+                    self.moment_of_inertia_is,
                     digits,
                 ),
                 "\n\nMg_number_should:",
@@ -70,10 +69,10 @@ def print_planet(self, style=0, digits=3):
                     "M_H2O mantle [wt%]:",
                     round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
                 )
-                print("Ocean fraction is:", round(10**self.ocean_fraction_is, digits))
+                print("Ocean fraction is:", round(10 ** self.ocean_fraction_is, digits))
                 print(
                     "Ocean fraction should:",
-                    round(10**self.ocean_fraction_should, digits),
+                    round(10 ** self.ocean_fraction_should, digits),
                 )
                 print(
                     "Core mass fraction:",

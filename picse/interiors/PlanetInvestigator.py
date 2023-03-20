@@ -502,7 +502,7 @@ def filter_data_match(data, obj="titan", filter_type=1, acc_R=1.0e-2, acc_MoI=2.
         total Radius
 
     """
-    acc = np.sqrt(acc_R**2 + acc_MoI**2)
+    acc = np.sqrt(acc_R ** 2 + acc_MoI ** 2)
 
     # Extract the values of the real object
     data_is = [MoI_solar[obj], J2_solar[obj], R_solar[obj]]
@@ -524,12 +524,12 @@ def filter_data_match(data, obj="titan", filter_type=1, acc_R=1.0e-2, acc_MoI=2.
         except TypeError:
             reldev_J2 = 1.0e10
 
-        reldev_best_fit = np.sqrt(reldev_R**2 + reldev_MoI**2)
+        reldev_best_fit = np.sqrt(reldev_R ** 2 + reldev_MoI ** 2)
         reldev_best_fit_list[i] = reldev_best_fit
 
         # The total radius and MoI factor are combined to determine a match
         if filter_type == 0:
-            reldev = np.sqrt(reldev_R**2 + reldev_MoI**2)
+            reldev = np.sqrt(reldev_R ** 2 + reldev_MoI ** 2)
 
             # If the data point does not match the real values, eject it
             if reldev > acc:
@@ -549,7 +549,7 @@ def filter_data_match(data, obj="titan", filter_type=1, acc_R=1.0e-2, acc_MoI=2.
 
 def run3(obj="titan", res=3, iterations=2, sampler=0, ranges=hard_ranges):
 
-    N = 2**res
+    N = 2 ** res
     eps_H2O = 1.0
     M_surface_should = M_solar[obj]
     data = np.empty([N, 15])
@@ -655,7 +655,7 @@ def run3(obj="titan", res=3, iterations=2, sampler=0, ranges=hard_ranges):
                 ocean_frac_should=np.log10(random_vals[2]),
                 temp_jumps=[
                     0.0,
-                    0.0 * 1400.0 * M_surface_should**0.75,
+                    0.0 * 1400.0 * M_surface_should ** 0.75,
                     0.0,
                     0.0,
                     0.0,
@@ -952,7 +952,7 @@ def planet_sampler(N=1):
             predictor_T="none",
             ocean=o,
             ocean_frac_should=of,
-            temp_jumps=[0.0, T0 * m**0.75, dtmtz, 0.0, 0.0],
+            temp_jumps=[0.0, T0 * m ** 0.75, dtmtz, 0.0, 0.0],
             Si_number_should=0.5,
             P_surface_should=1e5,
             T_surface_should=ts,
@@ -1192,8 +1192,8 @@ def run_track(T_range=[600, 200.0], N=5, S0=1360.0, eps=0.0, alpha=0.0, dT=10.0)
         pl = run_planet(T_surface=T, P_surface=1e7, ocean_mass_frac=0.1)
         pl.compute_luminosity(S0, eps=eps, alpha=alpha)
         planets2.append(pl)
-        dLdT = 16.0 * np.pi * pl.R_surface_is**2
-        dLdT *= sigmaSB * pl.T_surface_is**3 * (1.0 - eps / 2.0)
+        dLdT = 16.0 * np.pi * pl.R_surface_is ** 2
+        dLdT *= sigmaSB * pl.T_surface_is ** 3 * (1.0 - eps / 2.0)
 
         dE_grav = -(planets2[i + 1].E_grav - planets2[i].E_grav)
         dE_int = planets2[i + 1].E_int - planets2[i].E_int
@@ -1250,7 +1250,7 @@ def run_track(T_range=[600, 200.0], N=5, S0=1360.0, eps=0.0, alpha=0.0, dT=10.0)
     ax[2].plot(
         np.asarray(times2) / fac,
         [
-            (pl.luminosity / (4.0 * np.pi * sigmaSB * pl.R_surface_is**2))
+            (pl.luminosity / (4.0 * np.pi * sigmaSB * pl.R_surface_is ** 2))
             ** (1.0 / 4.0)
             for pl in planets2
         ],
@@ -1314,7 +1314,7 @@ def run_sample(
     log_core_FeSi=False,
     external_temp_index=0,
 ):
-    N = 2**res
+    N = 2 ** res
     # Fix total mass if it is not to be sampled
     if not sample_mass:
         if mass == None:
@@ -1451,7 +1451,7 @@ def run_sample(
             elif mass_scale == "log":
                 slope = np.log10(mass_range[1] / mass_range[0])
                 m = np.log10(mass_range[0]) + p * slope
-                m = 10**m
+                m = 10 ** m
 
             masses[i] = m
 
@@ -1579,7 +1579,7 @@ def run_sample(
         PS = np.log10(PS_range[1]) - np.log10(PS_range[0])
         PS *= random.random()
         PS += np.log10(PS_range[0])
-        PS = 10**PS
+        PS = 10 ** PS
         mg = inputs[i][0]
         ocmf = [1.0, inputs[i][2], inputs[i][3], inputs[i][4]]
         # print ("ocmf =", ocmf)
@@ -1638,7 +1638,7 @@ def run_sample(
             predictor_T="none",
             ocean=put_ocean[i],
             ocean_frac_should=of,
-            temp_jumps=[0.0, T0 * (m * (1.0 - 10**of)) ** 0.75, dtmtz, 0.0, 0.0],
+            temp_jumps=[0.0, T0 * (m * (1.0 - 10 ** of)) ** 0.75, dtmtz, 0.0, 0.0],
             Si_number_mantle=sim,
             P_surface_should=PS,
             T_surface_should=ts,
@@ -1832,7 +1832,7 @@ def extract_params(planets):
         all_all_out[i][47] = (
             pl.layer_properties[0]["indigenous_mass"] / m_earth / pl.M_core_is
         )  # inner core mass fraction
-        all_all_out[i][48] = 10**pl.ocean_frac_is
+        all_all_out[i][48] = 10 ** pl.ocean_frac_is
         all_all_out[i][49] = pl.P_surface_is
 
         try:
@@ -2511,7 +2511,7 @@ def plot_models(
         # plot PT-profiles
         if plot_PT:
             col = ftool.extract_col_from_cmap(
-                cmap, PT_value_range_cmap, 10**pl.ocean_frac_is
+                cmap, PT_value_range_cmap, 10 ** pl.ocean_frac_is
             )
             ax2.semilogy(pl.profiles[1], pl.profiles[2], color=col)
             ax2.scatter(

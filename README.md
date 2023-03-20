@@ -15,18 +15,14 @@ Clone the git repository to a local directory via:
 ```
 git clone https://github.com/oshahliver/PICS.git
 ```
-Navigate to the project root. From there you first have to build the static libraries for the extension modules (requires gfortran to be installed on the system):
 
-```
-make static
-```
+Navigate to the project root. The package can be installed from the `setup.py` file as:
 
-Then the package can be installed from the ```setup.py``` file as:
 ```
 python3 -m pip install .
 ```
 
-NOTE: The installation process was only tested on a Linux Ubuntu system.
+NOTE: The installation process was only tested on Ubuntu.
 
 ## Basic usage
 
@@ -36,32 +32,32 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 
 The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
-| Parameter                   | Calibration Range               |
-|-----------------------------|------------------------------|
-| Total mass                  | 0.01 - 6 Earth masses        |
-| Water-mass-fraction         | 0 - 0.5                      |
-| Surface pressure            | 0.1 - 10'000 bar                   |
-| Surface temperature         | 100 - 3000 K                 |
-| Bulk $\rm[Mg]/[Mg + Fe]$            | 0.1 - 0.9                    |
-| Bulk $\rm[Si]/[Si + Mg]$            | 0.33 - 0.67                    |
-| Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5                    |
-| Mantle $\rm[SiO_2]/[SiO_2 + MgO]$         | 0.33 - 0.67                   |
-| Mantle $\rm[CaO]/[CaO + MgO]$         | 0 - 0                    |
-| Mantle $\rm[Al_2O_3]/[Al_2O_3 + MgO]$         | 0 - 0                    |
-| Core $\rm[S]/[S + O + Si + H + Fe]$         | 0 - 0                    |
-| Core $\rm[O]/[S + O + Si + H + Fe]$         | 0 - 0                    |
-| Core $\rm[Si]/[S + O + Si + H + Fe]$         | 0 - 0                    |
-| Core $\rm[H]/[S + O + Si + H + Fe]$         | 0 - 0                    |
+| Parameter                             | Calibration Range     |
+| ------------------------------------- | --------------------- |
+| Total mass                            | 0.01 - 6 Earth masses |
+| Water-mass-fraction                   | 0 - 0.5               |
+| Surface pressure                      | 0.1 - 10'000 bar      |
+| Surface temperature                   | 100 - 3000 K          |
+| Bulk $\rm[Mg]/[Mg + Fe]$              | 0.1 - 0.9             |
+| Bulk $\rm[Si]/[Si + Mg]$              | 0.33 - 0.67           |
+| Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5               |
+| Mantle $\rm[SiO_2]/[SiO_2 + MgO]$     | 0.33 - 0.67           |
+| Mantle $\rm[CaO]/[CaO + MgO]$         | 0 - 0                 |
+| Mantle $\rm[Al_2O_3]/[Al_2O_3 + MgO]$ | 0 - 0                 |
+| Core $\rm[S]/[S + O + Si + H + Fe]$   | 0 - 0                 |
+| Core $\rm[O]/[S + O + Si + H + Fe]$   | 0 - 0                 |
+| Core $\rm[Si]/[S + O + Si + H + Fe]$  | 0 - 0                 |
+| Core $\rm[H]/[S + O + Si + H + Fe]$   | 0 - 0                 |
 
 The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
 
 ### Creating your first planet
 
-To set up a simple planetary model import the ```planet_creator``` (handles the planetary objects and their properties) and the ```planet_iterator``` (handles the matching of boundary conditions).
+To set up a simple planetary model import the `planet_creator` (handles the planetary objects and their properties) and the `planet_iterator` (handles the matching of boundary conditions).
 
 ```python
 from pics.interiors import planet_iterator, planet_creator
-planet_creator.load_eos_tables() 
+planet_creator.load_eos_tables()
 ```
 
 Create an instance of the iterator toolkit that takes care of matching the boundary conditions of your planets.
@@ -100,12 +96,11 @@ Currently the structure integration for aqua planets does not always converge pr
 
 ## Coming soon (I hope!)
 
-
 1. Integration of the single-stage core segregation model from [[2]](#1) into the user interface.
 
 2. A interactive data structure with some basic analysis and visualization capabilities.
 
-3. ```SpecificObject``` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
+3. `SpecificObject` class to sample parameter variability within boundary conditions for specific objects s.a. known exoplanets, the terrestrial planets in the Solar System or the Moons of Jupiter and Saturn.
 
 4. A machine-learning enhanced algorithm for handling initial conditions in order to boost performance of the code.
 
@@ -114,13 +109,13 @@ Currently the structure integration for aqua planets does not always converge pr
 ...
 
 ## References
-<a id="1">[1]</a> 
+
+<a id="1">[1]</a>
 O. Shah, et al. (2021).
 Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation.
 A&A 646, A162
 
-<a id="2">[2]</a> 
+<a id="2">[2]</a>
 Oliver Shah, et al. (2022).
 Possible Chemical Composition And Interior Structure Models Of Venus Inferred From Numerical Modelling.
 ApJ 926 217
-

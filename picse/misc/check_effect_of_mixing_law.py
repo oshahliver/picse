@@ -20,7 +20,7 @@ accs = [[1.0e-4, 1.0e-3, 1.0e-4], [1.0e-4, 1.0e-3, 1.0e-2], [1.0e-5, 1.0e-3, 1.0
 
 
 def delta_T_CMB(M):
-    return 1400.0 * M**0.75
+    return 1400.0 * M ** 0.75
 
 
 def generate_data():

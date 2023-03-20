@@ -332,12 +332,12 @@ class Toolkit:
 
             elif w == "E_tot":
                 planet.initials[w + "_should"] = specs["val_should"][i] / (
-                    G * m_earth**2 / r_earth * 3 / 5
+                    G * m_earth ** 2 / r_earth * 3 / 5
                 )
 
             elif w == "L_int":
                 planet.initials[w + "_should"] = specs["val_should"][i] / (
-                    4 * np.pi * r_earth**2 * sigmaSB * 300**4
+                    4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4
                 )
 
             else:
@@ -616,10 +616,10 @@ class Toolkit:
         exitcode = 0
         while self.iteration:
             count += 1
-            print ("##################################")
-            print ("\n=================================")
+            print("##################################")
+            print("\n=================================")
             print("iteration", count)
-            print ("=================================")
+            print("=================================")
             # print ('layer_masses =', planet.layer_masses)
             planet.reset()
             # print ('layer_masses =', planet.layer_masses)

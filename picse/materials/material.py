@@ -91,8 +91,8 @@ import warnings
 
 # from picse.materials import brucite_phase as bruce
 
-mpl.rc("text", usetex=True)
-mpl.rcParams["text.latex.preamble"] = r"\usepackage{amsmath, amssymb}"
+# mpl.rc("text", usetex=True)
+# mpl.rcParams["text.latex.preamble"] = r"\usepackage{amsmath, amssymb}"
 warnings.filterwarnings("ignore")
 plotPath = "/home/os18o068/Documents/PHD/Abbildungen/"
 
@@ -400,10 +400,10 @@ def dPdrho_mean(densities, dPdrhos, fractions, dens=None):
     """
     if not dens is None:
         return 1.0 / (
-            dens**2
+            dens ** 2
             * sum(
                 [
-                    1 / d**2 * f / dp
+                    1 / d ** 2 * f / dp
                     for (dp, f, d) in zip(dPdrhos, fractions, densities)
                 ]
             )
@@ -413,7 +413,7 @@ def dPdrho_mean(densities, dPdrhos, fractions, dens=None):
             density_mean(densities, fractions) ** 2
             * sum(
                 [
-                    1 / d**2 * f / dp
+                    1 / d ** 2 * f / dp
                     for (dp, f, d) in zip(dPdrhos, fractions, densities)
                 ]
             )
@@ -640,7 +640,7 @@ def probe_mantle_comps(N=100):
             if j == 0:
                 diff = np.log10(ranges[j][1]) - np.log10(ranges[j][0])
                 val = np.log10(ranges[j][0]) + p * diff
-                val = 10**val
+                val = 10 ** val
 
             else:
                 diff = ranges[j][1] - ranges[j][0]
@@ -671,7 +671,7 @@ def mantle_comp(P_CS, ocmf):
     Parameters:
     P_CS (float): Core segregation pressure in Pa.
     ocmf (list): Outer core mass fractions.
-    
+
     Returns:
     tuple (real): Molar abundance of Fe and Si in the silicates.
     """
@@ -680,7 +680,7 @@ def mantle_comp(P_CS, ocmf):
     # Compute the core-segregation temperature
     T_CS = temp_liquidus_pyrolite(P_CS)
 
-    #Compute molar abundances of Fe and Si
+    # Compute molar abundances of Fe and Si
     fem = Fe_number_mantle(P_CS, T_CS, xi=xi)
     sim = Si_number_mantle(P_CS, T_CS, xi=xi)
 
@@ -750,7 +750,7 @@ def partition_coefficient_i(T, P, i, xi):
                 - 1.0
             )
             KD -= delta
-    return 10**KD
+    return 10 ** KD
 
 
 def partition_coefficient(T, P, ll):
@@ -765,7 +765,7 @@ def KD_S(T, P, xi, which="suer"):
     """
     Partition coefficient between metals and silicates for S from
     Boujibar 2014 or Suer et al. 2017
-    
+
     Parameters:
     T (float): Temperature in K.
     P (float): Pressure in Pa.
@@ -812,7 +812,7 @@ def KD_S(T, P, xi, which="suer"):
             + 14 * np.log(1.0 - xiO)
         )
 
-    return 10**KD
+    return 10 ** KD
 
 
 def Margules_eq(P, T, A, B, C):
@@ -899,7 +899,7 @@ def coefs_Fe_FeO(P, xiFe):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans**2)
+        / (Rgas * T_trans ** 2)
         * T_prime_trans
         * (1.0 - xiFe) ** 2
         * (W2 + 2.0 * (W1 - W2) * xiFe)
@@ -931,7 +931,7 @@ def coefs_FeO_Fe(P, xiFeO):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans**2)
+        / (Rgas * T_trans ** 2)
         * T_prime_trans
         * (1.0 - xiFeO) ** 2
         * (W1 + 2.0 * (W2 - W1) * xiFeO)
@@ -957,105 +957,6 @@ def T_liquidus_pyrolite_prime(P):
     c = 1.9
 
     return T0 * 1.0 / c / a * (1.0 + P / a) ** (1.0 / c - 1.0)
-
-
-def specific_thermal_energy(T, P, C_p):
-    """
-    Computes the specific thermal energy of a substance.
-
-    Parameters:
-    T (float): Temperature in K.
-    P (float): Pressure in Pa.
-    C_p (function): Function to compute specific heat in J/K/kg.
-
-    Returns:
-    float: Thermal energy.
-    """
-
-    # Compute the internal energy using the heat capacity function
-    U = integrate.quad(C_p, 0.0, T, args=(P,))[0]
-
-    # Compute the thermal energy using the internal energy and specific volume (assuming m = 1)
-    E_therm = U + P / C_p(T, P)
-
-    return E_therm
-
-
-def specific_heat_iron(T, P):
-    """Computes the heat capacity of iron at a given temperature and pressure from Stacey et al. 2001.
-
-    Parameters:
-    T (float or ndarray): temperature in K
-    P (float or ndarray): pressure in Pa
-
-    Returns:
-    float or ndarray: heat capacity in J/kg/K
-    """
-    x = T / 1000.0
-    y = P / 1.0e9
-
-    a = 6.53538
-    b = -0.00211775
-    c = 3.34129e-7
-    d = -2.90386e-11
-    e = 1.47786
-    f = -0.00688309
-    g = 1.10548e-6
-    h = -9.19282e-11
-    i = -0.0353877
-    j = 0.000136698
-    k = -7.21556e-9
-
-    cp = (
-        a
-        + b * x
-        + c * x**2
-        + d * x**3
-        + (e + f * x + g * x**2 + h * x**3) * y
-        + j * y**2
-        + k * y * x**2
-        + i * y * x**3
-    )
-
-    return cp
-
-
-def specific_heat_pyrolite(T, rho):
-    """Computes the heat capacity of pyrolite at a given temperature and density from Stixrude and Lithgow-Bertelloni 2011.
-
-    Parameters:
-    T (float or ndarray): temperature in K
-    rho (float or ndarray): density in kg/m^3
-
-    Returns:
-    float or ndarray: heat capacity in J/kg/K
-    """
-    a = 2.054
-    b = 4.581
-    c = -0.0537
-    d = -0.000072
-    e = 5.09
-    f = -1.52
-    g = -0.167
-    h = 0.117
-    i = 0.019
-    j = 0.00071
-    k = 0.0011
-
-    x = T / 1000.0
-    y = rho / 1000.0
-
-    cp = (
-        a
-        + b * x
-        + c * x**2
-        + d * x**3
-        + (e + f * x + g * x**2 + h * x**3 + i * x**4) * y
-        + j * y**2
-        + k * y * x**2
-    )
-
-    return cp
 
 
 def gamma_FeO(P, x_FeO=0.0):
@@ -1161,7 +1062,7 @@ def xi_S(P, T, xi):
     """
     Computes mol fraction of sulfur in the mantle assuming chemical
     equilibrium between mantle and core. P, T at CMB and xiFe and xiO in core.
-    
+
     Parameters
     ----------
     P (float): Pressure in Pa.
@@ -1180,7 +1081,7 @@ def xi_FeO(P, T, xi):
     """
     Computes mol fraction of iron oxide in the mantle assuming chemical
     equilibrium between mantle and core. P, T at CMB and xiFe and xiO in core.
-    
+
     Parameters
     ----------
     P (float): Pressure in Pa.
@@ -1253,8 +1154,8 @@ def Fe_number_mantle(P, T, xi):
     # print ('P, T, xi =', P, T, xi)
     # print ('xiSiO2 =', xiSiO2)
     # print ('xiFeO =', xiFeO)
-    if result <= 0. or result > xi_Fe_mantle_max:
-       result = xi_Fe_mantle_max
+    if result <= 0.0 or result > xi_Fe_mantle_max:
+        result = xi_Fe_mantle_max
     return result
 
 
@@ -1262,7 +1163,7 @@ def Si_number_mantle(P, T, xi):
     """
     Computes Si# in the mantle assuming chemical equilibrium between mantle
     and core. P, T at CMB and xi = xiFe, xiH, xiS, xiSi, xiO in core.
-    
+
     Parameters
     ----------
     P (float): Pressure in Pa.
@@ -1338,7 +1239,6 @@ def xi_mantle(T, P, ll, x_core=0.0, x_Fe_core=0.0, x_O_core=0.0):
     return x_core / KD, x_core / x_Fe_core * xi_FeO_mantle / KD
 
 
-
 def T_melt_MgSiO3(P):
     # Belonoshko et al. 2005
     a = 4.6e9
@@ -1364,7 +1264,7 @@ def P_CS(M, a=1.5, P0=40e9):
     """
     Estimate pressure of core segregation using a simple scaling law.
     """
-    return P0 * M**a
+    return P0 * M ** a
 
 
 # def xSievert(
@@ -1475,7 +1375,7 @@ def temp_melt_iron(P, X_Si, X_O, X_S):
     Computes melting temperature of iron alloys according
     to Li et al. 2020. The effect of O, Si, and S are accounted
     for according to Andrault et al. 2016.
-    
+
     Parameters:
     P (float): Pressure in Pa.
     X_Si (float): Molar concentration of silicon.
@@ -1503,7 +1403,7 @@ def temp_solidus_pyrolite(P):
     """
     Compute solidus temperature of a pyrolite composition
     according to Andrault et al. 2016.
-    
+
     Parameters:
     P (float): Pressure in Pa.
 
@@ -1522,7 +1422,7 @@ def temp_liquidus_pyrolite(P):
     """
     Compute liquidus temperature of a pyrolite composition
     according to Andrault et al. 2016.
-    
+
     Parameters:
     P (float): Pressure in Pa.
 
@@ -1552,11 +1452,11 @@ def taylorN_Mg(X_H2O):
     k2 = b1 * (a2 + b2 * x) ** (-1) - (a1 + b1 * x) * (a2 + b2 * x) ** (-2) * b2
     k3 = -b1 * (a2 + b2 * x) ** (-2) * b2 - (
         b1 * (a2 + b2 * x) ** (-2) * b2
-        + (a1 + b1 * x) * (-2) * (a2 + b2 * x) ** (-3) * b2**2
+        + (a1 + b1 * x) * (-2) * (a2 + b2 * x) ** (-3) * b2 ** 2
     )
 
     k2 *= x
-    k3 *= 0.5 * x**2
+    k3 *= 0.5 * x ** 2
 
     print(k1, k2, k3)
 
@@ -2556,6 +2456,129 @@ def estimate_Mcore(
 #         drhodr = dPdr / dPdrho
 
 #     return [dPdr, dmdr, dTdr, drhodr]
+
+
+class FreeEnergy:
+    def __init__(self, potential, potential_type, molar_mass):
+        self.potential_type = potential_type
+        self.potential = potential
+        self.molar_mass = molar_mass
+
+    def compute(self, T=None, P=None, V=None, **kwargs):
+        if self.potential_type == "helmholtz":
+            # Compute potential
+            A = self.potential(T=T, V=V, **kwargs)
+
+            # Compute derivatives
+            dAdT_V = ftool.der1(self.potential, T, which="T", V=V, **kwargs)
+            dAdV_T = ftool.der1(self.potential, V, which="V", T=T, **kwargs)
+
+            # Compute second derivatives
+            d2AdT2_V = ftool.der2(self.potential, T, which="T", V=V, **kwargs)
+            d2AdV2_T = ftool.der2(self.potential, V, which="V", T=T, **kwargs)
+            d2AdVdT = ftool.dermix(self.potential, V, T, arg1="V", arg2="T", **kwargs)
+            from picse.materials.equations_of_state.Wagle2019EOS import P_corr
+
+            self.temperature = T
+            self.molar_volume = V
+            self.density = self.molar_mass / self.molar_volume  # g / cm^3
+
+            # Pressure needs to be defined seperately
+            # This is currently only for Wagle 2019
+            def pres(V=None, T=None):
+                return -ftool.der1(
+                    self.potential, V, which="V", T=T, **kwargs
+                ) + P_corr(V)
+
+            self.pressure = pres(V=V, T=T)  # GPa
+            self.entropy = -dAdT_V  # kJ / mol / K
+            self.enthalpy = A - T * dAdT_V - V * dAdV_T
+            self.internal_energy = A - T * dAdT_V
+            self.heat_capacity_V = -T * d2AdT2_V  # kJ / mol / K
+            self.bulk_modulus_T = -V * ftool.der1(pres, V, which="V", T=T)
+            self.thermal_expansion = (
+                ftool.der1(pres, T, which="T", V=V) / self.bulk_modulus_T
+            )
+            self.gamma = (
+                self.thermal_expansion
+                * self.bulk_modulus_T
+                * self.molar_volume
+                / (self.heat_capacity_V)
+            )
+            self.heat_capacity_P = self.heat_capacity_V * (
+                1.0 + self.thermal_expansion * self.gamma * self.temperature
+            )
+            self.bulk_modulus_S = (
+                1 + self.thermal_expansion * self.gamma * self.temperature
+            ) * self.bulk_modulus_T
+
+            self.sound_speed = np.sqrt(self.bulk_modulus_S / self.density)
+            self.helmholtz = A
+            self.gibbs = self.helmholtz + self.molar_volume * self.pressure
+
+    def plot_curves(self):
+        pass
+
+    def plot_maps(
+        self, res=[3, 3], y_range=[3.0, 8.0], x_range=[2000, 10000], log=[False, False],
+    **kwargs):
+        if log[0]:
+            x = np.logspace(np.log10(x_range[0]), np.log10(x_range[1]), 2 ** res[0])
+
+        else:
+            x = np.linspace(x_range[0], x_range[1], 2 ** res[0])
+
+        if log[1]:
+            y = np.logspace(np.log10(y_range[0]), np.log10(y_range[1]), 2 ** res[0])
+
+        else:
+            y = np.linspace(y_range[0], y_range[1], 2 ** res[0])
+
+        dat = np.empty([3, 2, 2 ** res[0], 2 ** res[1]])
+        labels = [
+            ["Pressure (GPa)", "Density (g/cm^3)"],
+            ["Thermal expansion (1/K)", "Isoch. heat (kJ / mol / K)"],
+            ["Internal energy (kJ / mol)", "Entropy (kJ / mol / K)"],
+        ]
+        for i in range(len(x)):
+            for j in range(len(y)):
+                if self.potential_type == "helmholtz":
+                    self.compute(T=x[i], V=y[j], **kwargs)
+                elif self.potential_type == "gibbs":
+                    self.compute(T=x[i], P=y[j], **kwargs)
+
+                dat[0][0][i][j] = self.pressure
+                dat[0][1][i][j] = self.density
+                dat[1][0][i][j] = self.thermal_expansion
+                dat[1][1][i][j] = self.heat_capacity_V
+                dat[2][0][i][j] = self.internal_energy
+                dat[2][1][i][j] = self.entropy
+
+        fig, ax = plt.subplots(len(dat), len(dat[0]), figsize=(10, 9))
+        for i in range(len(ax)):
+            for j in range(len(ax[i])):
+                im = ax[i][j].imshow(
+                    dat[i][j].T, origin="lower", aspect="equal", extent=[0, 1, 0, 1]
+                )
+                fig.colorbar(im, ax=ax[i][j], format="%.2e", label=labels[i][j])
+                if log[0]:
+                    ax[i][j].set_xscale("log")
+                    ax[i][j].xaxis.set_major_formatter(plt.FormatStrFormatter("%d"))
+                if log[1]:
+                    ax[i][j].set_yscale("log")
+                    ax[i][j].yaxis.set_major_formatter(plt.FormatStrFormatter("%.2f"))
+                ax[i][j].set_xlabel("Temperature (K)")
+                ax[i][j].set_ylabel("Volume (cm^3/mol)")
+                ax[i][j].set_xticks(np.linspace(0, 1, 3))
+                ax[i][j].set_yticks(np.linspace(0, 1, 3))
+                ax[i][j].set_xticklabels(
+                    ["{:.0f}".format(x_tick) for x_tick in np.linspace(x[0], x[-1], 3)]
+                )
+                ax[i][j].set_yticklabels(
+                    ["{:.2f}".format(y_tick) for y_tick in np.linspace(y[0], y[-1], 3)]
+                )
+
+        fig.savefig("eos.pdf", format="pdf", bbox_inches="tight")
 
 
 class Unit:

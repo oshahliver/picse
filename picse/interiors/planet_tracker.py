@@ -20,7 +20,7 @@ def energy_loss(temperature, radius):
     float
         The energy lost by the planet per unit time.
     """
-    return 4 * np.pi * radius**2 * sigmaSB * temperature**4
+    return 4 * np.pi * radius ** 2 * sigmaSB * temperature ** 4
 
 
 class Engine:
@@ -113,7 +113,7 @@ class ThermoEngine(Engine):
         for i in range(1, len(time_array)):
             # Compute the new surface temperature using the energy balance equation
             new_surface_temperature = temperature[-1] - energy_lost * timestep / (
-                4 * np.pi * radius**2 * sigmaSB
+                4 * np.pi * radius ** 2 * sigmaSB
             )
 
             # Update the surface temperature and store it in the temperature array
@@ -129,7 +129,7 @@ class ThermoEngine(Engine):
         # Use vectorization to compute the energy loss for all time steps at once
         energy_lost_array = np.full_like(temperature_array, energy_lost)
         energy_loss_time = (
-            energy_lost_array * timestep / (4 * np.pi * radius**2 * sigmaSB)
+            energy_lost_array * timestep / (4 * np.pi * radius ** 2 * sigmaSB)
         )
         temperature_array[1:] -= energy_loss_time[:-1]
 

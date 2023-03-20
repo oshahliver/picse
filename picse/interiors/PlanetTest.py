@@ -481,7 +481,7 @@ class Shell:
 
         # compute gravitanional acceleration
         try:
-            self.gravity = G * self.mass / self.radius**2
+            self.gravity = G * self.mass / self.radius ** 2
 
         except TypeError:
             self.gravity = None
@@ -858,7 +858,7 @@ class Shell:
             self.force_bisection = True
 
         # update gravity and escape velocity
-        self.gravity = G * self.mass / self.radius**2
+        self.gravity = G * self.mass / self.radius ** 2
         self.v_esc = np.sqrt(2.0 * G * self.mass / self.radius)
 
         # update thermal velocity of water vapor at these conditions assuming
@@ -1739,7 +1739,7 @@ class Planet:
         )
         self.seed_material.Compute()
         self.rho_center = self.seed_material.dens
-        self.M_seed = 4.0 / 3.0 * np.pi * self.rho_center * R_seed**3
+        self.M_seed = 4.0 / 3.0 * np.pi * self.rho_center * R_seed ** 3
         self.seed = Layer(
             m=self.M_seed,
             T=self.T_center,

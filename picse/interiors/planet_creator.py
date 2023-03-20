@@ -455,7 +455,7 @@ class Planet:
             self.Fe_number_mantle,
         ]
 
-        self.M_ocean_should = self.M_surface_should * 10**self.ocean_fraction_should
+        self.M_ocean_should = self.M_surface_should * 10 ** self.ocean_fraction_should
 
         if self.label == "aqua":
             self.Si_number_layers.append(0.0)
@@ -629,7 +629,7 @@ class Planet:
             self.M_ocean_is = 0.0
 
         self.mean_density = self.M_surface_is / (
-            4.0 / 3.0 * np.pi * self.R_surface_is**3
+            4.0 / 3.0 * np.pi * self.R_surface_is ** 3
         )
         self.compute_ocean_depth()
 
@@ -726,7 +726,7 @@ class Planet:
         self.profiles = np.array(prof)
 
         # normalize moi
-        self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is**2)
+        self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is ** 2)
 
     def plot(
         self,

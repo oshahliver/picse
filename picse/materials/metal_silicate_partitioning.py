@@ -1,6 +1,7 @@
 import numpy as np
 from picse.utils.function_tools import functionTools
-from picse.physicalparams import (mO, mSi, mFe, mMg, mS)
+from picse.physicalparams import mO, mSi, mFe, mMg, mS
+
 
 def mantle_comp(P_CS, ocmf=[]):
     xi = mat2at_core(ocmf, xiH=0.0)
@@ -9,6 +10,7 @@ def mantle_comp(P_CS, ocmf=[]):
     sim = Si_number_mantle(P_CS, T_CS, xi=xi)
 
     return fem, sim
+
 
 def epsilon_ki(T, k, i):
     m = [mO * 1e-3, mSi * 1e-3]
@@ -46,7 +48,7 @@ def partition_coefficient_i(T, P, i, xi):
                 - 1.0
             )
             KD -= delta
-    return 10**KD
+    return 10 ** KD
 
 
 def partition_coefficient(T, P, ll):
@@ -97,7 +99,7 @@ def KD_S(T, P, xi, which="suer"):
             + 14 * np.log(1.0 - xiO)
         )
 
-    return 10**KD
+    return 10 ** KD
 
 
 def Margules_eq(P, T, A, B, C):
@@ -184,7 +186,7 @@ def coefs_Fe_FeO(P, xiFe):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans**2)
+        / (Rgas * T_trans ** 2)
         * T_prime_trans
         * (1.0 - xiFe) ** 2
         * (W2 + 2.0 * (W1 - W2) * xiFe)
@@ -216,7 +218,7 @@ def coefs_FeO_Fe(P, xiFeO):
     )
     g_prime += (
         -1.0
-        / (Rgas * T_trans**2)
+        / (Rgas * T_trans ** 2)
         * T_prime_trans
         * (1.0 - xiFeO) ** 2
         * (W1 + 2.0 * (W2 - W1) * xiFeO)
@@ -233,6 +235,7 @@ def coefs_FeO_Fe(P, xiFeO):
 
 def W_FeO_MgO(P):
     return 11e3 + 0.011 * P / 1e5
+
 
 def gamma_FeO(P, x_FeO=0.0):
     """Interaction parameter of FeO from Frost et al. 2010.
@@ -288,7 +291,6 @@ def gamma_Fe_smoothed(P, xiFe):
     else:
         K, Z = coefs_Fe_FeO(P, xiFe)
         return max(1.0 + K * np.exp(-Z * (P - P_FeO_Fe_trans)), 1.0)
-
 
 
 def xi_S(P, T, xi):

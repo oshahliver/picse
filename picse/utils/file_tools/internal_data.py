@@ -180,22 +180,23 @@ def get_eos_dir():
     EoS tables.
     """
 
-    package_directory = resource_filename("pics", "")
+    package_directory = resource_filename("picse", "")
     relative_directory = "data/EoS_tables"
     return os.path.join(package_directory, relative_directory)
+
 
 def get_predictor_dir():
     """Get the pkl models to predict initial conditions for given set
     of boundary conditions
     """
-    package_directory = resource_filename("pics", "")
+    package_directory = resource_filename("picse", "")
     relative_directory = "data/initial_conditions"
     return os.path.join(package_directory, relative_directory)
 
 
 def get_training_dir():
     """Get the directory containing the training data"""
-    with resources.path("pics.data", "training_data") as moddir:
+    with resources.path("picse.data", "training_data") as moddir:
         return moddir
 
 
@@ -228,7 +229,7 @@ class RenameUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         renamed_module = module
         if module == "regression":
-            renamed_module = "pics.utils.calibration_tools.regression"
+            renamed_module = "picse.utils.calibration_tools.regression"
 
         return super(RenameUnpickler, self).find_class(renamed_module, name)
 

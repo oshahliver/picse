@@ -101,7 +101,7 @@ def V(T=None, P=None, ph=0):
 
 def cp0(T=None, P=None, ph=0):
     c0, c1, c2 = c_list[ph]
-    return c0 + c1 * T + c2 / T**2
+    return c0 + c1 * T + c2 / T ** 2
 
 
 def alpha(T=None, P=None, ph=0):
@@ -137,7 +137,7 @@ def Density(T=None, P=None, ph=0):
 
 def Plot(res=3, ph=0):
 
-    N = 2**res
+    N = 2 ** res
     pres = np.linspace(1.0e7, 1.0e8, N)
     temp = np.linspace(100, 400, N)
 

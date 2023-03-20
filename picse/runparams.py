@@ -4,7 +4,7 @@ Created on Mon Dec  3 15:07:45 2018
 
 @author: os18o068
 """
-from pics.physicalparams import m_earth, r_earth
+from picse.physicalparams import m_earth, r_earth
 
 dur = 0.0
 time_round = 3

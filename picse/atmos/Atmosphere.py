@@ -68,10 +68,10 @@ def m_barom(mu=None, r=None, g=None, R_planet=None, T=None, rho0=None, M0=None):
         -4
         * np.pi
         * rho0
-        / H**3
+        / H ** 3
         * (
-            (H**2 * r**2 + 2 * H * r + 2) * np.exp(-H * (r - R_planet))
-            - H**2 * R_planet**2
+            (H ** 2 * r ** 2 + 2 * H * r + 2) * np.exp(-H * (r - R_planet))
+            - H ** 2 * R_planet ** 2
             - 2 * H * R_planet
             - 2
         )
@@ -389,11 +389,11 @@ class Shell:
 
         self.tempType = tempType
 
-        self.dPdr = -G * self.mass * self.dens / self.radius**2
+        self.dPdr = -G * self.mass * self.dens / self.radius ** 2
         self.drhodr = self.dPdr / self.dPdrho
         self.dTdP = self.gamma * self.temp / (self.dens * self.dPdrho)
         self.dTdr = self.dPdr * self.dTdP
-        self.dmdr = 4.0 * np.pi * self.radius**2 * self.dens
+        self.dmdr = 4.0 * np.pi * self.radius ** 2 * self.dens
 
         if self.tempType == "isothermal":
             self.dTdr = 0.0
@@ -446,7 +446,7 @@ class Shell:
         # first update gradients
         if not self.mix.dPdrho == 0.0:
             self.dPdrho = self.mix.dPdrho
-        self.dPdr = -G * self.mass * self.dens / self.radius**2
+        self.dPdr = -G * self.mass * self.dens / self.radius ** 2
 
         try:
             self.drhodr = self.dPdr / self.dPdrho
@@ -466,7 +466,7 @@ class Shell:
 
         self.dTdP = self.gamma * self.temp / (self.dens * self.dPdrho)
         self.dTdr = self.dPdr * self.dTdP
-        self.dmdr = 4.0 * np.pi * self.radius**2 * self.dens
+        self.dmdr = 4.0 * np.pi * self.radius ** 2 * self.dens
 
         # if isothermal set all temperature derivatives to zero
         if self.tempType == "isothermal":
@@ -1053,7 +1053,7 @@ class Atmosphere:
                 self.layers[-1].shells[0].pres,
             )
             # compute surface gravity
-            gravity = G * M_surf / R_surf**2
+            gravity = G * M_surf / R_surf ** 2
 
             # compute atmospheric density at surface level
             rho0 = self.layers[-1].shells[0].dens

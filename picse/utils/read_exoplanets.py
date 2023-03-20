@@ -463,14 +463,14 @@ def MR_Grasset_2009(M, X_w):
     )
 
     def xi(x, xis):
-        dummy = [xis[i] * x**i for i in range(3)]
+        dummy = [xis[i] * x ** i for i in range(3)]
         return sum(dummy)
 
     coefs = [xi(X_w, all_xis.T[i]) for i in range(4)]
 
     a, b, c, d = coefs
 
-    return 10 ** (np.log10(a) + (b + c * M + d * M**2) * np.log10(M))
+    return 10 ** (np.log10(a) + (b + c * M + d * M ** 2) * np.log10(M))
 
 
 def plot_MR(N_mass=20, N_oc=3, oc=[0.0, 100.0]):

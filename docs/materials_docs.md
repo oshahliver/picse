@@ -1,6 +1,6 @@
-# The ```pics.materials``` Module: A collection of tools to handle the properties and equations of state of planetary building blocks
+# The `pics.materials` Module: A collection of tools to handle the properties and equations of state of planetary building blocks
 
-The ```pics.materials``` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. Note that the actual implementation of the equations of state in the structure code uses pre-generated equation of state tables and table interpolation algorithms to boost performance.
+The `pics.materials` lets you play around with different planetary building blocks and their mixtures using adequate equations of state and simple mixing laws. Note that the actual implementation of the equations of state in the structure code uses pre-generated equation of state tables and table interpolation algorithms to boost performance.
 
 ## Basic Usage
 
@@ -17,35 +17,33 @@ The ```pics.materials``` lets you play around with different planetary building 
 
 The following list contains all compounds for which an equation of state implementation is available.
 
-
-| Compound             | ID  | EoS            | Pressure range (GPa) | Temperature range (K) | Reference |
-|----------------------|-----|----------------|----------------------|-----------------------|------------|
-| $\rm H_2O$           | 000 | FEF            |                |               |  [[1]](#1) |
-| $\rm Mg_2SiO_4$      | 001 | BM3             |                |               |  [[2]](#2) |
-| $\rm Mg_2Si_2O_6$    | 002 | BM3             |              |               | [[2]](#2) |
-| $\rm Fe_2SiO_4$      | 003 | BM3        |              |                | [[2]](#2) |
-| $\rm Fe_2Si_2O_6$    | 004 | BM3  |            |                | [[2]](#2) |
-| $\rm MgO$            | 005 | MGD               |                      |                       |   [[2]](#2)         |
-| $\rm MgSiO_3$        | 006 | MGD               |                      |                       |   [[2]](#2)         |
-| $\rm FeO$            | 007 | MGD               |                      |                       |   [[2]](#2)         |
-| $\rm FeSiO_3$        | 008 | MGD               |                      |                       |    [[2]](#2)        |
-| $\rm Fe(s)$             | 009 |   Bel             |                      |                       |  [[2]](#2)          |
-| $\rm FeS$            | 010 |      MGD          |                      |                       |   [[2]](#2)         |
-| $\rm Mg(OH)_2$            | 011 |    BM3            |                      |                       |     [[1]](#1)       |
-| $\rm \alpha-(Mg,Fe)_2Si_4$            | 012 |   BM3             |                      |                       |    [[1]](#1)        |
-| $\rm \beta-(Mg,Fe)_2Si_4$            | 013 |       BM3         |                      |                       |      [[1]](#1)      |
-| $\rm \gamma-(Mg,Fe)_2Si_4$            | 014 |       BM3         |                      |                       |     [[1]](#1)       |
-| $\rm post-(Mg,Fe)SiO_3$            | 015 |         MGD       |                      |                       |    [[1]](#1)        |
-| $\rm SiO_2$            | 016 |        MGD        |                     |                       |            |         
-| $\rm CaCl_2-type \ SiO_2$            | 017 |         MGD       |                      |                       |   -         |
-| $\rm FeSi$            | 018 |        MGD        |                      |                       |             [[2]](#2) |
-| $\rm Fe(l)$            | 019 |      Bel          |                      |                       |             - |
-| $\rm Fe_3C$            | 020 |       MGD         |                      |                       |             - |
-
+| Compound                   | ID  | EoS | Pressure range (GPa) | Temperature range (K) | Reference |
+| -------------------------- | --- | --- | -------------------- | --------------------- | --------- |
+| $\rm H_2O$                 | 000 | FEF |                      |                       | [[1]](#1) |
+| $\rm Mg_2SiO_4$            | 001 | BM3 |                      |                       | [[2]](#2) |
+| $\rm Mg_2Si_2O_6$          | 002 | BM3 |                      |                       | [[2]](#2) |
+| $\rm Fe_2SiO_4$            | 003 | BM3 |                      |                       | [[2]](#2) |
+| $\rm Fe_2Si_2O_6$          | 004 | BM3 |                      |                       | [[2]](#2) |
+| $\rm MgO$                  | 005 | MGD |                      |                       | [[2]](#2) |
+| $\rm MgSiO_3$              | 006 | MGD |                      |                       | [[2]](#2) |
+| $\rm FeO$                  | 007 | MGD |                      |                       | [[2]](#2) |
+| $\rm FeSiO_3$              | 008 | MGD |                      |                       | [[2]](#2) |
+| $\rm Fe(s)$                | 009 | Bel |                      |                       | [[2]](#2) |
+| $\rm FeS$                  | 010 | MGD |                      |                       | [[2]](#2) |
+| $\rm Mg(OH)_2$             | 011 | BM3 |                      |                       | [[1]](#1) |
+| $\rm \alpha-(Mg,Fe)_2Si_4$ | 012 | BM3 |                      |                       | [[1]](#1) |
+| $\rm \beta-(Mg,Fe)_2Si_4$  | 013 | BM3 |                      |                       | [[1]](#1) |
+| $\rm \gamma-(Mg,Fe)_2Si_4$ | 014 | BM3 |                      |                       | [[1]](#1) |
+| $\rm post-(Mg,Fe)SiO_3$    | 015 | MGD |                      |                       | [[1]](#1) |
+| $\rm SiO_2$                | 016 | MGD |                      |                       |           |
+| $\rm CaCl_2-type \ SiO_2$  | 017 | MGD |                      |                       | -         |
+| $\rm FeSi$                 | 018 | MGD |                      |                       | [[2]](#2) |
+| $\rm Fe(l)$                | 019 | Bel |                      |                       | -         |
+| $\rm Fe_3C$                | 020 | MGD |                      |                       | -         |
 
 The stated temperature and pressure ranges are only rough guidlines. $\rm Al$ and $\rm Ca$ are modelled as substitutes to $\rm Mg$ and $\rm Si$ in the mantle minerals according to [[3]](#3).
 
-Example:
+### Example 1:
 
 ```python
 from pics.materials import material, eos
@@ -73,82 +71,11 @@ dens = eos.compute(ll = 3, what = "dens", pres = 2e10, temp = 300.)
 print(all_props)
 ```
 
-## The ```pics.materials.Material``` module
+### Example 2:
 
-### ```Material.density_mean()```:
+The `Mixture` class is a useful tool for investigating and visualizing the properties of mixtures different planetary building blocks and to create equation of state tables.
 
-Compute the mean density of a mixture from the individual densities using a linear mixing law.
-
-### ```Material.bulk_modulus_mean()```:
-
-Compute the mean isothermal bulk modulus from the individual densities and bulk modulii of a mixture using a linear mixing law.
-
-### ```Material.thermal_expansion_mean()```:
-
-Compute the mean thermal expansion coefficient from the individual densities and thermal expansions using a linear mixing law.
-
-### ```Material.dPdrho_mean()```:
-
-Compute the mean density derivative of the pressure of a mixture using a linear mixing law.
-
-### ```Material.temp_melt_iron()```:
-
-Computes melting temperature of iron alloys according to Li et al. 2020. The effect of O, Si, and S are accounted for according to Andrault et al. 2016.
-
-### ```Material.temp_solidus_pyrolite()```:
-
-Computes solidus temperature of a pyrolite composition according to Andrault et al. 2016.
-
-### ```Material.temp_liquidus_pyrolite()```:
-
-Computes liquidus temperature of a pyrolite composition according to Andrault et al. 2016.
-
-### ```Material.specific_heat_iron()```:
-
-Computes the specific heat capacity at a given temperature and pressure using the parametrization given by Stacey et al. 2001.
-
-### ```Material.specific_heat_pyrolite()```:
-
-Computes the specific heat capacity at a given temperature and density using the parametrization given by Stixtude and Lithgow-Bertelloni 2011.
-
-### ```Material.silicon_number()```:
-
-Computes the silicon number from the Si to Mg ratio at a given magnesium number. This calculation is independant on the mineral composition.
-
-### ```Material.silicon_number_max()```:
-
-Computes max Si# that is allowed at given Mg# for pure per + ol composition.
-
-### ```Material.silicon_number_min()```:
-
-Computes min Si# that is allowed at given Mg# for pure per + ol composition.
-
-### ```Material.Si2Mg()```:
-
-Computes ratio of Si to Mg for given magnesium and silicon numbers.
-
-### ```Material.at2mat()```:
-
-Converts atomic mole fractions into material mole fractions. The composition
-of the different materials is given by the matrix N.
-
-### ```Material.mantle_composition()```:
-
-Computes the mantle composition according to the single stage core-segregation model.
-
-### The ```Material.Unit``` class
-
-The ```Mixture``` class is a useful tool for investigating and visualizing the properties of isolated planetary building blocks and to create equation of state tables.
-
-Note. The ```Unit``` class is a separate implementation from the corresponding routines of the structure integrator implemented in fortran.
-
-### The ```Material.Mixture``` class
-
-The ```Mixture``` class is a useful tool for investigating and visualizing the properties of mixtures different planetary building blocks and to create equation of state tables.
-
-Note. The ```Mixture``` class is a separate implementation from the corresponding routines of the structure integrator implemented in fortran.
-
-Example:
+Note. The `Mixture` class is a separate implementation from the corresponding routines of the structure integrator implemented in fortran.
 
 ```python
 from pics.meterials import material
@@ -159,70 +86,9 @@ mix.compute()
 mix.print()
 ```
 
-#### ```Mixture.compute()```:
+### Example 3:
 
-Initializes a new material instance for each of the
-compontents in the mixture and computes volumetric and thermodynamic properties of the individual components at the pressure and temperature conditions specified for the mixture. Uses simple mixing laws to compute the bulk properties of the mixture from the individual components. If values for the pressure or temperature are passed as function arguments the conditions will be updated and the EoS evaluated accordingly.
-
-Parameters:
-
-```float: T=None```: Temperature in kelvin.\
-```float: P=None```: Pressure in pascal.\
-```int: phase=None```: Phase region signature.
-
-
-#### ```Mixture.update_fractions(new_fractions)```:
-
-Changes the relative abundances of the individual components at fixed P and T and computes the new bulk properties of the mixture.
-
-Parameters:
-
-```list: new_fractions```: list containing the new molar abundances of each component of the mixture.
-
-#### ```Mixture.update_weight_fractions()```:
-
-Computes the mass fraction of each component of the mixture from their mole fractions and the molar masses.
-
-#### ```Mixture.update()```:
-
-This method updates the material instance of each component of the
-mixture individually and then computes the new mean density in the cell
-without re-initializing any component objects. If no new pressure or
-temperature is passed, nothing will be done. If the density and or density derivative of the pressure are passed the individual contributions of the densities and density derivatives of the pressure of each material will be reconstructed without calling the equation of statee which is more efficient.
-
-Parameters:
-
-```float: P=None```: pressure in pascal.\
-```float: T=None```: temperature in kelvin.\
-```float: d=None```: density in kilogram per cubic meter.\
-```float: dPdrho=None```: density derivative of pressure.
-
-#### ```Mixture.plot()```:
-
-Simple plotting routine to visualize basic volumetric and thermodynamic properties of the mixture.
-
-#### ```Mixture.print()```:
-
-Prints basic volumetric and thermodynamic properties of the mixture to standard output.
-
-
-#### ```Mixture.update_volumetric_props()```:
-
-Updates the individual volumetric properties.
-
-#### ```Mixture.update_mean_volumetric_props()```:
-
-Updates the mean volumetric properties from the individual properties.
-
-## The ```pics.materials.eos``` module
-
-The ```eos``` module contains all implementations of the different equations of state available in PICSE and links to the corresponding euqation of state parameters for the different planetary building blocks that are stored in a separate file.
-
-### ```eos.compute()```
-
-Employs the EOS for the given material and computes the specified quantity at a given conditions.
-
-Example:
+Employ the EOS for the given material and computes the specified quantity at a given conditions.
 
 ```python
 from pics.materials import eos
@@ -231,6 +97,7 @@ from pics.materials import eos
 params = eos.compute(ll=0, P=1e8, T=250)
 print(params)
 ```
+
 Output:
 
 ```pyhton
@@ -239,106 +106,17 @@ Output:
 
 ```
 
-### ```eos.P_BM()```:
-
-Computes the pressure using the 3rd order Birch-Murnaghan equation of state.
-
-Parameters:
-
-```float: eta=0```: Compression ratio.\
-```float: K=0```: Bulk modulus.\
-```float: K0_prime=0```: Pressure derivative of bulk modulus.
-
-### ```eos.rho_BM()```:
-
-Computes the density using the 3rd order Birch-Murnaghan equation of state.
-
-Parameters:
-
-```int: ll=0```: Compound signature.\
-```float: T=0```: Temperature in kelvin.\
-```float: P=0```: Pressure in Pa.\
-```float: dmin=None```: Lower bound for density bisection.\
-```float: dmax=None```: Upper bound for density bisection.\
-```float: aT=None```: First fitting parameter to thermal expansion coefficient.\
-```float: bT=None```: Second fitting parameter to thermal expansion coefficient.\
-```float: cT=None```: Third fitting parameter to thermal expansion coefficient.
-
-### ```eos.dPdrho_BM()```:
-
-Computes the density derivative of the pressure using the 3rd order Birch-Murnaghan equation of state.
-
-### ```eos.P_MGD()```:
-
-Computes the pressure using the Mie-Grüneisen-Debye equation of state.
-
-### ```eos.rho_MGD()```:
-
-Computes the density using the Mie-Grüneisen-Debye equation of state.
-
-### ```eos.dPdrho_MGD()```:
-
-Computes the density derivative of the pressure using the Mie-Grüneisen-Debye equation of state.
-
-### ```eos.P_Vinet()```:
-
-Computes the pressure using the Vinet equation of state.
-
-### ```eos.rho_Vinet()```:
-
-Computes the density using the Vinet equation of state.
-
-### ```eos.dPdrho_Vinet()```:
-
-Computes the density derivative of the pressure using the Vinet equation of state.
-
-### ```eos.P_Bel()```:
-
-Computes the pressure using the Belonoshko equation of state.
-
-### ```eos.rho_Bel()```:
-
-Computes the density using the Belonoshko equation of state.
-
-### ```eos.dPdrho_Bel()```:
-
-Computes the density derivative of the pressure using the Belonoshko equation of state.
-
-### ```eos.P_VR()```:
-
-Computes the pressure using the Vinet-Rydberg equation of state.
-
-### ```eos.rho_VR()```:
-
-Computes the density using the Vinet-Rydberg equation of state.
-
-### ```eos.dPdrho_VR()```:
-
-Computes the density derivative of the pressure using the Vinet-Rydberg equation of state.
-
-## The ```pics.materials.eos_tables``` module
-
-Not ready!
-
-## The ```pics.materials.hydration``` module
-
-Not ready!
-
-## The ```pics.materials.metal_silicate_partitioning``` module
-
-Not ready!
-
 # References
 
-<a id="1">[1]</a> 
+<a id="1">[1]</a>
 O. Shah, et al. (2021).
 Internal water storage capacity of terrestrial planets and the effect of hydration on the M-R relation.
 A&A 646, A162
 
-<a id="2">[2]</a> 
+<a id="2">[2]</a>
 Oliver Shah, et al. (2022).
 Possible Chemical Composition And Interior Structure Models Of Venus Inferred From Numerical Modelling.
 ApJ 926 217
 
-<a id="3">[3]</a> 
+<a id="3">[3]</a>
 C. Sotin, et al. (2007).

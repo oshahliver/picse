@@ -40,7 +40,7 @@ class MySim:
 
     def update(self):
         self.v1 = 2 * self.d
-        self.v2 = self.e + self.d**2
+        self.v2 = self.e + self.d ** 2
         self.v3 = np.sqrt(self.f) + self.v1
 
 

@@ -7,7 +7,7 @@ LIB_DIR = "lib"
 SRC_DIR = "lib"
 
 # Generate object files for static linking:
-subprocess.run(['make', 'static', 'clean'])
+subprocess.run(["make", "static"])
 
 # Specify the object files for static linking
 # Must be pre-compiled at this point
@@ -71,3 +71,6 @@ setup(
     #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
+
+
+subprocess.run(["make", "clean"])

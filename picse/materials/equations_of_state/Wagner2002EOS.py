@@ -320,7 +320,7 @@ epsilonr_list = [1, 1, 1]
 
 
 def Delta(the, B, delta, a):
-    return the**2 + B * ((delta - 1.0) ** 2) ** a
+    return the ** 2 + B * ((delta - 1.0) ** 2) ** a
 
 
 def theta(tau, A, delta, beta):
@@ -343,7 +343,7 @@ def dDeltaddelta(the, A, B, beta, delta, a):
 
 def dDeltaddelta_2(the, A, B, beta, delta, a):
     return (
-        2.0 * A**2.0 / beta**2.0 * (delta - 1.0) ** (2.0 / beta - 2.0)
+        2.0 * A ** 2.0 / beta ** 2.0 * (delta - 1.0) ** (2.0 / beta - 2.0)
         + 2.0
         * the
         * A
@@ -432,7 +432,7 @@ def dphi0dtau_2(d=None, T=None):
             * (1 - np.exp(-gamma0_list[i + 3] * tau)) ** (-2)
         )
 
-    return -n3 / tau**2 - k
+    return -n3 / tau ** 2 - k
 
 
 def phir(d=None, t=None, **kwargs):
@@ -672,7 +672,7 @@ def dphirddelta_2(d=None, T=None):
             br_list[0]
             * (br_list[0] - 1)
             * Delta1 ** (br_list[0] - 2)
-            * dDeltaddelta1**2
+            * dDeltaddelta1 ** 2
             + br_list[0] * Delta1 ** (br_list[0] - 1) * dDeltaddelta11
         )
     ) + nr_list[55] * (
@@ -689,7 +689,7 @@ def dphirddelta_2(d=None, T=None):
             br_list[1]
             * (br_list[1] - 1)
             * Delta2 ** (br_list[1] - 2)
-            * dDeltaddelta2**2
+            * dDeltaddelta2 ** 2
             + br_list[1] * Delta2 ** (br_list[1] - 1) * dDeltaddelta22
         )
     )
@@ -735,7 +735,7 @@ def dphirdtau_2(d=None, T=None):
             )
             * (
                 (tr_list[ii] / tau - 2 * betar_list[i] * (tau - gammar_list[i])) ** 2
-                - tr_list[ii] / tau**2
+                - tr_list[ii] / tau ** 2
                 - 2 * betar_list[i]
             )
         )
@@ -751,7 +751,7 @@ def dphirdtau_2(d=None, T=None):
         (
             2 * br_list[0] * Delta1 ** (br_list[0] - 1)
             + 4
-            * theta1**2
+            * theta1 ** 2
             * br_list[0]
             * (br_list[0] - 1)
             * Delta1 ** (br_list[0] - 2)
@@ -770,7 +770,7 @@ def dphirdtau_2(d=None, T=None):
         (
             2 * br_list[1] * Delta2 ** (br_list[1] - 1)
             + 4
-            * theta2**2
+            * theta2 ** 2
             * br_list[1]
             * (br_list[1] - 1)
             * Delta2 ** (br_list[1] - 2)
@@ -972,7 +972,7 @@ def cV_spec(T=None, d=None, P=None):
         d = density(P=P, T=T)
 
     tau = T_critical / T
-    return -Rgasspec * tau**2 * (dphi0dtau_2(T=T, d=d) + dphirdtau_2(d=d, T=T))
+    return -Rgasspec * tau ** 2 * (dphi0dtau_2(T=T, d=d) + dphirdtau_2(d=d, T=T))
 
 
 def cp_spec(T=None, d=None, P=None):
@@ -993,9 +993,9 @@ def cp_spec(T=None, d=None, P=None):
         drdelta = dphirddelta(d=d, T=T)
 
         cp = Rgasspec * (
-            -(tau**2) * (dphi0dtau_2(d=d, T=T) + dphirdtau_2(d=d, T=T))
+            -(tau ** 2) * (dphi0dtau_2(d=d, T=T) + dphirdtau_2(d=d, T=T))
             + (1 + delta * drdelta - delta * tau * dphirddeltadtau(d=d, T=T)) ** 2
-            / (1 + 2 * delta * drdelta + delta**2 * dphirddelta_2(d=d, T=T))
+            / (1 + 2 * delta * drdelta + delta ** 2 * dphirddelta_2(d=d, T=T))
         )
 
     # cp = ftool.deriv(f=h_spec, whicharg='T', x0=T, d=d, acc=1.0e-6, plot=True)
@@ -1124,9 +1124,9 @@ def together(P=None, T=None):
         )
 
         cp = Rgasspec * (
-            -(tau**2) * (K5 + K6)
+            -(tau ** 2) * (K5 + K6)
             + (1.0 + delta * K1 - delta * tau * K4) ** 2
-            / (1.0 + 2.0 * delta * K1 + delta**2 * K3)
+            / (1.0 + 2.0 * delta * K1 + delta ** 2 * K3)
         )
 
         # test = (heat_ratio-1.)/heat_ratio*T/P

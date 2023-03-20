@@ -454,7 +454,7 @@ class Plot:
                         left = xmin + ll
                         right = left + 1
                         # print('\n left/right =', left, right)
-                        partial_xticks = np.linspace(10**left, 10**right, 10)
+                        partial_xticks = np.linspace(10 ** left, 10 ** right, 10)
                         for lll in range(10):
                             xticks_minor.append(np.log10(partial_xticks[lll]))
 
@@ -488,7 +488,7 @@ class Plot:
                         left = ymin + ll
                         right = left + 1
                         # print('\n left/right =', left, right)
-                        partial_yticks = np.linspace(10**left, 10**right, 10)
+                        partial_yticks = np.linspace(10 ** left, 10 ** right, 10)
                         for lll in range(10):
                             yticks_minor.append(np.log10(partial_yticks[lll]))
 

@@ -11,11 +11,14 @@ from picse.utils.function_tools import PIMPtools
 from picse.materials import eosTablesUse as eosTab
 import numpy as np
 from matplotlib import pyplot as plt
+
 # from picse.materials import Mazevet2018EOS as mazevet
 import matplotlib.transforms as transforms
-from picse.materials import Feistel2006EOS as feistel
+from picse.materials.equations_of_state import Feistel2006EOS as feistel
+
 # from picse.materials import eoswater
 from picse.materials import phaseCheck
+
 # from picse.materials import hydration
 # from picse.materials import brucite_phase as bruce
 from picse.utils.function_tools import functionTools as ftool
@@ -491,7 +494,7 @@ def P_VR(
     e0 = 198e-6
     e = e0 * eta ** (-g)
 
-    Pe = 3.0 / 2.0 * n_list[ll] * Rgas * e * g * T**2 * d / molmass
+    Pe = 3.0 / 2.0 * n_list[ll] * Rgas * e * g * T ** 2 * d / molmass
     print("Pe =", Pe)
     return P0 + Pth + Pe
 
@@ -602,7 +605,7 @@ def P_Ichi(
     g = -0.4
 
     gamma = gamma0 * (1.0 + a * (eta ** (-b) - 1.0))
-    Eth = 3.0 * n_list[ll] * Rgas * (T + e0 * eta ** (-g) * T**2)
+    Eth = 3.0 * n_list[ll] * Rgas * (T + e0 * eta ** (-g) * T ** 2)
     Eth0 = 3.0 * n_list[ll] * Rgas * (T0_list[ll] + e0 * eta ** (-g) * T0_list[ll] ** 2)
 
     V = molmass / d / eta
@@ -692,7 +695,7 @@ def P_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     a = a_VDW_list[ll]
     b = b_VDW_list[ll]
     c1 = d * Rgas * T / (mm - d * b)
-    c2 = d**2 * a / mm**2
+    c2 = d ** 2 * a / mm ** 2
     print("c1 =", c1)
     print("c2 =", c2)
     return c1 - c2
@@ -710,7 +713,7 @@ def dPdrho_VDW(d=0.0, T=0.0, ll=None, **kwargs):
     b = b_VDW_list[ll]
     return (
         Rgas * T / (mm - b * d)
-        - 2.0 * d * a / mm**2
+        - 2.0 * d * a / mm ** 2
         + b * d * Rgas * T / (mm - b * d) ** 2
     )
 
@@ -916,7 +919,6 @@ def compute(
         - Element 9: Al content for silicates. Defaults to None.
     """
 
-
     Fe_number = min(Fe_number, 100.0 - 1.0e-10)
     FeMg = Fe_number / (100.0 - Fe_number)
 
@@ -1025,7 +1027,9 @@ def compute(
 
             # for Mg(OH)2 (Brucite) different phases are taken into account
             elif ll == 11:
-                raise NotImplementedError("Mg(OH)2 EoS is currently not available here.")
+                raise NotImplementedError(
+                    "Mg(OH)2 EoS is currently not available here."
+                )
                 stopper = False
 
                 if phase == None:
@@ -1047,7 +1051,9 @@ def compute(
                 stopper = False
 
                 if phase == None:
-                    raise NotImplementedError("Mg(OH)2 EoS is currently not available here. Specify the phase argument to 0 to avoid this error.")
+                    raise NotImplementedError(
+                        "Mg(OH)2 EoS is currently not available here. Specify the phase argument to 0 to avoid this error."
+                    )
                     phase = bruce.phaseCheck(T=T, P=P)
 
                 # phase 0 is Mg(OH) which does not exist in the anhydrous case

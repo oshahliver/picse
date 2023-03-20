@@ -770,7 +770,7 @@ class PieGhost:
             self.phi2 = np.pi * 2 / 3
 
         self.r = r  # Radius of circle
-        self.angles = np.linspace(self.phi1, self.phi2, 2**res)
+        self.angles = np.linspace(self.phi1, self.phi2, 2 ** res)
         self.offset = offset
 
         # Create circle segment
@@ -801,7 +801,7 @@ class PieSlice:
             self.phi2 = np.pi * 2 / 3
 
         self.r = r  # Radius of circle
-        self.angles = np.linspace(self.phi1, self.phi2, 2**res)
+        self.angles = np.linspace(self.phi1, self.phi2, 2 ** res)
         self.offset = offset
 
         # Create circle segment

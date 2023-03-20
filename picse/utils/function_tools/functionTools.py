@@ -21,6 +21,91 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from picse import physicalparams
 from picse.runparams import color_list
 import pickle
+from scipy.misc import derivative
+from scipy.optimize import bisect
+
+
+def der1(fct, x0, which="T", **kwargs):
+    """Computes the derivative of a function with respect to one of the
+    function arguments.
+
+    Parameters:
+    fct (function): the function to differentiate.
+    x0 (float): the point at which the derivative is computed.
+    which (str): the argument with respect to which the differentiation is carried out
+
+    Returns:
+    float: value of the derivative at x0.
+    """
+
+    def f(x):
+        kwargs.update({which: x})
+        return fct(**kwargs)
+
+    dfdx = derivative(f, x0, dx=1e-3 * x0)
+    return dfdx
+
+
+def der2(fct, x0, which="T", **kwargs):
+    """Computes the derivative of a function with respect to one of the
+    function arguments.
+
+    Parameters:
+    fct (function): the function to differentiate.
+    x0 (float): the point at which the derivative is computed.
+    which (str): the argument with respect to which the differentiation is carried out
+
+    Returns:
+    float: value of the derivative at x0.
+    """
+
+    # def f(x):
+    #     return der1(fct, x, which=which, **kwargs)
+    def f(x):
+        kwargs.update({which: x})
+        return fct(**kwargs)
+
+    d2fdx2 = derivative(f, x0, dx=1e-3 * x0, n=2, order=5)
+    return d2fdx2
+
+
+def dermix(fct, x1, x2, arg1="T", arg2="V", **kwargs):
+    """Computes the derivative of a function with respect to one of the
+    function arguments.
+
+    Parameters:
+    fct (function): the function to differentiate.
+    x1 (float): Value of the first argument at which the derivative is computed.
+    x2 (float): Value of the second argument at which the derivative is computed.
+    arg1 (str): First argument with respect to which the differentiation is carried out
+    arg2 (str): Second argument with respect to which the differentiation is carried out
+
+    Returns:
+    float: value of the derivative at x1, x2 with respect to arg1 and arg2.
+    """
+
+    def f(x):
+        kwargs.update({arg2: x})
+        return der1(fct, x1, which=arg1, **kwargs)
+
+    d2fdx1dx2 = derivative(f, x2, dx=1e-3 * x2)
+    return d2fdx1dx2
+
+
+def invert_function(fct, x1, x2, which="P", **kwargs):
+    """Inverts a function with respect to a certain variable
+
+    Parameters:
+    fct (function): the function to be inverted.
+    x1 (float): lower bound for the root finding
+    x2 (float): upper bound for the root finding
+    which (str): the label of the argument to be eliminated
+
+    Returns:
+    float: value of the inverted function.
+    """
+
+    return bisect(fct(**kwargs), x1, x2)
 
 
 def clean_names(folder):
@@ -98,7 +183,7 @@ def my_cmap(res=3, start=0, reverse=False):
     if reverse:
         border_colors = list(reversed(border_colors))
 
-    n_additional_bins = 2**res
+    n_additional_bins = 2 ** res
 
     colors = []
 
@@ -428,7 +513,7 @@ def row(pnt, order=2):
     r = []
     for i in range(order + 1):
         for j in range(order + 1):
-            r.append(x**i * y**j)
+            r.append(x ** i * y ** j)
 
     return r
 
@@ -576,7 +661,7 @@ def fancyround(num, digits=2):
 
     dummy_num = round(dummy_num, digits - 1)
 
-    return dummy_num * 10**exponent
+    return dummy_num * 10 ** exponent
 
 
 def scinot(num, digits=2):
@@ -594,7 +679,7 @@ def scinot(num, digits=2):
     except OverflowError:
         exponent = 0
 
-    return str(round(num / 10**exponent, digits - 1)) + "e" + str(exponent)
+    return str(round(num / 10 ** exponent, digits - 1)) + "e" + str(exponent)
 
 
 def print_table(data, cols, wide):
@@ -1273,7 +1358,7 @@ def row1d(x, order=2):
     """Compute row of coefficient matrix 'M' for 2nd order 2d interpolation"""
     r = []
     for i in range(order + 1):
-        r.append(x**i)
+        r.append(x ** i)
     return r
 
 
@@ -1435,7 +1520,7 @@ def interpolate_deriv1d(grid=[], data=[], order=2, plot=False, which="left", **k
         a_vector_ = np.linalg.solve(matrix, b_vector)
 
     def func(x, a, order):
-        return sum([x**i * a[i] for i in range(order + 1)])
+        return sum([x ** i * a[i] for i in range(order + 1)])
 
     if plot:
         xx = np.linspace(min(x_list), max(x_list), 25)

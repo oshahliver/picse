@@ -175,7 +175,7 @@ class multi_linear_model:
             for i in range(self.n_params + 1):
                 self.coefs.append(1.0)
 
-            for i in range(2**self.n_params - self.n_params - 1):
+            for i in range(2 ** self.n_params - self.n_params - 1):
                 self.coefs.append(0.0)
 
         else:
@@ -223,7 +223,7 @@ class multi_linear_model:
 
             fig, ax = plt.subplots()
 
-            N = 2**6
+            N = 2 ** 6
 
             x1 = np.linspace(min(self.x_data[0]), max(self.x_data[0]), N)
             x2 = np.linspace(min(self.x_data[1]), max(self.x_data[1]), N)

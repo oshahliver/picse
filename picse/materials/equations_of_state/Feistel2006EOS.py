@@ -110,7 +110,7 @@ def g0PP(P):
     cc = 0.0
     for k in range(3):
         kk = k + 2
-        cc += g0_list[kk] * kk * (kk - 1) / P_triple**2 * (pi - pi0) ** (kk - 2)
+        cc += g0_list[kk] * kk * (kk - 1) / P_triple ** 2 * (pi - pi0) ** (kk - 2)
 
     return cc
 
@@ -134,7 +134,7 @@ def r2P(P):
 
 
 def r2PP(P):
-    return r2_list[2] * 2.0 / P_triple**2
+    return r2_list[2] * 2.0 / P_triple ** 2
 
 
 def complex_number(p, t):
@@ -147,7 +147,7 @@ def complex_number(p, t):
                 (t_list[k] - tau) * np.log(t_list[k] - tau)
                 + (t_list[k] + tau) * np.log(t_list[k] + tau)
                 - 2.0 * t_list[k] * np.log(t_list[k])
-                - tau**2 / t_list[k]
+                - tau ** 2 / t_list[k]
             )
             for k in range(len(t_list))
         ]
@@ -199,7 +199,7 @@ def gP(T=None, P=None):
         (t2 - tau) * np.log(t2 - tau)
         + (t2 + tau) * np.log(t2 + tau)
         - 2 * t2 * np.log(t2)
-        - tau**2 / t2
+        - tau ** 2 / t2
     )
 
     return g0P(P) + T_triple * np.real(cc)
@@ -214,7 +214,7 @@ def gPP(T=None, P=None):
         (t2 - tau) * np.log(t2 - tau)
         + (t2 + tau) * np.log(t2 + tau)
         - 2 * t2 * np.log(t2)
-        - tau**2 / t2
+        - tau ** 2 / t2
     )
 
     return g0PP(P) + T_triple * np.real(cc)
@@ -333,7 +333,7 @@ def dTdP_S(T=None, P=None, d=None, type=1):
 
         # compute dT/dP_S from Maxwell relation
         # dT/dP_S = dV/dS_P= = -1/rho*2 * (dS_spec/drho)**(-1)
-        dTdP_S = -1.0 / (d**2 * dsdrho)
+        dTdP_S = -1.0 / (d ** 2 * dsdrho)
 
     elif type == 1:
         a = alpha_th_p(T=T, P=P, d=d)
@@ -359,7 +359,7 @@ def together(T=None, P=None):
     s = -K2
     cp = -T * K3
     alpha = K5 / K1
-    dPdrho = -(K1**2) / K4
+    dPdrho = -(K1 ** 2) / K4
     dTdP = T * alpha / (d * cp)
 
     return d, dTdP, dPdrho, alpha, cp, s, u
