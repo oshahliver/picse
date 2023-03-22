@@ -115,6 +115,7 @@ class PlanetaryOutputParams(Parameters):
             "M_surface_is": None,
             "P_surface_is": None,
             "T_surface_is": None,
+            "ener_tot_is":None,
             "moment_of_inertia_is": None,
             "ocean_fraction_is": None,
             "ocean_depth": None,
@@ -128,36 +129,36 @@ class PlanetaryOutputParams(Parameters):
         }
 
 
-class RunOutputParams(Parameters):
-    def __init__(self, **kwargs):
-        self.default_values = {
-            "M_surface_is": None,
-            "R_surface_is": None,
-            "T_surface_is": None,
-            "Mg_number_is": None,
-            "Si_number_is": None,
-            "Fe_count": None,
-            "Si_count": None,
-            "Mg_count": None,
-            "O_count": None,
-            "H2O_count": None,
-            "H_count": None,
-            "S_count": None,
-            "ocean_fraction_is": None,
-            "moment_of_inertia_is": None,
-            "layer_properties": [],
-            "profiles": [],
-            "shell_count": 0,
-            "layer_count": 0,
-            "fractions_out": [],
-            "x_Fe_mantle": None,
-            "Si_number_mantle": None,
-            "mantle_exists": False,
-            "inner_core_exists": False,
-            "outer_core_exists": False,
-            "gravitational_energy": None,
-            "internal_energy": None,
-        }
+# class RunOutputParams(Parameters):
+#     def __init__(self, **kwargs):
+#         self.default_values = {
+#             "M_surface_is": None,
+#             "R_surface_is": None,
+#             "T_surface_is": None,
+#             "Mg_number_is": None,
+#             "Si_number_is": None,
+#             "Fe_count": None,
+#             "Si_count": None,
+#             "Mg_count": None,
+#             "O_count": None,
+#             "H2O_count": None,
+#             "H_count": None,
+#             "S_count": None,
+#             "ocean_fraction_is": None,
+#             "moment_of_inertia_is": None,
+#             "layer_properties": [],
+#             "profiles": [],
+#             "shell_count": 0,
+#             "layer_count": 0,
+#             "fractions_out": [],
+#             "x_Fe_mantle": None,
+#             "Si_number_mantle": None,
+#             "mantle_exists": False,
+#             "inner_core_exists": False,
+#             "outer_core_exists": False,
+#             "gravitational_energy": None,
+#             "internal_energy": None,
+#         }
 
 
 class PlanetaryInputParams(Parameters):
@@ -170,6 +171,7 @@ class PlanetaryInputParams(Parameters):
             "T_surface_should": 300.0,
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
+            "ener_tot_should":1.0,
             "ocean_fraction_should": -10,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],

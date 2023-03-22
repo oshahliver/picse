@@ -615,10 +615,10 @@ contains
          self%indigenous_ener_grav = params(7)
          self%indigenous_ener_int = params(8)
          
-         print *, ""
-         print *, "mass =", params(2)
-         print *, "ener grav =", params(7)
-         print *, "ener int =", params(8)
+         ! print *, ""
+         ! print *, "mass =", params(2)
+         ! print *, "ener grav =", params(7)
+         ! print *, "ener int =", params(8)
          self%dr = dr
 
 !~ print *, 'fractions =', self%fractions

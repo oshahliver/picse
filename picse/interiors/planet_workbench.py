@@ -197,7 +197,7 @@ class BlindSet(DataSet):
                     )
 
                     # temporarely supress all prints
-                    sys.stdout = open(os.devnull, "w")
+                    # sys.stdout = open(os.devnull, "w")
 
                     pl = planet_class(
                         planetary_params=planetary_params,

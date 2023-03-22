@@ -124,7 +124,7 @@ class Toolkit:
                 "ocean_fraction_is": planet.ocean_fraction_is,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_FeS_core,
-                # "ener_tot_is": planet.ener_tot_is,
+                "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
 
@@ -139,7 +139,7 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "x_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "ener_tot_is": planet.ener_tot_is,
+                "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
 
@@ -153,7 +153,7 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "ener_tot_is": planet.ener_tot_is,
+                "ener_tot_is": planet.ener_tot_is,
                 # "L_int_is": planet.L_int_is,
             }
         try:
@@ -563,7 +563,7 @@ class Toolkit:
 
                 # M_core has to be treated seperately here as it is not an attribute
                 # of the Planet class but rather the first entry of layer_masses of a
-                # Planet.Planet object. Also the planets properties only need to be
+                # Planet object. Also the planets properties only need to be
                 # updated if the condition is NOT already met
                 if specs["how"][i] == "M_core":
                     planet.initials["layer_masses"][0] = newval[i]
@@ -576,14 +576,14 @@ class Toolkit:
 
                 else:
                     planet.initials[specs["how"][i]] = newval[i]
-            """
-            print ('vals should =', val_should)
+            
+            print ('vals should =', specs["val_should"])
             print ('vals is =', val_is)
-            print ('initial howval =', [all_how[h] for h in how])
-            print ('initial whatval =', [all_what[w+'_is'] for w in what])
+            print ('initial howval =', [all_how[h] for h in specs["how"]])
+            print ('initial whatval =', [all_what[w+'_is'] for w in specs["what"]])
             print ('initial reldev =', reldev)
             print ('initial deltas =', self.delta)
-            """
+            
 
             if sum(self.delta) == 0.0:
                 print("All parameters already satisfied")
@@ -608,9 +608,9 @@ class Toolkit:
                 self.oldhowvals.append([n for n in newval])
                 self.oldwhatvals.append([v for v in val_is])
 
-                # print("initial howvals =", self.oldhowvals)
-                # print("initial whatvals =", self.oldwhatvals)
-                # print("initial newvals =", newval)
+                print("initial howvals =", self.oldhowvals)
+                print("initial whatvals =", self.oldwhatvals)
+                print("initial newvals =", newval)
 
         count = 0
         exitcode = 0
@@ -699,10 +699,11 @@ class Toolkit:
                 linsys.create_model()
                 linsys.predict()
                 newval = linsys.pred
+                print ("newvals predicted =", newval)
 
             except np.linalg.LinAlgError as err:
                 if "Singular matrix" in str(err):
-                    print("Singular matrix")
+                    print("WARNING: Singular matrix")
                     """The reason for a singular matrix can be the fact that
                     one of the parameters is already met in which case the
                     delta is zero and hence y1 = y2. In this case adopt 
@@ -759,12 +760,10 @@ class Toolkit:
                     self.iteration = False
                     exitcode = 1
                     print(
-                        "WARNING: Ceiling for parameter "
-                        + specs["how"][i]
-                        + " reached."
+                        f"WARNING: Ceiling for parameter {specs['how'][i]} reached"
                     )
                     print("vapor =", planet.vapor_reached)
-                    print("T / P =", planet.T_surface_is, planet.P_surface_is * 1e-5)
+                    print("surface T / P =", planet.T_surface_is, planet.P_surface_is * 1e-5)
             # print ('a =', a)
             if len(self.passives) > 0:
                 self.passive_delta = [
