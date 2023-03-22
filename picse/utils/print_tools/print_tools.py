@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from picse.physicalparams import r_earth, m_earth, mH2O, material_list_fort
+from picse.physicalparams import r_earth, m_earth, mH2O, material_list_fort, G
 from picse.utils.function_tools import functionTools as ftool
 
 
@@ -36,10 +36,7 @@ def print_planet(self, style=0, digits=3):
                 "\nP_center [GPa]:",
                 round(self.P_center * 1.0e-9, digits),
                 "\n\nMOI factor:",
-                round(
-                    self.moment_of_inertia_is,
-                    digits,
-                ),
+                round(self.moment_of_inertia_is, digits,),
                 "\nMg_number_should:",
                 round(self.Mg_number_should, digits),
                 "\nMg_number_is:",

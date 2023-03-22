@@ -2520,8 +2520,13 @@ class FreeEnergy:
         pass
 
     def plot_maps(
-        self, res=[3, 3], y_range=[3.0, 8.0], x_range=[2000, 10000], log=[False, False],
-    **kwargs):
+        self,
+        res=[3, 3],
+        y_range=[3.0, 8.0],
+        x_range=[2000, 10000],
+        log=[False, False],
+        **kwargs,
+    ):
         if log[0]:
             x = np.logspace(np.log10(x_range[0]), np.log10(x_range[1]), 2 ** res[0])
 

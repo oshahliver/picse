@@ -331,14 +331,10 @@ class Toolkit:
                 planet.initials[w + "_should"] = specs["val_should"][i] / m_earth
 
             elif w == "ener_tot":
-                planet.initials[w + "_should"] = specs["val_should"][i] / (
-                    G * m_earth ** 2 / r_earth * 3 / 5
-                )
+                planet.initials[w + "_should"] = specs["val_should"][i]
 
             elif w == "L_int":
-                planet.initials[w + "_should"] = specs["val_should"][i] / (
-                    4 * np.pi * r_earth ** 2 * sigmaSB * 300 ** 4
-                )
+                planet.initials[w + "_should"] = specs["val_should"][i]
 
             else:
                 planet.initials[w + "_should"] = specs["val_should"][i]
@@ -543,9 +539,7 @@ class Toolkit:
 
                 # Add random fluctuation to avoid singular matrix if the initial
                 # values of two data points are identical
-                rand = random.random()
-                # print("random fluc =", rand)
-                all_how[specs["how"][i]] *= 1.0 + rand * 1e-2
+                all_how[specs["how"][i]] *= 1.0 + random.random() * 1e-6
 
                 # force newval to stay within the defined value ranges for the
                 # currently iterated parameter
@@ -576,14 +570,13 @@ class Toolkit:
 
                 else:
                     planet.initials[specs["how"][i]] = newval[i]
-            
-            print ('vals should =', specs["val_should"])
-            print ('vals is =', val_is)
-            print ('initial howval =', [all_how[h] for h in specs["how"]])
-            print ('initial whatval =', [all_what[w+'_is'] for w in specs["what"]])
-            print ('initial reldev =', reldev)
-            print ('initial deltas =', self.delta)
-            
+
+            # print ('vals should =', specs["val_should"])
+            # print ('vals is =', val_is)
+            # print ('initial howval =', [all_how[h] for h in specs["how"]])
+            # print ('initial whatval =', [all_what[w+'_is'] for w in specs["what"]])
+            # print ('initial reldev =', reldev)
+            # print ('initial deltas =', self.delta)
 
             if sum(self.delta) == 0.0:
                 print("All parameters already satisfied")
@@ -608,9 +601,9 @@ class Toolkit:
                 self.oldhowvals.append([n for n in newval])
                 self.oldwhatvals.append([v for v in val_is])
 
-                print("initial howvals =", self.oldhowvals)
-                print("initial whatvals =", self.oldwhatvals)
-                print("initial newvals =", newval)
+                # print("initial howvals =", self.oldhowvals)
+                # print("initial whatvals =", self.oldwhatvals)
+                # print("initial newvals =", newval)
 
         count = 0
         exitcode = 0
@@ -699,7 +692,7 @@ class Toolkit:
                 linsys.create_model()
                 linsys.predict()
                 newval = linsys.pred
-                print ("newvals predicted =", newval)
+                print("newvals predicted =", newval)
 
             except np.linalg.LinAlgError as err:
                 if "Singular matrix" in str(err):
@@ -759,11 +752,13 @@ class Toolkit:
                 ):
                     self.iteration = False
                     exitcode = 1
-                    print(
-                        f"WARNING: Ceiling for parameter {specs['how'][i]} reached"
-                    )
+                    print(f"WARNING: Ceiling for parameter {specs['how'][i]} reached")
                     print("vapor =", planet.vapor_reached)
-                    print("surface T / P =", planet.T_surface_is, planet.P_surface_is * 1e-5)
+                    print(
+                        "surface T / P =",
+                        planet.T_surface_is,
+                        planet.P_surface_is * 1e-5,
+                    )
             # print ('a =', a)
             if len(self.passives) > 0:
                 self.passive_delta = [

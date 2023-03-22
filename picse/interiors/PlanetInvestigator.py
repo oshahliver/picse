@@ -2296,11 +2296,7 @@ def plot_models(
     param_scales = [
         ["lin", "lin", "lin"],
         ["lin", "log", "lin"],
-        [
-            "lin",
-            "log",
-            "log",
-        ],
+        ["lin", "log", "log",],
         ["lin", "lin", "lin"],
         ["lin", "lin", "lin"],
     ]

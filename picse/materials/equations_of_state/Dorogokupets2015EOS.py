@@ -11,9 +11,9 @@ from picse.utils.function_tools import functionTools as ftool
 from matplotlib import pyplot as plt
 
 # Fo, Wds, Rwd, Akm, Prv, PPrv, Au, MgO, Pt
-U0_list = [-2200.69, -2173.0, -2163.3, -1472.5, -1524.0, -1447.9, 0., -609.571, 0]
+U0_list = [-2200.69, -2173.0, -2163.3, -1472.5, -1524.0, -1447.9, 0.0, -609.571, 0]
 V0_list = [43.67, 40.54, 39.5, 24.45, 26.35, 24.2, 10.215, 11.248, 9.091]
-K0_list = [127.4, 169.0, 187.4, 252.0, 215.3, 253.7, 167., 160.3, 275.0]
+K0_list = [127.4, 169.0, 187.4, 252.0, 215.3, 253.7, 167.0, 160.3, 275.0]
 Kp_list = [4.3, 4.14, 3.98, 4.38, 4.91, 4.0, 5.9, 4.25, 5.43]
 k_list = [5, 5, 5, 5, 5, 5, 2, 5, 2]
 theta01_list = [949, 921, 929, 943, 995, 943, 178, 747, 184]
@@ -117,8 +117,22 @@ def E0(V, V0=None, kp=None, k=None, K0=None):
 def F_th(V, T, m1=None, m2=None, ll=None):
     m1 = m1_list[ll]
     m2 = m2_list[ll]
-    theta1 = theta(V, theta0=theta01_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
-    theta2 = theta(V, theta0=theta02_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
+    theta1 = theta(
+        V,
+        theta0=theta01_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
+    theta2 = theta(
+        V,
+        theta0=theta02_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
 
     a1 = m1 * R * T * np.log(1 - np.exp(-theta1 / T))
     a2 = m2 * R * T * np.log(1 - np.exp(-theta2 / T))
@@ -166,9 +180,9 @@ def P0(V, ll):
         DESCRIPTION.
 
     """
-    X = (V/V0_list[ll])**(1/3)
-    eta = 3*Kp_list[ll]/2 - k_list[ll] + 1/2
-    return 3 * K0_list[ll] * X**(-k_list[ll])*(1-X)*np.exp(eta*(1-X))
+    X = (V / V0_list[ll]) ** (1 / 3)
+    eta = 3 * Kp_list[ll] / 2 - k_list[ll] + 1 / 2
+    return 3 * K0_list[ll] * X ** (-k_list[ll]) * (1 - X) * np.exp(eta * (1 - X))
 
 
 def P_th(V, T, ll):
@@ -190,47 +204,105 @@ def P_th(V, T, ll):
         DESCRIPTION.
 
     """
-    gam = gamma(V, V0=V0_list[ll], beta = beta_list[ll], gamma0=gamma0_list[ll], gamma_inf=gamma_inf_list[ll])
-    theta1 = theta(V, theta0=theta01_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
-    theta2 = theta(V, theta0=theta02_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
-    print (theta1, theta2, gam)
-    print (np.exp(theta1/T))
-    a1 = m1_list[ll] * R  * gam / V * (theta1 / (np.exp(theta1/T)-1))
-    a2 = m2_list[ll] * R  * gam / V * (theta2 / (np.exp(theta2/T)-1))  
-    
+    gam = gamma(
+        V,
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+        gamma0=gamma0_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+    )
+    theta1 = theta(
+        V,
+        theta0=theta01_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
+    theta2 = theta(
+        V,
+        theta0=theta02_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
+    print(theta1, theta2, gam)
+    print(np.exp(theta1 / T))
+    a1 = m1_list[ll] * R * gam / V * (theta1 / (np.exp(theta1 / T) - 1))
+    a2 = m2_list[ll] * R * gam / V * (theta2 / (np.exp(theta2 / T) - 1))
+
     return a1 + a2
-    #return -ftool.der1(F_th, V, which="V", T=T, ll=ll)
-    
+    # return -ftool.der1(F_th, V, which="V", T=T, ll=ll)
+
 
 def C_V(V, T, ll):
-    theta1 = theta(V, theta0=theta01_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
-    theta2 = theta(V, theta0=theta02_list[ll], gamma_inf=gamma_inf_list[ll], gamma0=gamma0_list[ll], V0=V0_list[ll], beta=beta_list[ll])
-    a1 = m1_list[ll] * R * ((theta1/T)**2 * np.exp(theta1/T)/(np.exp(theta1/T)-1)**2)
-    a2 = m2_list[ll] * R * ((theta2/T)**2 * np.exp(theta2/T)/(np.exp(theta2/T)-1)**2)
+    theta1 = theta(
+        V,
+        theta0=theta01_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
+    theta2 = theta(
+        V,
+        theta0=theta02_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+        gamma0=gamma0_list[ll],
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+    )
+    a1 = (
+        m1_list[ll]
+        * R
+        * ((theta1 / T) ** 2 * np.exp(theta1 / T) / (np.exp(theta1 / T) - 1) ** 2)
+    )
+    a2 = (
+        m2_list[ll]
+        * R
+        * ((theta2 / T) ** 2 * np.exp(theta2 / T) / (np.exp(theta2 / T) - 1) ** 2)
+    )
     return a1 + a2
 
 
 def K_T0(V, ll):
-    X = (V/V0_list[ll])**(1/3)
-    eta = 3*Kp_list[ll]/2 - k_list[ll] + 1/2
-    return K0_list[ll] * X**(-k_list[ll]) * np.exp(eta * (1-X)) * (X + (1-X) * (eta*X+k_list[ll]))
+    X = (V / V0_list[ll]) ** (1 / 3)
+    eta = 3 * Kp_list[ll] / 2 - k_list[ll] + 1 / 2
+    return (
+        K0_list[ll]
+        * X ** (-k_list[ll])
+        * np.exp(eta * (1 - X))
+        * (X + (1 - X) * (eta * X + k_list[ll]))
+    )
 
 
 def K_T(V, T, ll):
     x = V / V0_list[ll]
-    gam = gamma(V, V0=V0_list[ll], beta = beta_list[ll], gamma0=gamma0_list[ll], gamma_inf=gamma_inf_list[ll])
+    gam = gamma(
+        V,
+        V0=V0_list[ll],
+        beta=beta_list[ll],
+        gamma0=gamma0_list[ll],
+        gamma_inf=gamma_inf_list[ll],
+    )
     pth = P_th(V, T, ll)
-    q = beta_list[ll] * x**beta_list[ll] * (gamma0_list[ll] - gamma_inf_list[ll])/gam
-    K_th = pth * (1 + gam - q ) - gam**2 * T * C_V(V, T, ll) / V
-    K_Ta = P_a(V, T, 7) * (1-m_list[7])
-    print (K_Ta)
-    return K_T0(V, ll) + K_th*1e-3 #+ K_Ta * 1e-3
+    q = (
+        beta_list[ll]
+        * x ** beta_list[ll]
+        * (gamma0_list[ll] - gamma_inf_list[ll])
+        / gam
+    )
+    K_th = pth * (1 + gam - q) - gam ** 2 * T * C_V(V, T, ll) / V
+    K_Ta = P_a(V, T, 7) * (1 - m_list[7])
+    print(K_Ta)
+    return K_T0(V, ll) + K_th * 1e-3  # + K_Ta * 1e-3
 
 
 def P_a(V, T, ll):
     x = V / V0_list[ll]
-    a = a0_list[ll] * x**m_list[ll]
-    Ea = (m1_list[ll] + m2_list[ll]) / 2 * R * a * T**2
+    a = a0_list[ll] * x ** m_list[ll]
+    Ea = (m1_list[ll] + m2_list[ll]) / 2 * R * a * T ** 2
     return m_list[ll] / V * Ea
 
 
@@ -253,15 +325,12 @@ def pressure(V, T, ll):
         DESCRIPTION.
 
     """
-    return P0(V, ll) + P_th(V, T, ll)*1e-3
+    return P0(V, ll) + P_th(V, T, ll) * 1e-3
+
 
 def plot():
     temps = np.linspace(-100, 100)
-    x = 1.
+    x = 1.0
     pres = np.array([P_th(x, t, 0) for t in temps])
-    
+
     plt.plot(temps, pres)
-    
-    
-    
-    

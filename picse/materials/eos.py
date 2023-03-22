@@ -1842,13 +1842,7 @@ def compute(
 
 
 def dTdP_ad(
-    ll=None,
-    T=None,
-    phase=None,
-    P=None,
-    Fe_number=0.0,
-    saturation=False,
-    gamma=1,
+    ll=None, T=None, phase=None, P=None, Fe_number=0.0, saturation=False, gamma=1,
 ):
     stuff = compute(
         ll=ll, T=T, P=P, Fe_number=Fe_number, saturation=saturation, phase=phase

@@ -31,7 +31,6 @@ ext1 = Extension(
     name="{}.utils.fortplanet".format(PACKAGE_NAME),
     sources=["{}/fortran/eosfort_wrapper.f95".format(SRC_DIR)],
     extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in fort_objects],
-    # libraries=['three'], # --> does not work!
     f2py_options=["--quiet"],
 )
 
@@ -39,14 +38,12 @@ ext2 = Extension(
     name="{}.utils.fortfunctions".format(PACKAGE_NAME),
     sources=["{}/fortran/functionsPy.f95".format(SRC_DIR)],
     extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["LinAlg"]],
-    # libraries=['three'], # --> does not work!
     f2py_options=["--quiet"],
 )
 
 setup(
     name=PACKAGE_NAME,
     version="0.0.1",
-    # package_dir={"": "foo"}, # --> does not include .py files!
     install_requires=[
         "astropy",
         "plotly",
@@ -68,8 +65,8 @@ setup(
     # include_package_data=True,
     package_dir={"picse": "picse"},
     package_data={"": ["*.tab", "*.pkl", "*.csv"]},
-    #   # py_modules = ['main', 'bar.myclass'], # --> does not work!
     #   optional=os.environ.get('CIBUILDWHEEL', '0') != '1',
 )
 
+# remove static library files
 subprocess.run(["make", "clean"])

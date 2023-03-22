@@ -5,6 +5,7 @@ interior model for a set of boundary conditions.
 
 from picse.interiors import planet_iterator
 from picse.interiors import planet_creator
+from picse.interiors import planet_evolution
 from picse.physicalparams import m_earth, r_earth, G
 import os
 import numpy as np
@@ -14,6 +15,7 @@ planet_creator.load_eos_tables()
 
 # Create an instance of the iterator toolkit
 iterator = planet_iterator.Toolkit()
+evolver = planet_evolution.Toolkit()
 
 #######################################################################
 # Model specifications
@@ -23,11 +25,11 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.3,  # desired total mass (in earth masses)
+    "M_surface_should": 1.2,  # desired total mass (in earth masses)
     "T_surface_should": 300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
     "Mg_number_should": 0.5,  # desired bulk magnesium number
-    "ener_tot_should": -1.4,  # total planetary energy
+    "ener_tot_should": -1.1,  # total planetary energy
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "contents": [[2], [2], [4, 5], [6, 7]],  # composition of each layer
@@ -60,12 +62,12 @@ iterator_specs = {
 # Initialize a telluric planet instance with the specified properties
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
 
-# Perform initial structure integration
+# Create initial model
 pl.construct()
-
-# Pass planet instance to iterator to match boundary conditions
-# NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, iterator_specs=iterator_specs)
+
+# Perform time evolution
+evolver.evolve(planet=pl, iterator=iterator, iterator_specs=iterator_specs)
 
 #######################################################################
 # Model inspection
@@ -73,30 +75,3 @@ iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 
 # print fundamental planeatary properties to standard output
 pl.print()
-
-# You can also access individual parameters as attributes. for instance:
-# print("total radius (km):", pl.R_surface_is * 1e-3)
-# print("mean density (gcc):", pl.mean_density * 1e-3)
-# print(
-#     "norm. moment of inertia:",
-#     pl.moment_of_inertia_is / (pl.R_surface_is**2 * pl.M_surface_is),
-# )
-# print("total mass (m_earth):", pl.M_surface_is / m_earth)
-# print("desired total mass (m_earth):", pl.M_surface_should)
-# print("surface pressure (bar):", pl.P_surface_is * 1e-5)
-# print("desired surface pressure (bar):", pl.P_surface_should * 1e-5)
-# print("surface temperature (K):", pl.T_surface_is)
-# print("desired surface temperature (K):", pl.T_surface_should)
-# print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
-# print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
-
-# # # Plot the radial P, T, M, and rho profiles
-# file_path = os.getcwd()
-# pl.plot(
-#     file_name="structure_profiles",
-#     file_path=file_path,
-#     write_html=True,
-#     display=True,
-#     write_image=True,
-#     image_extension="pdf",
-# )

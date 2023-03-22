@@ -71,10 +71,7 @@ class BlindSet(DataSet):
         self.ready = False
 
     def set_up(
-        self,
-        n,
-        meta={},
-        sampling="uni",
+        self, n, meta={}, sampling="uni",
     ):
 
         self.n_planets = n
@@ -197,7 +194,7 @@ class BlindSet(DataSet):
                     )
 
                     # temporarely supress all prints
-                    # sys.stdout = open(os.devnull, "w")
+                    sys.stdout = open(os.devnull, "w")
 
                     pl = planet_class(
                         planetary_params=planetary_params,
@@ -299,8 +296,7 @@ class Population:
                     sys.stdout = open(os.devnull, "w")
 
                     pl = self.planet_class(
-                        planetary_params=planetary_params,
-                        run_params=self.run_params,
+                        planetary_params=planetary_params, run_params=self.run_params,
                     )
 
                     pl.construct()

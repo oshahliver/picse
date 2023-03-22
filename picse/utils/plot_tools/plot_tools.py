@@ -49,7 +49,10 @@ def plot_structure(
     fig.update_layout(height=500, width=800, showlegend=False)
     scalings = [[1.0, 1.0, 1.0], [1e-9, 1.0 / m_earth, 1.0]]
     params = [["temperature", "density", "ener_grav"], ["pressure", "mass", "ener_int"]]
-    labels = [["Temperature", "Density", "Grav. energy"], ["Pressure", "Mass", "Int. energy"]]
+    labels = [
+        ["Temperature", "Density", "Grav. energy"],
+        ["Pressure", "Mass", "Int. energy"],
+    ]
     units = [
         ["(K)", "(km \ m^{-3})", "(3GM_\oplus^2 / 5R_\oplus)"],
         ["(GPa)", "(\mathit{M_\oplus})", "(3GM_\oplus^2 / 5R_\oplus)"],

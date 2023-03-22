@@ -4509,22 +4509,8 @@ class Toolkit:
             [[0.875, 3.3], [2, 0], [0.875, 1.75]],
         ],
         rect_extent=[
-            [
-                [0.05, 1],
-                [
-                    1,
-                    1,
-                ],
-                [0.05, 0.5],
-            ],
-            [
-                [0.05, 1],
-                [
-                    1,
-                    1,
-                ],
-                [0.05, 0.5],
-            ],
+            [[0.05, 1], [1, 1,], [0.05, 0.5],],
+            [[0.05, 1], [1, 1,], [0.05, 0.5],],
         ],
     ):
 
@@ -5897,14 +5883,19 @@ class Toolkit:
             for i in range(len(all_pops)):
 
                 errors = (
-                    np.asarray(dissoc_positions[i])
-                    / np.asarray(dissoc_positions[0])
-                    * np.asarray(dissoc_positions_error[i])
-                ) ** 2 + (
-                    np.asarray(dissoc_positions[i])
-                    / np.asarray(dissoc_positions[0]) ** 2
-                    * np.asarray(dissoc_positions_error[0])
-                ) ** 2
+                    (
+                        np.asarray(dissoc_positions[i])
+                        / np.asarray(dissoc_positions[0])
+                        * np.asarray(dissoc_positions_error[i])
+                    )
+                    ** 2
+                    + (
+                        np.asarray(dissoc_positions[i])
+                        / np.asarray(dissoc_positions[0]) ** 2
+                        * np.asarray(dissoc_positions_error[0])
+                    )
+                    ** 2
+                )
 
                 errors = np.sqrt(errors)
 

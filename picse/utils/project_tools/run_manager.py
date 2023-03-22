@@ -2081,9 +2081,7 @@ class WorkFlow:
                     for d in dummy.tolist():
                         self.combined_ranges[i][struc][param].append(d)
 
-    def plot_structures(
-        self,
-    ):
+    def plot_structures(self,):
         if self.combined_ranges == None:
             self.get_ranges()
 

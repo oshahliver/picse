@@ -115,7 +115,7 @@ class PlanetaryOutputParams(Parameters):
             "M_surface_is": None,
             "P_surface_is": None,
             "T_surface_is": None,
-            "ener_tot_is":None,
+            "ener_tot_is": None,
             "moment_of_inertia_is": None,
             "ocean_fraction_is": None,
             "ocean_depth": None,
@@ -171,7 +171,7 @@ class PlanetaryInputParams(Parameters):
             "T_surface_should": 300.0,
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
-            "ener_tot_should":1.0,
+            "ener_tot_should": 1.0,
             "ocean_fraction_should": -10,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
@@ -700,11 +700,13 @@ class Planet:
 
         self.update_layers(self.layer_properties_dummy)
         self.trim_profiles()
-        
+
         self.ener_grav = self.profiles[7][-1]
         self.ener_int = self.profiles[8][-1]
         self.ener_tot_is = self.ener_grav + self.ener_int
-        self.luminosity = (self.R_surface_is/ r_earth)**2 * (self.T_surface_is / 300)**4
+        self.luminosity = (
+            4 * np.pi * sigmaSB * (self.R_surface_is) ** 2 * (self.T_surface_is) ** 4
+        )
         self.status = "very much alive"
 
     def trim_profiles(self):
@@ -734,13 +736,12 @@ class Planet:
         self.profiles[6] *= 1.0 / (self.M_surface_is * self.R_surface_is ** 2)
 
         # normalize gravitational energy
-        self.profiles[7]  *= 1 / (3/5 * G * m_earth**2 / r_earth)
+        self.profiles[7] *= 1 / (3 / 5 * G * m_earth ** 2 / r_earth)
         # normalize internal energy
-        self.profiles[8]  *= 1 / (3/5 * G * m_earth**2 / r_earth)
+        self.profiles[8] *= 1 / (3 / 5 * G * m_earth ** 2 / r_earth)
 
     def plot(
-        self,
-        **kwargs,
+        self, **kwargs,
     ):
 
         plot_structure(self.profiles, **kwargs)

@@ -52,9 +52,7 @@ meta = {
 }
 
 blind.set_up(
-    400000,
-    meta=meta,
-    sampling="uni",
+    400000, meta=meta, sampling="uni",
 )
 
 blind.create()

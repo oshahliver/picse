@@ -257,12 +257,7 @@ def RungeKutta(
     if order == 4:
         # Butcher-table for the 4th order solver
         alist = [
-            [
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            ],
+            [0.0, 0.0, 0.0, 0.0,],
             [0.5, 0.0, 0.0, 0.0],
             [0.0, 0.5, 0.0, 0.0],
             [0.0, 0.0, 1.0, 0.0],

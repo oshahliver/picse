@@ -798,10 +798,7 @@ def plot_hydro_effect():
     fig, ax = plt.subplots(figsize=(4, 3))
 
     ax.tick_params(
-        right=True,
-        top=True,
-        direction="in",
-        which="both",
+        right=True, top=True, direction="in", which="both",
     )
 
     plt.xticks(fontsize=10)
