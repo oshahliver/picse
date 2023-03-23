@@ -107,11 +107,13 @@ mrd.plot()
 
 ### Create thermal evolution time line
 
-```python
+First you need to import all relvant libraries and define the planetary parameters as well as the specifications for the iterator as we have done before.
 
-from picse.interiors import planet_evolution
+```python
+from picse.interiors import planet_evolution, planet_creator
 from picse.physicalparams import m_earth, r_earth, year, day
 import pandas as pd
+import numpy as np
 
 planet_creator.load_eos_tables()
 
@@ -144,13 +146,23 @@ iterator_specs = {
     "noisy": False,
 }
 
+```
+
+Next you have to define the start end end points of the time evolution, the energy source term and the specifications for the evolver instance.
+Here we use a 2nd order Runge-Kutta scheme with a step size adaption parameter of 1/4 and an accuracy for the total energy of 0.001% to solve the energy balance equation.
+
+```python
+start_time = 0.
 end_time = 10e6 * year * day
 
-def source(t, albedo):
-    return 4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4 * 0.1
+# Define external energy source term
+def source(t):
+    albedo = 0.3
+    F0 = 1366
+    return 4 * np.pi * r_earth ** 2 * F0 * (1 - albedo) / 4 * 0.1
 
 evolver_specs = {
-    "start": 0,
+    "start": start_time,
     "end": end_time,
     "eps": 0.25,
     "order": 2,
@@ -158,7 +170,11 @@ evolver_specs = {
     "acc": 1e-5,
     "write": True,
 }
+```
 
+Now you can create a `TimeLine` instance and create the thermal evolution model using the chosen specifications for the `iterator` and the `evolver`.
+
+```python
 # Create timeline
 tl = planet_evolution.TimeLine()
 tl.set_up(

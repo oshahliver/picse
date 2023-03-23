@@ -8,7 +8,7 @@ For more detailed documentation, see [interiors](./interiors_docs.md), and [mate
 
 ### Single Planets
 
-To set up a simple planetary model import the `planet_creator`, for handling of the planetary objects and their properties, and the `planet_iterator`, for handling of the boundary conditions (For more details, see [interiors](.interiors_docs.md).).
+To set up a simple planetary model import the `planet_creator`, for handling of the planetary objects and their properties, and the `planet_iterator`, for handling of the boundary conditions (For more details, see [interiors](./interiors_docs.md).).
 
 ```python
 from pics.interiors import planet_iterator, planet_creator
