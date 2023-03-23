@@ -2,11 +2,59 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from picse.runparams import param_colors
-from picse.physicalparams import m_earth, r_earth, G
+from picse.physicalparams import m_earth, r_earth, G, year, day
 import pandas as pd
 import numpy as np
 import os
 
+
+def plot_timeline(df,
+                  display = True,
+                  file_name="timeline",
+                  file_path = None,
+                  image_extension="pdf",
+                  write_html=False,
+                  write_image=False):
+    ncol =2
+    nrow = 2
+    fig = make_subplots(
+        rows=nrow,
+        cols=ncol,
+        shared_xaxes=True,
+        horizontal_spacing=0.15,
+        vertical_spacing=0.1,
+    )
+    fig.update_layout(height=600, width=1200, showlegend=False)
+    
+    params = [[["radius"], ["temp_surface"]], [["ener_int", "ener_grav", "ener_tot"], ["luminosity"]]]
+    for i in range(2):
+        for j in range(2):
+            ind = ncol * i + j
+
+            for k in range(len(params[i][j])):
+                fig.add_trace(
+                    go.Scatter(
+                        x=df["time"] / ( year * day),
+                        y=df[params[i][j][k]],
+                        line=dict(color="rgb{}".format(param_colors[ind])),
+                    ),
+                    row=i + 1,
+                    col=j + 1,
+                )
+    fig.update_yaxes(type="log", row=2, col=2)
+
+    # Write to interactive html
+    if write_html:
+        print("writing html to", "{}/{}.html".format(file_path, file_name))
+        fig.write_html("{}/{}.html".format(file_path, file_name), include_mathjax="cdn")
+
+    # Save static image
+    if write_image:
+        fig.write_image("{}/{}.{}".format(file_path, file_name, image_extension))
+
+    # Display in browser
+    if display:
+        fig.show()
 
 def plot_structure(
     profiles,

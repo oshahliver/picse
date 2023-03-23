@@ -171,7 +171,7 @@ class PlanetaryInputParams(Parameters):
             "T_surface_should": 300.0,
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
-            "ener_tot_should": 1.0,
+            "ener_tot_should": -1.0,
             "ocean_fraction_should": -10,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
@@ -497,9 +497,7 @@ class Planet:
             self.layer_masses[1] = M_outer_core + M_inner_core
 
         self.M_core_should = self.layer_masses[1]
-        print(
-            "the initial values are:", self.T_center, self.P_center, self.layer_masses
-        )
+   
 
     def update_initials(self):
         """Updates the initial planetary parameters from the current values"""
@@ -672,7 +670,7 @@ class Planet:
         else:
             self.converged = True
 
-    def construct(self, echo=False):
+    def construct(self, echo=True):
         # Gather layer dims for fortplanet routine
         layer_dims = [len(item) for item in self.contents]
         # print ("contents =", self.contents)

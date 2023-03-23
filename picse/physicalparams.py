@@ -15,7 +15,7 @@ hPl = 6.62607015e-34  # Planck constant in J s
 m_p = 1.6726219e-27  # proton mass in kg
 NA = 6.0221409e23  # Avogadro8's constant
 au = 1.49598e11  # astronomical unit in m
-yr = 365.26  # year in days
+year = 365.26  # year in days
 day = 24.0 * 3600  # day in seconds
 
 r_sun = 695510.0e3  # solar radius in m
@@ -366,19 +366,19 @@ orbit_solar = {
     "sun": 0.0,
     "mercury": 87.97,
     "venus": 225.0,
-    "earth": yr,
+    "earth": year,
     "moon": 27.32,
-    "mars": 1.881 * yr,
-    "jupiter": 11.86 * yr,
+    "mars": 1.881 * year,
+    "jupiter": 11.86 * year,
     "europa": 3.551,
     "io": 42 / 24,
     "callisto": 16.69,
     "ganymede": 7.155,
-    "saturn": 29.46 * yr,
+    "saturn": 29.46 * year,
     "enceladus": 1.37,
     "titan": 15.945,
-    "uranus": 84.01 * yr,
-    "neptune": 164.8 * yr,
+    "uranus": 84.01 * year,
+    "neptune": 164.8 * year,
     "pluto": 248.59,
 }
 

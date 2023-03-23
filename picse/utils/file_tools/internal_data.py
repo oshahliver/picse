@@ -10,8 +10,32 @@ from pkg_resources import resource_filename
 import os
 import pandas as pd
 
+labels = {
+    "mass": "M_surface_is",
+    "radius": "R_surface_is",
+    "moi_factor": "moment_of_inertia_is",
+    "mg_number": "Mg_number_is",
+    "si_number": "Si_number_is",
+    "si_number_mantle": "Si_number_mantle",
+    "fe_number_mantle": "Fe_number_mantle",
+    "temp_surface": "T_surface_is",
+    "pres_surface": "P_surface_is",
+    "temp_center": "T_center",
+    "pres_center": "P_center",
+    "core_radius": "core_radius",
+    "core_mass_fraction": "core_mass_fraction_is",
+    "ocean_mass_fraction": "ocean_fraction_is",
+    "ocean_depth": "ocean_depth",
+    "ener_tot": "ener_tot_is",
+    "ener_grav":"ener_grav",
+    "ener_int":"ener_int",
+    "luminosity":"luminosity",
+}
 
-def create_data(planets):
+def add_to_timeline(planet, data):
+    """
+    Creates the time line data for a thermal evolution model
+    """
     labels = {
         "mass": "M_surface_is",
         "radius": "R_surface_is",
@@ -28,6 +52,10 @@ def create_data(planets):
         "core_mass_fraction": "core_mass_fraction_is",
         "ocean_mass_fraction": "ocean_fraction_is",
         "ocean_depth": "ocean_depth",
+        "ener_tot": "ener_tot_is",
+        "ener_grav":"ener_grav",
+        "ener_int":"ener_int",
+        "luminosity":"luminosity",
     }
 
     scalings = {
@@ -46,6 +74,56 @@ def create_data(planets):
         "core_mass_fraction": 1,
         "ocean_mass_fraction": 1,
         "ocean_depth": 1,
+        "ener_tot":1,
+        "ener_grav":1,
+        "ener_int":1,
+        "luminosity":1,
+    }   
+
+    for key, val in labels.items():
+        data[key].append(getattr(planet, val, None))
+
+def create_data(planets):
+    labels = {
+        "mass": "M_surface_is",
+        "radius": "R_surface_is",
+        "moi_factor": "moment_of_inertia_is",
+        "mg_number": "Mg_number_is",
+        "si_number": "Si_number_is",
+        "si_number_mantle": "Si_number_mantle",
+        "fe_number_mantle": "Fe_number_mantle",
+        "temp_surface": "T_surface_is",
+        "pres_surface": "P_surface_is",
+        "temp_center": "T_center",
+        "pres_center": "P_center",
+        "core_radius": "core_radius",
+        "core_mass_fraction": "core_mass_fraction_is",
+        "ocean_mass_fraction": "ocean_fraction_is",
+        "ocean_depth": "ocean_depth",
+                "ener_tot": "ener_tot_is",
+        "ener_grav":"ener_grav",
+        "ener_int":"ener_int"
+    }
+
+    scalings = {
+        "mass": 1 / m_earth,
+        "radius": 1 / r_earth,
+        "moi_factor": 1,
+        "mg_number": 1,
+        "si_number": 1,
+        "si_number_mantle": 1,
+        "fe_number_mantle": 1,
+        "temp_surface": 1,
+        "pres_surface": 1,
+        "temp_center": 1,
+        "pres_center": 1,
+        "core_radius": 1,
+        "core_mass_fraction": 1,
+        "ocean_mass_fraction": 1,
+        "ocean_depth": 1,
+                "ener_tot":1,
+        "ener_grav":1,
+        "ener_int":1
     }
 
     data = {}

@@ -9,7 +9,7 @@ Created on Thu Apr  4 16:03:10 2019
 
 # from picse.utils import functionTools as ftool
 from matplotlib import pyplot as plt
-
+import sys, os
 # import matplotlib.patches as patches
 from sklearn.linear_model import LinearRegression
 from picse.utils.function_tools import matrix_generator as mgen
@@ -76,6 +76,7 @@ class Toolkit:
             "iterationLimit",
             "deltaType",
             "unpredictable",
+            "noisy"
         ]
 
     def get_specs(self, planet, omit=[]):
@@ -99,6 +100,7 @@ class Toolkit:
             "iterationLimit": 20,  # --> max. number of iterations
             "deltaType": 0,  # --> mode for initial adjustment of adjustables
             "unpredictable": False,  # --> no effect at this point
+            "noisy":True,
         }
 
         if planet.label == "telluric":
@@ -316,7 +318,11 @@ class Toolkit:
                     specs.update({key: val})
 
                 else:
-                    raise KeyError("Invalid iterator specification given")
+                    raise KeyError(f"Invalid iterator specification <{key}> given")
+
+        # Temporarily disable std outputs
+        if not specs["noisy"]:
+            sys.stdout = open(os.devnull, "w")
 
         passives = []
         passive_predictors = []
@@ -608,7 +614,16 @@ class Toolkit:
         count = 0
         exitcode = 0
         while self.iteration:
+
             count += 1
+            if "progress_bar" in kwargs:
+                try:
+                    same_text = kwargs["old_text"].split("(")[0]
+
+                except KeyError:
+                    same_text = ""
+                kwargs["progress_bar"].text = f"{same_text}(Iteration {count})"
+
             print("##################################")
             print("\n=================================")
             print("iteration", count)
@@ -865,5 +880,9 @@ class Toolkit:
             if count >= specs["iterationLimit"]:
                 self.iteration = False
                 print("WARNING: iteration limit reached after", count, "iterations !")
+        
+        # Re-enable std outputs
+        if not specs["noisy"]:
+            sys.stdout = sys.__stdout__
 
         return exitcode
