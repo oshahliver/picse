@@ -711,6 +711,32 @@ class Reprinter:
         sys.stdout.write(text)
         self.text = text
 
+def is_valid_optional_arg(f, key):
+    """
+    Checks if a key is a valid optional argument for a function f.
+
+    Parameters:
+    f (function): The function to check.
+    key (str): The key to check.
+
+    Returns:
+    bool: True if the key is a valid optional argument for f, False otherwise.
+    """
+    # Get the function signature
+    sig = inspect.signature(f)
+
+    # Check if the key is a parameter in the signature
+    if key not in sig.parameters:
+        return False
+
+    # Check if the parameter is an optional argument
+    param = sig.parameters[key]
+    if param.default is param.empty:
+        return False
+
+    return True
+
+
 
 def checkKey(name="", **kwargs):
     value = None
@@ -1199,16 +1225,26 @@ def integrate(
     except TypeError:
         pass
 
-    if order == 4:
-        # Butcher-table for the 4th order solver
-        alist = [
+    # Butcher table for classical nth order RK method
+    if order == 2:
+        alist = np.array([[0, 0], [1/2, 0]])
+        blist = np.array([0, 1])
+        clist = np.array([0, 1/2])
+
+    elif order == 3:
+        alist = np.array([[0, 0, 0], [1/2, 0, 0], [-1, 2, 0]])
+        blist = np.array([1/6, 2/3, 1/6])
+        clist = np.array([0, 1/2, 1])
+
+    elif order == 4:
+        alist = np.array([
             [0.0, 0.0, 0.0, 0.0],
             [0.5, 0.0, 0.0, 0.0],
             [0.0, 0.5, 0.0, 0.0],
             [0.0, 0.0, 1.0, 0.0],
-        ]
-        blist = [1.0 / 6.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 6.0]
-        clist = [0.0, 1.0 / 2.0, 1.0 / 2.0, 1.0]
+        ])
+        blist = np.array([1.0 / 6.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 6.0])
+        clist = np.array([0.0, 1.0 / 2.0, 1.0 / 2.0, 1.0])
 
     x = start
     # set up data arrays for subsequent plotting
@@ -1240,7 +1276,13 @@ def integrate(
                 # use updated key arguments to compute new gradients:
                 # newgrad = dydx(x = x + h*clist[i], y = ki, ...)
                 # print ("grads before f=", newgrads)
-                newgrads = dydx(oldgrad=oldgrad, **kwargs)
+                # gradients depend on old gradients
+                if is_valid_optional_arg(dydx, "oldgrad"):
+                    newgrads = dydx(oldgrad=oldgrad, **kwargs)
+                # gradients independent of old gradients
+                else:
+                    newgrads = dydx(**kwargs)
+
                 # print ("grads after f=", newgrads)
 
             except KeyError:
@@ -1255,10 +1297,10 @@ def integrate(
             for j in range(len(blist)):
                 y[i] += h * k_list[j][i] * blist[j]
 
-        if identity == "construct shell":
-            if y[3] > yold[3]:
-                # print ('i knew it...')
-                y[3] = yold[3]  # +h*oldgrad[3]
+        # if identity == "construct shell":
+        #     if y[3] > yold[3]:
+        #         # print ('i knew it...')
+        #         y[3] = yold[3]  # +h*oldgrad[3]
 
         # update x variable if integration over multiple grid points is performed
         x += h

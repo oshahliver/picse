@@ -1085,7 +1085,9 @@ contains
       grads(5) = dMOIdr
       grads(6) = dXdr
       grads(7) = - G * m / r * dmdr ! gravitational energy
-      grads(8) = (1d7 + 2000*T) * dmdr ! internal energy
+
+      ! TODO. implement self-consistent prescription for heat capacity
+      grads(8) = 10000 * T * dmdr ! internal energy
 
 !~ print *, 'fractions =', weight_fractions(:)
 !~ print *, 'vals =', vals(:)

@@ -1,5 +1,6 @@
 import numpy as np
-from picse.physicalparams import sigmaSB, G, m_earth, r_earth
+from picse.physicalparams import sigmaSB, G, m_earth, r_earth, T_zero
+from picse.utils.function_tools import functionTools as ftool
 import sys, os
 
 
@@ -8,7 +9,7 @@ class Toolkit:
         self.iterator = None
 
     def get_specs(self, planet):
-        return {}
+        pass
 
     def evolve(self, planet, iterator=None, iterator_specs={}):
         if not planet.status == "very much alive":
@@ -19,27 +20,50 @@ class Toolkit:
         else:
             pass
 
-        # Compute time step
-        eps = 1e-1
+        # The thermal evolution model requires the total mass and the total
+        # energy of the planet to be adjusted. in case the planet was
+        # created using different boundary conditions, the iterator specs
+        # must be updated here for the thermal evolution model.
+        iterator_specs.update(
+            {
+                "what": ["M_surface", "ener_tot"],  # --> target properties
+                "how": ["P_center", "T_center"],  # --> adjustable properties
+            }
+        )
 
-        # Initial conditions
-        E = planet.ener_tot_is  # Total energy
-        R = planet.R_surface_is  # Radius of the sphere
-        T = planet.T_surface_is  # Surface temperature of the sphere
-        L_in = 0.0
+        eps = 2e-1
+        t = 0.0
+        E = planet.ener_tot_is
+
+        albedo = 0.3
+        L_in = 4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4
+
+        # Define the integrator for the energy balance equation
+        # Note. Different models could be implemented here.
+        def gradient(y=[], source=0.0, **kwargs):
+            """
+            Computes rate of change of total energy based on the luminosity of the planet.
+            """
+            # Update the boundary conditions for the current time step
+            iterator_specs.update(
+                {"val_should": [planet.M_surface_should * m_earth, y[0]]}
+            )
+            iterator.iterate(planet=planet, iterator_specs=iterator_specs)
+            newgrad = (
+                -4
+                * np.pi
+                * planet.R_surface_is ** 2
+                * sigmaSB
+                * planet.T_surface_is ** 4
+            )
+            return [(newgrad + source) / (3 / 5 * G * m_earth ** 2 / r_earth)]
 
         # Integration loop
-        for i in range(15):
+        for i in range(25):
             print("\n########################")
             print(f"Time step {i+1}")
             print("Surface temperature =", planet.T_surface_is)
-            print ("Luminostiy =", planet.luminosity)
-            # Compute outgoing radiation
-            L_out = planet.luminosity
 
-            # Compute RK2 step
-            E_0 = E
-            L_out_0 = L_out
             dt = (
                 min(
                     abs(
@@ -64,41 +88,24 @@ class Toolkit:
                 * eps
             )
             print("dt = {:e}".format(dt / (365 * 24 * 3600)))
-            E_mid = E_0 + (L_in - L_out_0) * dt / 2 / (
-                3 / 5 * G * m_earth ** 2 / r_earth
-            )
 
-            # Compute radius and temperature at midpoint
-            # Here the mass of the planet can change too if mass loss
-            # or accretion processes are considered.
-            # temporarely supress all prints
             sys.stdout = open(os.devnull, "w")
-
-            iterator_specs.update(
-                {"val_should": [planet.M_surface_should * m_earth, E_mid]}
+            t, E, = ftool.integrate(
+                dydx=gradient,
+                y=[E],
+                N=1,
+                start=t,
+                end=t + dt,
+                source=L_in,
+                order=2,
+                noisy=True,
+                whicharg="t",
             )
-            iterator.iterate(planet=planet, iterator_specs=iterator_specs)
-            R_mid = planet.R_surface_is
-            T_mid = planet.T_surface_is
-
-            # Compute final energy
-            L_out_mid = 4 * np.pi * R_mid ** 2 * sigmaSB * T_mid ** 4
-            E += (L_in - L_out_mid) * dt / (3 / 5 * G * m_earth ** 2 / r_earth)
-
-            # Compute new radius and temperature
-            iterator_specs.update(
-                {"val_should": [planet.M_surface_should * m_earth, E]}
-            )
-            iterator.iterate(planet=planet, iterator_specs=iterator_specs)
             sys.stdout = sys.__stdout__
 
-            R = planet.R_surface_is
-            T = planet.T_surface_is
-
-            if planet.T_surface_is <= 200:
-                print("WARNING: Surface temperature too low")
+            if planet.T_surface_is <= T_zero:
+                print(f"WARNING: Lower bound for surface temperature reached at {round(planet.T_surface_is, 3)} K.")
                 break
-
 
 class TimeLine:
     def __init__(self, specs={}):

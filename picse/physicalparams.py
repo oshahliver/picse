@@ -99,8 +99,9 @@ m_jupiter = 1.898e27
 # temperature and pressure lower bound values for planetary interior to avoid
 # spurious behaviour in the integration. These values do not apply for the
 # atmopshere as both T and P must be allowed to become smaller
-T_zero = 50.0
-P_zero = 10.0
+T_zero = 100 # kelvin
+P_zero = 10 # pascal
+
 # density of atomic hydrogen at T=2.7 K and P=1.0e-11 Pa
 rho_zero = 1.0e-17
 
