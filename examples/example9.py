@@ -56,56 +56,56 @@ iterator_specs = {
     "acc": [1e-5, 1e-3],  # --> desired relative accuracies
     "iterationLimit": 15,  # --> max. number of iterations
     "deltaType": 0,  # --> mode for initial adjustment of adjustables
-    "noisy":False, # --> disable std outputs
+    "noisy": False,  # --> disable std outputs
 }
 
-end_time = 50e6 * year * day # end time of integration
-albedo = 0.3 # planetary albedo
-L_in = 4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4 * .1 # incident radiation power
+end_time = 10e6 * year * day  # end time of integration
+albedo = 0.3  # planetary albedo
+L_in = (
+    4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4 * 0.1
+)  # incident radiation power
 
 # set up the specifications for the evolver
 # parameters that are not specified will be assigend a
 # default value for the corresponding base type
-evolver_specs = {"start": 0, # --> start time
-                 "end": end_time, # --> end time
-                 "eps": 0.25, # --> time step refinement parameter
-                 "order": 2, # --> order of integration scheme
-                 "source": L_in, # --> external energy source
-                 "acc":1e-5, # --> accuracy of energy iteration
-                 "write":True, # --> write timeline data to file
+evolver_specs = {
+    "start": 0,  # --> start time
+    "end": end_time,  # --> end time
+    "eps": 0.25,  # --> time step refinement parameter
+    "order": 2,  # --> order of integration scheme
+    "source": L_in,  # --> external energy source
+    "acc": 1e-5,  # --> accuracy of energy iteration
+    "write": True,  # --> write timeline data to file
 }
 
 #######################################################################
 # Model creation and execution
 #######################################################################
-temps = [600, 800, 1000]
 
 # Perform time evolution
-for i in range(1):
-    planetary_params.update({"T_surface_should": temps[i]})
-    iterator_specs.update(
-        {
-            "val_should": [
-                planetary_params["M_surface_should"] * m_earth,
-                planetary_params["T_surface_should"],
-            ]
-        }
-    )
-    # Initialize a telluric planet instance with the specified properties
-    pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
+planetary_params.update({"T_surface_should": 400})
+iterator_specs.update(
+    {
+        "val_should": [
+            planetary_params["M_surface_should"] * m_earth,
+            planetary_params["T_surface_should"],
+        ]
+    }
+)
+# Initialize a telluric planet instance with the specified properties
+pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
 
-    # Create initial model
-    pl.construct()
-    iterator.iterate(planet=pl, iterator_specs=iterator_specs)
+# Create initial model
+pl.construct()
+iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 
-    evolver_specs.update({"tag": i + 1})
-    data = evolver.evolve(
-        planet=pl,
-        iterator=iterator,
-        iterator_specs=iterator_specs,
-        evolver_specs = evolver_specs
-    )
-    del pl
+data, instances = evolver.evolve(
+    planet=pl,
+    iterator=iterator,
+    iterator_specs=iterator_specs,
+    evolver_specs=evolver_specs,
+)
+del pl
 
 df = pd.DataFrame(data)
 
@@ -114,13 +114,23 @@ print(df.head())
 # Model inspection
 #######################################################################
 
-# Plot the time line
-file_path = os.getcwd()
-plot_tools.plot_timeline(df, 
-    file_name="timeline",
-    file_path=file_path,
-    write_html=True,
-    display=True,
-    write_image=True,
-    image_extension="pdf",
+tl = planet_evolution.TimeLine()
+tl.set_up(
+    iterator_specs=iterator_specs,
+    planetary_params=planetary_params,
+    evolver_specs=evolver_specs,
 )
+tl.create()
+
+df = pd.DataFrame(tl.data)
+print (df.head())
+# # Plot the time line
+# file_path = os.getcwd()
+# plot_tools.plot_timeline(df,
+#     file_name="timeline",
+#     file_path=file_path,
+#     write_html=True,
+#     display=True,
+#     write_image=True,
+#     image_extension="pdf",
+# )

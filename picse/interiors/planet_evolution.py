@@ -4,6 +4,7 @@ from picse.utils.function_tools import functionTools as ftool
 import sys, os
 import copy
 from picse.utils.file_tools import internal_data
+from picse.interiors import planet_workbench, planet_creator, planet_iterator
 from alive_progress import alive_bar
 
 
@@ -19,18 +20,13 @@ class Toolkit:
             "acc": 1e-5,
             "tag": "",
             "eps": 0.25,
-            "write":False,
-            "source":0,
-            "out_path":os.getcwd()
+            "write": True,
+            "source": 0,
+            "out_path": os.getcwd(),
         }
 
     def evolve(
-        self,
-        planet,
-        iterator=None,
-        iterator_specs={},
-        evolver_specs = {},
-    
+        self, planet, iterator=None, iterator_specs={}, evolver_specs={},
     ):
         if not planet.status == "very much alive":
             raise TypeError(
@@ -60,13 +56,15 @@ class Toolkit:
             {
                 "what": ["M_surface", "ener_tot"],  # --> target properties
                 "how": ["P_center", "T_center"],  # --> adjustable properties
-                "all_val_should_weights":["log", "lin"], # --> energy must be lin!
-                "all_howval_weights":["exp", "lin"], # --> energy must be lin!
+                "all_val_should_weights": ["log", "lin"],  # --> energy must be lin!
+                "all_howval_weights": ["exp", "lin"],  # --> energy must be lin!
             }
         )
 
         if not new_iterator_specs["what"][0] == "M_surface":
-            raise ValueError ("For thermal evolution models the first target property must be the total mass.")
+            raise ValueError(
+                "For thermal evolution models the first target property must be the total mass."
+            )
 
         t = self.evolver_specs["start"]
         y = [planet.ener_tot_is]
@@ -80,10 +78,10 @@ class Toolkit:
         # print ("time (yr) = {:e}".format(t / (year*day)))
 
         if self.evolver_specs["write"]:
-            data = {key:[] for key, val in internal_data.labels.items()}
+            data = {key: [] for key, val in internal_data.labels.items()}
             internal_data.add_to_timeline(planet, data)
-            data.update({"time":[self.evolver_specs["start"]]})
-        
+            data.update({"time": [self.evolver_specs["start"]]})
+
         with alive_bar(
             manual=True,
             title=f"Creating time line {self.evolver_specs['tag']}",
@@ -117,7 +115,8 @@ class Toolkit:
                     * np.pi
                     * planet.R_surface_is ** 2
                     * sigmaSB
-                    * planet.T_surface_is ** 4 * .2
+                    * planet.T_surface_is ** 4
+                    * 0.2
                 )
 
                 return [(newgrad + source) / (3 / 5 * G * m_earth ** 2 / r_earth)]
@@ -191,23 +190,53 @@ class Toolkit:
                 iteration_count += 1
 
                 sys.stdout = sys.__stdout__
-                bar(((t - self.evolver_specs["start"]) / (self.evolver_specs["end"] - self.evolver_specs["start"])))
-        
+                bar(
+                    (
+                        (t - self.evolver_specs["start"])
+                        / (self.evolver_specs["end"] - self.evolver_specs["start"])
+                    )
+                )
+
         if self.evolver_specs["write"]:
-            return data
+            return data, []
         else:
-            return 
+            return None, None
+
 
 class TimeLine:
-    def __init__(self, specs={}):
-        self.objects = {"planet": None}
+    def __init__(self, tag="", specs={}, base_type="telluric"):
+        self.tag = tag
+        self.data = None
+
+        if base_type == "telluric":
+            self.planet_class = planet_creator.TelluricPlanet
+        elif base_type == "aqua":
+            self.planet_class = planet_creator.AquaPlanet
+        else:
+            raise ValueError("Passed unknown base tpye <{base_type}> to Population")
 
     def get_specs(self):
         pass
 
-    def create(self, planet, planetary_specs={}, iterator_specs={}):
+    def set_up(self, iterator_specs={}, planetary_params={}, evolver_specs={}):
+        self.planet = self.planet_class(planetary_params=planetary_params)
+        self.iterator_specs = iterator_specs
+        self.evolver_specs = evolver_specs
+        self.iterator = planet_iterator.Toolkit()
+        self.evolver = Toolkit()
+
+        # Perform initial structure integration
+        self.planet.construct()
+        self.iterator.iterate(self.planet, iterator_specs=self.iterator_specs)
+
+    def create(self):
         """ Creates the thermal evolution time line for the 
         planet according to the user defined specifications.
         """
-        
-        pass
+
+        self.data, self.instances = self.evolver.evolve(
+            planet=self.planet,
+            iterator=self.iterator,
+            iterator_specs=self.iterator_specs,
+            evolver_specs=self.evolver_specs,
+        )

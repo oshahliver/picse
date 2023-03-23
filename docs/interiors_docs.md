@@ -109,4 +109,65 @@ mrd.plot()
 
 ```python
 
+from picse.interiors import planet_evolution
+from picse.physicalparams import m_earth, r_earth, year, day
+import pandas as pd
+
+planet_creator.load_eos_tables()
+
+planetary_params = {
+    "M_surface_should": 1.0,
+    "T_surface_should": 400,
+    "P_surface_should": 1e5,
+    "Mg_number_should": 0.5,
+    "ener_tot_should": -1.0,
+    "Fe_number_mantle": 0.0,
+    "Si_number_mantle": 0.4,
+    "contents": [[2], [2], [4, 5], [6, 7]],
+}
+
+iterator_specs = {
+    "what": ["M_surface", "T_surface"],
+    "how": ["P_center", "T_center"],
+    "val_should": [
+        planetary_params["M_surface_should"] * m_earth,
+        planetary_params["T_surface_should"],
+    ],
+    "all_val_should_weights": [
+        "log",
+        "log",
+    ],
+    "all_howval_weights": ["exp", "exp"],
+    "acc": [1e-5, 1e-3],
+    "iterationLimit": 15,
+    "deltaType": 0,
+    "noisy": False,
+}
+
+end_time = 10e6 * year * day
+
+def source(t, albedo):
+    return 4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4 * 0.1
+
+evolver_specs = {
+    "start": 0,
+    "end": end_time,
+    "eps": 0.25,
+    "order": 2,
+    "source": source,
+    "acc": 1e-5,
+    "write": True,
+}
+
+# Create timeline
+tl = planet_evolution.TimeLine()
+tl.set_up(
+    iterator_specs=iterator_specs,
+    planetary_params=planetary_params,
+    evolver_specs=evolver_specs,
+)
+tl.create()
+
+df = pd.DataFrame(tl.data)
+print (df.head())
 ```

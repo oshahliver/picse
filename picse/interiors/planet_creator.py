@@ -497,7 +497,6 @@ class Planet:
             self.layer_masses[1] = M_outer_core + M_inner_core
 
         self.M_core_should = self.layer_masses[1]
-   
 
     def update_initials(self):
         """Updates the initial planetary parameters from the current values"""
