@@ -105,9 +105,12 @@ mrd.extract_data()
 mrd.plot()
 ```
 
-### Create thermal evolution time line
+### Thermal evolution time lines
 
-First you need to import all relvant libraries and define the planetary parameters as well as the specifications for the iterator as we have done before.
+The `TimeLine` class can be used to create thermal evolution models of planets. For this the energy balance equation is integrated over time assuming that the total power
+emitted from the planets surface follows the Stefan-Boltzman law. The user can define a time-dependent energy source term to account for stellar irradiation and the greenhouse effect.
+
+First you need to import all relvant libraries and define the planetary parameters as well as the specifications for the iterator as we have done before. Here we evolve a planet with an initial surface temperature of 400 kelvin. For the time evolution model to work the first boundary condition has to be the planetary mass and a high level of accuracy is required to guarantee the stability of the time integration.
 
 ```python
 from picse.interiors import planet_evolution, planet_creator
@@ -122,7 +125,6 @@ planetary_params = {
     "T_surface_should": 400,
     "P_surface_should": 1e5,
     "Mg_number_should": 0.5,
-    "ener_tot_should": -1.0,
     "Fe_number_mantle": 0.0,
     "Si_number_mantle": 0.4,
     "contents": [[2], [2], [4, 5], [6, 7]],
@@ -149,7 +151,7 @@ iterator_specs = {
 ```
 
 Next you have to define the start end end points of the time evolution, the energy source term and the specifications for the evolver instance.
-Here we use a 2nd order Runge-Kutta scheme with a step size adaption parameter of 1/4 and an accuracy for the total energy of 0.001% to solve the energy balance equation.
+Here we use a 2nd order Runge-Kutta scheme with a step size adaption parameter of 1/4 and an accuracy for the total energy of 0.001% to solve the energy balance equation over a time span of 10 million years.
 
 ```python
 start_time = 0.
@@ -187,3 +189,7 @@ tl.create()
 df = pd.DataFrame(tl.data)
 print (df.head())
 ```
+
+Note. If you encounter convergence or stability issues with your evolution models, try adjusting the relative error tolerances of the total mass and the energy and the time step adaption parameter.
+
+Note. If no external energy source is present, the temperature will go to zero which can cause numerical issues either in the iterator (negative temperatures may be predicted for the initial conditions) or the equations of state (spurious behaviour can occur at very low temperature). Try avoiding such scenarios by using at least a small external energy source term.
