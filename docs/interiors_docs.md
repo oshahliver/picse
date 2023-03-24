@@ -107,6 +107,28 @@ mrd.extract_data()
 mrd.plot()
 ```
 
+### Single-stage core-segregation model
+
+The core- and mantle compositions of planets are not strictly independent. They are dictated by the metal-silicate partitioning behaviour of different elements during the formation of the core. A simplified approach to model this is to assume that the segregation occured as a single-stage event at average segregation conditions characterized by the average segregation pressure and the liquidus temperature of the silicates at this pressure. With this, the mantle composition and the oxygen fugacity of the planet are uniquely constrained by the core composition.
+
+The following example creates a sample of input parameters for planets between 0.5 and 2 Earth masses from the single-stage core segregation model within specified ranges for the core composition.
+
+```python
+from picse.interiors import planet_workbench
+import pandas as pd
+
+workbench = planet_workbench.Toolkit()
+
+specs = {
+    "ranges": {"mass": [.5, 2], "x_FeO":[1e-6, .1], "x_FeSi":[1e-6, .2], "x_FeS":[1e-6, .5]},
+    "sampling": {"mass": "log"},
+    "core_segregation": "on",
+}
+inputs = workbench.sample_inputs(specs=specs, n_planets=1000)
+df = pd.DataFrame(inputs)
+print(df.head())
+```
+
 ### Thermal evolution time lines
 
 The `TimeLine` class can be used to create thermal evolution models of planets. For this the energy balance equation is integrated over time assuming that the total power

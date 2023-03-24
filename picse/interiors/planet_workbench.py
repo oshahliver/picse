@@ -27,7 +27,7 @@ class Toolkit:
     def __init__(self):
         self.iterator = planet_iterator.Toolkit()
 
-    def sample_inputs(self, specs={}, n_planets = 10):
+    def sample_inputs(self, specs={}, n_planets = 10, iteration_limit = 10000):
         """Construct all input parameters for the most recent planetary model
         according to some pre-defined conditions. The input parameters are chosen
         from random sampling. Each call of this function generates a random planet
@@ -39,21 +39,26 @@ class Toolkit:
         """
         ranges = {
             "temp_surface":[200, 1500],
-            "pres_surface":[1e-4, 1e9],
+            "pres_surface":[1e-4, 1e8],
             "mass": [1e-2, 6.0],
             "Mg_number": [0.1, 0.9],
+            "Fe_number_mantle":[0, 0.1],
+            "Si_number_mantle":[.4, .6],
             "pres_core_seg": [3e9, 7e9],
-            "xi_FeS": [1e-6, 0.5],
-            "xi_FeSi": [1e-6, 0.3],
-            "xi_FeO": [1e-6, 0.3],
+            "x_FeS": [1e-6, 0.5],
+            "x_FeSi": [1e-6, 0.3],
+            "x_FeO": [1e-6, 0.3],
             "temp_TBL": [1400, 2000],
             "delta_temp_core": [1200, 1600],
+            "oxygen_fug":[-10, 0],
         }
         sampling = {key: "lin" for key in ranges.keys()}
         
         # core composition sampled logarithmically by default
-        sampling["xi_FeSi"] = "log"
-        sampling["xi_FeO"] = "log"
+        # sampling["x_FeS"] = "log"
+        sampling["x_FeSi"] = "log"
+        sampling["x_FeO"] = "log"
+        sampling["pres_surface"] = "log"
 
         try:
             specs.update({"core_segregation":specs["core_segregation"]})
@@ -114,16 +119,10 @@ class Toolkit:
                 if specs["core_segregation"] == "on":
                     # Adjust the mantle composition until consistency is reached
                     if specs["core_seg_type"] == "forward":
-                        pass
-
-                    # Adjust core composition until consistency is reached
-                    elif specs["core_seg_type"] == "inverse":
-                        # Adjust core composition until consistency is reached
-                        # TODO. come up with a smart way to accelerate this process
-                        iteration = 0
+                        raise NotImplementedError ("The 'forward' option for the core segregation model is not available yet.")
                         while True:
                             # if iteration exceeds a predefined limit resample mass and pressure as well
-                            if iteration > 10000:
+                            if iteration > iteration_limit:
                                 for key in ["pres_core_seg", "mass"]:
                                     p = random.random()
 
@@ -139,14 +138,61 @@ class Toolkit:
 
                                 # compute core segregation temperature
                                 temp_core_seg = material.temp_liquidus_pyrolite(inputs["pres_core_seg"])
+                                iteration = 0
                                 bar.text = "Creating core composition (abort and resample!)"
 
-                            # Si and O content in the core must be adjusted until a consisten
+                            # Si and Fe content in the mantle must be adjusted until a consistent
                             # set of values is obtained
-                            adjust = ["xi_FeSi", "xi_FeO"]
+                            adjust = ["Fe_number_mantle", "Si_number_mantle"]
+                            
+                            # Get max and min silicon content for the iron content
+                            simmin = material.silicon_number_min(inputs["Fe_number_mantle"])
+                            simmax = material.silicon_number_max(inputs["Fe_number_mantle"])
+                            
+                            # Probe silicon number in allowed range
+                            p = random.random()
+                            if sampling["Si_number_mantle"] == "lin":
+                                    value = simmin + p * (simmax - simmin)
+                            elif sampling["Si_number_mantle"] == "log":
+                                value = 10 ** (np.log10(simmin) + p * np.log10(simmax / simmin))
+
+                            inputs.update({"Si_number_mantle": value})                          
+
+                            # Compute iron content in core from mantle composition and
+                            # bulk magnesium number
+                            x_Fe_core = random.random()
+
+                            # TODO. Figure out smart way to invert partitioning model
+                            # probably have to do it using brute force which sucks
+
+                    # Adjust core composition until consistency is reached
+                    elif specs["core_seg_type"] == "inverse":
+                        # Adjust core composition until consistency is reached
+                        # TODO. come up with a smart way to accelerate this process
+                        iteration = 0
+                        while True:
+                            # if iteration exceeds a predefined limit resample mass and pressure as well
+                            if iteration > iteration_limit:
+                                
+                                for key in ["pres_core_seg", "mass"]:
+                                    p = random.random()
+                                    val = ranges[key]
+                                    if sampling[key] == "lin":
+                                        value = val[0] + p * (val[1] - val[0])
+                                    elif sampling[key] == "log":
+                                        value = 10 ** (np.log10(val[0]) + p * np.log10(val[1] / val[0]))
+
+                                    inputs.update({key: value})
+
+                                # The core segregation pressure scales with the mass
+                                inputs["pres_core_seg"] *= inputs["mass"] ** pres_core_seg_exponent
+                                # compute core segregation temperature
+                                temp_core_seg = material.temp_liquidus_pyrolite(inputs["pres_core_seg"])
+                                iteration = 0
+                                bar.text = f"Probing core composition (abort and resample!)"
 
                             # check if Si# and Fe# are in allowed range and resample if not
-                            ocmf = [0.0, inputs["xi_FeS"], inputs["xi_FeSi"], inputs["xi_FeO"]]
+                            ocmf = [0.0, inputs["x_FeS"], inputs["x_FeSi"], inputs["x_FeO"]]
 
                             # convert to atomic abundances
                             xi = material.mat2at_core(ocmf, xiH=0.0)
@@ -156,8 +202,8 @@ class Toolkit:
                             sim = material.Si_number_mantle(inputs["pres_core_seg"], temp_core_seg, xi=xi)
 
                             # Get max and min silicon content for the iron content
-                            simmin = material.silicon_number_min(1.0 - fem)
-                            simmax = material.silicon_number_max(1.0 - fem)
+                            simmin = material.silicon_number_min(fem)
+                            simmax = material.silicon_number_max(fem)
 
                             margin = 1e-4
                             femmin = margin
@@ -182,19 +228,33 @@ class Toolkit:
 
                             # Inconsistency detected --> resample core composition
                             else:
-                                for key in adjust:
+                                # Si and O content in the core must be adjusted until a consistent
+                                # set of values is obtained
+                                for key in ["x_FeSi", "x_FeO"]:
                                     val = ranges[key]
                                     p = random.random()
-                                if sampling[key] == "lin":
-                                    value = val[0] + p * (val[1] - val[0])
-                                elif sampling[key] == "log":
-                                    value = 10 ** (np.log10(val[0]) + p * np.log10(val[1] / val[0]))
+                                    if sampling[key] == "lin":
+                                        value = val[0] + p * (val[1] - val[0])
+                                    elif sampling[key] == "log":
+                                        value = 10 ** (np.log10(val[0]) + p * np.log10(val[1] / val[0]))
 
-                                inputs.update({key: value})
-                                iteration += 1
-                            bar.text = f"Creating core composition (Iteration {iteration})"
+                                    inputs.update({key: value})
+
+                            iteration += 1
+                            bar.text = f"Probing core composition (Iteration {iteration})"
+            
+                    # get the oxide fractions in the silicates
+                    oxides = material.compute_oxide_fractions(sim, fem)
+
+                    # compute oxygen fugacity of the silicates
+                    oxfug = material.logfO2(inputs["pres_core_seg"], xi[0], oxides[2])
+                    inputs.update({"oxygen_fug":oxfug})
+                    inputs.update({"Si_number_mantle":sim})
+                    inputs.update({"Fe_number_mantle":fem})
 
                 inputs.update({"temp_core_seg":temp_core_seg})
+                
+                
                 for key in all_inputs.keys():
                     all_inputs[key].append(inputs[key])
                 bar()

@@ -686,7 +686,6 @@ def mantle_comp(P_CS, ocmf):
 
     return fem, sim
 
-
 # def plot_core_content(xiH=np.linspace(0.0, 0.5)):
 #     y = np.empty([len(xiH), 5])
 #     labels = ["Fe", "H", "S", "Si", "O"]
@@ -995,23 +994,23 @@ def gamma_Fe(P, x_Fe=None):
     return np.exp(r)
 
 
-def gamma_FeO_smoothed(P, xiFeO):
-    xiFeO = min(xiFeO, 0.99999)
+def gamma_FeO_smoothed(P, x_FeO):
+    xiFeO = min(x_FeO, 0.99999)
     if P < P_FeO_Fe_trans:
-        return gamma_FeO(P=P, xiFeO=xiFeO)
+        return gamma_FeO(P=P, x_FeO=x_FeO)
 
     else:
-        K, Z = coefs_FeO_Fe(P, xiFeO)
+        K, Z = coefs_FeO_Fe(P, x_FeO)
         return max(1.0 + K * np.exp(-Z * (P - P_FeO_Fe_trans)), 1.0)
 
 
-def gamma_Fe_smoothed(P, xiFe):
-    xiFe = min(xiFe, 0.99999)
+def gamma_Fe_smoothed(P, x_Fe):
+    xiFe = min(x_Fe, 0.99999)
     if P < P_FeO_Fe_trans:
-        return gamma_Fe(P=P, xiFe=xiFe)
+        return gamma_Fe(P=P, x_Fe=x_Fe)
 
     else:
-        K, Z = coefs_Fe_FeO(P, xiFe)
+        K, Z = coefs_Fe_FeO(P, x_Fe)
         return max(1.0 + K * np.exp(-Z * (P - P_FeO_Fe_trans)), 1.0)
 
 
@@ -1120,17 +1119,17 @@ def xi_SiO2(P, T, xi):
     return xiSi * xiFeO / (xiFe * KD_Si)
 
 
-def logfO2(P, xiFe, xiFeO):
+def logfO2(P, x_Fe, x_FeO):
     """
     Computes oxygen fugacity according to Rose-Weston et al. 2009.
     The activity coefficients for Fe in the metal phase and FeO in the silicate
     phase are computed using a similar smoothing as in Schaefer et al. 2017 and
     along the pyrolite liquidus curve from Andrault 2011.
     """
-    gamma_Fe_ = gamma_Fe_smoothed(P, xiFe)
-    gamma_FeO_ = gamma_FeO_smoothed(P, xiFeO)
-    aFe = gamma_Fe_ * xiFe
-    aFeO = gamma_FeO_ * xiFeO
+    gamma_Fe_ = gamma_Fe_smoothed(P, x_Fe = x_Fe)
+    gamma_FeO_ = gamma_FeO_smoothed(P, x_FeO = x_FeO)
+    aFe = gamma_Fe_ * x_Fe
+    aFeO = gamma_FeO_ * x_FeO
     return 2 * np.log10(aFeO / aFe)
 
 
@@ -1174,7 +1173,7 @@ def Si_number_mantle(P, T, xi):
     -------
     float: Silicon number in the silicates.
     """
-    xiFe, xiH, xiS, xiSi, xiO = xi
+    # xiFe, xiH, xiS, xiSi, xiO = xi
     xiSiO2 = xi_SiO2(P, T, xi)
     xiFeO = xi_FeO(P, T, xi)
     SiMg = xiSiO2 / (1 - xiFeO - xiSiO2)
@@ -1481,10 +1480,10 @@ def compute_oxide_fractions(Si_number, x_Fe):
     """Computes oxide fractions of MgO, SiO2, FeO from Si# = [Si] / [Mg + Si] and
     the iron number xi_Fe = [Fe] / [Mg + Fe] in the mantle.
     """
-    xiFeO = (1.0 - Si_number) / ((1.0 - x_Fe) / x_Fe + 1.0 - Si_number)
-    xiSiO2 = Si_number * (1.0 - xiFeO)
-    xiMgO = 1.0 - xiFeO - xiSiO2
-    return xiMgO, xiSiO2, xiFeO
+    x_FeO = (1.0 - Si_number) / ((1.0 - x_Fe) / x_Fe + 1.0 - Si_number)
+    x_SiO2 = Si_number * (1.0 - x_FeO)
+    x_MgO = 1.0 - x_FeO - x_SiO2
+    return x_MgO, x_SiO2, x_FeO
 
 
 def silicon_number_max(x_Fe):
