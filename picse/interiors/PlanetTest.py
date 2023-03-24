@@ -14,7 +14,7 @@ from matplotlib.ticker import (
     LogLocator,
     FixedLocator,
 )
-from pics.physicalparams import (
+from picse.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -51,7 +51,7 @@ from pics.physicalparams import (
     material_YH,
     material_YS,
 )
-from pics.runparams import (
+from picse.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -65,23 +65,24 @@ from pics.runparams import (
 )
 import numpy as np
 import time
-from pics.utils.function_tools import functionTools as ftool
+from picse.utils.function_tools import functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
-from pics.atmos import Atmosphere
+from picse.atmos import Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings
-from pics.materials import material
+from picse.materials import material
 
 # import eosfort
-from pics.utils.plot_tools.plot_tools import plotTools
-from pics.utils import fortfunctions
+from picse.utils.plot_tools import plotTools
+
+# from picse import fortfunctions
 import matplotlib
 
-matplotlib.rc("text", usetex=True)
-matplotlib.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
+# matplotlib.rc("text", usetex=True)
+# matplotlib.rcParams["text.latex.preamble"] = [r"\usepackage{amsmath, amssymb}"]
 
 
 warnings.filterwarnings("ignore")
@@ -156,102 +157,102 @@ def convergence_test(
                     )
 
 
-def ComputeCoreMass(
-    contents=None,
-    Mg_number=None,
-    M_surface=1.0,
-    Mg_number_mantle=None,
-    SiMg=None,
-    M_ocean=0.0,
-    xi_H_core=0.0,
-):
-    """Computes the core mass of a planet at given total mass, composition and
-    value for Mg#
-    """
+# def ComputeCoreMass(
+#     contents=None,
+#     Mg_number=None,
+#     M_surface=1.0,
+#     Mg_number_mantle=None,
+#     SiMg=None,
+#     M_ocean=0.0,
+#     xi_H_core=0.0,
+# ):
+#     """Computes the core mass of a planet at given total mass, composition and
+#     value for Mg#
+#     """
 
-    Mg_number_mantle = min(Mg_number_mantle, 0.9999999)
-    Si_number_mantle = SiMg / (SiMg + 1.0 / Mg_number_mantle - 1)
-    O_number_mantle = (1.0 + 2.0 * SiMg * Mg_number_mantle) / (
-        2.0 + (2.0 * SiMg - 1.0) * Mg_number_mantle
-    )
+#     Mg_number_mantle = min(Mg_number_mantle, 0.9999999)
+#     Si_number_mantle = SiMg / (SiMg + 1.0 / Mg_number_mantle - 1)
+#     O_number_mantle = (1.0 + 2.0 * SiMg * Mg_number_mantle) / (
+#         2.0 + (2.0 * SiMg - 1.0) * Mg_number_mantle
+#     )
 
-    fractions = fortfunctions.functions.compute_abundance_vector(
-        simg=SiMg,
-        femg=1.0 / Mg_number_mantle - 1.0,
-        n_mats=len(contents[2]),
-        ymgi=[material_YMg[i - 1] for i in contents[2]],
-        ysii=[material_YSi[i - 1] for i in contents[2]],
-        xih2oi=[0.0 for i in contents[2]],
-        xifei=[1.0 - Mg_number_mantle for i in contents[2]],
-        xialsii=[0.0 for i in contents[2]],
-        xialmgi=[0.0 for i in contents[2]],
-        contents=contents[2],
-        additional=[],
-    )
+#     fractions = fortfunctions.functions.compute_abundance_vector(
+#         simg=SiMg,
+#         femg=1.0 / Mg_number_mantle - 1.0,
+#         n_mats=len(contents[2]),
+#         ymgi=[material_YMg[i - 1] for i in contents[2]],
+#         ysii=[material_YSi[i - 1] for i in contents[2]],
+#         xih2oi=[0.0 for i in contents[2]],
+#         xifei=[1.0 - Mg_number_mantle for i in contents[2]],
+#         xialsii=[0.0 for i in contents[2]],
+#         xialmgi=[0.0 for i in contents[2]],
+#         contents=contents[2],
+#         additional=[],
+#     )
 
-    Q1 = sum(
-        [
-            fractions[i] * Mg_number_mantle * material_YMg[contents[2][i] - 1]
-            for i in range(len(contents[2]))
-        ]
-    )
-    Q2 = (
-        sum(
-            [
-                fractions[i] * Mg_number_mantle * material_YMg[contents[2][i] - 1]
-                for i in range(len(contents[2]))
-            ]
-        )
-        * mMg
-        + sum(
-            [
-                fractions[i]
-                * (1.0 - Mg_number_mantle)
-                * material_YMg[contents[2][i] - 1]
-                for i in range(len(contents[2]))
-            ]
-        )
-        * mFe
-        + sum(
-            [
-                fractions[i] * material_YSi[contents[2][i] - 1]
-                for i in range(len(contents[2]))
-            ]
-        )
-        * mSi
-        + sum(
-            [
-                fractions[i] * material_YO[contents[2][i] - 1]
-                for i in range(len(contents[2]))
-            ]
-        )
-        * mO
-    )
-    Q3 = sum(
-        [
-            fractions[i] * (1.0 - Mg_number_mantle) * material_YMg[contents[2][i] - 1]
-            for i in range(len(contents[2]))
-        ]
-    )
-    Q4 = 1.0 + xi_H_core / 2.0
-    Q5 = xi_H_core / 2.0 * (mFe + mO) + mFe + xi_H_core * mH
+#     Q1 = sum(
+#         [
+#             fractions[i] * Mg_number_mantle * material_YMg[contents[2][i] - 1]
+#             for i in range(len(contents[2]))
+#         ]
+#     )
+#     Q2 = (
+#         sum(
+#             [
+#                 fractions[i] * Mg_number_mantle * material_YMg[contents[2][i] - 1]
+#                 for i in range(len(contents[2]))
+#             ]
+#         )
+#         * mMg
+#         + sum(
+#             [
+#                 fractions[i]
+#                 * (1.0 - Mg_number_mantle)
+#                 * material_YMg[contents[2][i] - 1]
+#                 for i in range(len(contents[2]))
+#             ]
+#         )
+#         * mFe
+#         + sum(
+#             [
+#                 fractions[i] * material_YSi[contents[2][i] - 1]
+#                 for i in range(len(contents[2]))
+#             ]
+#         )
+#         * mSi
+#         + sum(
+#             [
+#                 fractions[i] * material_YO[contents[2][i] - 1]
+#                 for i in range(len(contents[2]))
+#             ]
+#         )
+#         * mO
+#     )
+#     Q3 = sum(
+#         [
+#             fractions[i] * (1.0 - Mg_number_mantle) * material_YMg[contents[2][i] - 1]
+#             for i in range(len(contents[2]))
+#         ]
+#     )
+#     Q4 = 1.0 + xi_H_core / 2.0
+#     Q5 = xi_H_core / 2.0 * (mFe + mO) + mFe + xi_H_core * mH
 
-    core_frac = (
-        (1.0 - M_ocean / M_surface)
-        * (Q1 / Q2 - Mg_number * (Q1 / Q2 + Q3 / Q2))
-        / (Mg_number * (Q4 / Q5 - Q1 / Q2 - Q3 / Q2) + Q1 / Q2)
-    )
+#     core_frac = (
+#         (1.0 - M_ocean / M_surface)
+#         * (Q1 / Q2 - Mg_number * (Q1 / Q2 + Q3 / Q2))
+#         / (Mg_number * (Q4 / Q5 - Q1 / Q2 - Q3 / Q2) + Q1 / Q2)
+#     )
 
-    Q = (
-        Mg_number_mantle / (1.0 - Mg_number_mantle) * mMg
-        + Si_number_mantle / (1.0 - Si_number_mantle) * mSi
-        + O_number_mantle / (1.0 - O_number_mantle) * mO
-        + mFe
-    )
+#     Q = (
+#         Mg_number_mantle / (1.0 - Mg_number_mantle) * mMg
+#         + Si_number_mantle / (1.0 - Si_number_mantle) * mSi
+#         + O_number_mantle / (1.0 - O_number_mantle) * mO
+#         + mFe
+#     )
 
-    Q1 = (M_surface - M_ocean) * (Mg_number_mantle / Mg_number - 1.0)
-    Q2 = (1.0 - Mg_number_mantle) / mFe * Q + Mg_number_mantle / Mg_number - 1
-    return Q1 / Q2
+#     Q1 = (M_surface - M_ocean) * (Mg_number_mantle / Mg_number - 1.0)
+#     Q2 = (1.0 - Mg_number_mantle) / mFe * Q + Mg_number_mantle / Mg_number - 1
+#     return Q1 / Q2
 
 
 def PlotCoreMasses(

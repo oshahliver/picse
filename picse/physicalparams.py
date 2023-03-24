@@ -108,6 +108,13 @@ rho_zero = 1.0e-17
 # Temperature jumps at CMB, MTZ and Crust
 temperature_jumps = [0.0, 800.0, 300.0, 1200.0]
 
+# Maximum iron content in the silicates
+xi_Fe_mantle_max = 0.5
+
+# scaling parameter for core segregation pressure
+# P_CS(M) = P_CS_0 * (M/M_Earth)**eta
+pres_core_seg_exponent = 0.9
+
 # MR data for solar system planets
 # convention is: mercury, venus, earth, moon, mars, jupiter, europa, Io,
 # Ganymede, saturn, Titan, uranus, neptune, pluto

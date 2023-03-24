@@ -13,6 +13,9 @@ class Toolkit:
         self.iterator = None
 
     def get_specs(self, planet):
+        def source(t):
+            return 0.0
+
         self.evolver_specs = {
             "order": 2,
             "start": 0,
@@ -21,7 +24,7 @@ class Toolkit:
             "tag": "",
             "eps": 0.25,
             "write": True,
-            "source": 0,
+            "source": source,
             "out_path": os.getcwd(),
         }
 
@@ -91,7 +94,7 @@ class Toolkit:
         ) as bar:
             # Define the integrator for the energy balance equation
             # Note. Different models could be implemented here.
-            def gradient(y=[], source=0.0, **kwargs):
+            def gradient(t=0, y=[], **kwargs):
                 """
                 Computes rate of change of total energy based on the luminosity of the planet.
                 """
@@ -118,6 +121,9 @@ class Toolkit:
                     * planet.T_surface_is ** 4
                     * 0.2
                 )
+
+                # Compute energy source term for current time step
+                source = self.evolver_specs["source"](t)
 
                 return [(newgrad + source) / (3 / 5 * G * m_earth ** 2 / r_earth)]
 
@@ -162,11 +168,12 @@ class Toolkit:
                     y=y,
                     start=t,
                     end=t + dt,
-                    source=self.evolver_specs["source"],
+                    # source=self.evolver_specs["source"],
                     order=self.evolver_specs["order"],
                     noisy=False,
                     whicharg="t",
                     same_text=text,
+                    t=t,
                 )
 
                 bar.text = text

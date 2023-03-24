@@ -7,11 +7,11 @@ Created on Thu Apr  4 16:03:10 2019
 """
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-import pics.materials.material as material
-import pics.interiors.Planet as Planet
-from pics.interiors import PlanetTest
-import pics.interiors.PlanetFort as PlanetFort
-import pics.utils.function_tools.functionTools as ftool
+import picse.materials.material as material
+import picse.interiors.Planet as Planet
+from picse.interiors import PlanetTest
+import picse.interiors.PlanetFort as PlanetFort
+import picse.utils.function_tools.functionTools as ftool
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter, AutoMinorLocator
@@ -27,11 +27,11 @@ from sklearn.linear_model import LinearRegression
 import astropy.table
 from astropy.io import ascii
 import time
-from pics.utils import readPREM
-import pics.utils.function_tools.logTrans as logTrans
+from picse.utils import readPREM
+import picse.utils.function_tools.logTrans as logTrans
 import random
-import pics.utils.plot_tools.plotTools as plotTools
-from pics.physicalparams import (
+import picse.utils.plot_tools.plotTools as plotTools
+from picse.physicalparams import (
     m_earth,
     r_earth,
     Mg_number_solar,
@@ -62,13 +62,13 @@ from pics.physicalparams import (
     sigmaSB,
 )
 
-from pics.materials import phase_transitions_water_Wagner2002 as waterPhase
-from pics.runparams import suffix, plot_params, external_temp_profiles
-from pics.runparams import grid_color, background_color, color_list
-from pics.utils import fortplanet
-import pics.interiors.planet_iterator as planet_iterator
-from pics.interiors import planet_creator
-from pics import physicalparams, runparams
+from picse.materials import phase_transitions_water_Wagner2002 as waterPhase
+from picse.runparams import suffix, plot_params, external_temp_profiles
+from picse.runparams import grid_color, background_color, color_list
+from picse.utils import fortplanet
+import picse.interiors.planet_iterator as planet_iterator
+from picse.interiors import planet_creator
+from picse import physicalparams, runparams
 
 tk = planet_iterator.Toolkit()
 

@@ -1,14 +1,16 @@
-# The `pics.interiors` Module: The higher-level tools for creating planetary interior models
+# The `picse.interiors` Module: The higher-level tools for creating planetary interior models
 
-The true power of the PICSE package lies in the availability of a sphisticated library of higher-level tools that was specifically created for setting up, creating, and analysing planetary interior models. This library is continuously improved and updated. Here are a few examples of what the `picse.interiors` module achieves:
+The true power of the `picse` package lies in the availability of a sphisticated library of higher-level tools that was specifically created for setting up, creating, and analysing planetary interior models. This library is continuously improved and updated. Here are a few examples of what the `picse.interiors` module achieves:
 
 1. Offers the possibility to use base-type planets (e.g. telluric and aqua planets) for quick and robust creation of planets while maintaining the option to create more user-specific models using more generic classes.
 
 2. Provides Ready-to-use classes to create populations of planets and mass-radius diagrams with ease.
 
-3. Guarantees great flexibility for specifying planetary- and run parameters to explore a wide range of models and modelling strategies.
+3. Creates thermal evolution timlines of planets with customizable and time-dependent energy sources and adjustable strategies for integrating the energy-balance equation.
 
-4. Uses Machine-learning enhanced algorithms for predicting initial conditions and matching user specified boundary conditions over a wide parameter space that boost performance and stability.
+4. Guarantees great flexibility for specifying planetary- and run parameters to explore a wide range of models and modelling strategies.
+
+5. Uses Machine-learning enhanced algorithms for predicting initial conditions and matching user specified boundary conditions over a wide parameter space that boost performance and stability.
 
 ## Basic usage
 

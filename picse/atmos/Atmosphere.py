@@ -8,7 +8,7 @@ Created on Thu Feb 21 16:59:25 2019
 
 import matplotlib.ticker
 from matplotlib import pyplot as plt
-from pics.physicalparams import (
+from picse.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -36,7 +36,7 @@ from pics.physicalparams import (
     rho_zero,
 )
 
-from pics.runparams import (
+from picse.runparams import (
     eps_Psurf,
     eps_Pspace,
     eps_Mtot,
@@ -47,7 +47,7 @@ from pics.runparams import (
 import numpy as np
 
 # import eos
-from pics.utils import functionTools as ftool
+from picse.utils.function_tools import functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
@@ -1032,7 +1032,7 @@ class Atmosphere:
             rad_unit=rad_unit,
         )
 
-        from pics.runparams import param_colors
+        from picse.runparams import param_colors
 
         # plot barometric formula for linear or constant temperature profile
         # as reference

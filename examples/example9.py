@@ -32,7 +32,6 @@ planetary_params = {
     "T_surface_should": 400,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
     "Mg_number_should": 0.5,  # desired bulk magnesium number
-    "ener_tot_should": -1.0,  # total planetary energy
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "contents": [[2], [2], [4, 5], [6, 7]],  # composition of each layer
@@ -60,10 +59,15 @@ iterator_specs = {
 }
 
 end_time = 10e6 * year * day  # end time of integration
-albedo = 0.3  # planetary albedo
-L_in = (
-    4 * np.pi * r_earth ** 2 * 1366 * (1 - albedo) / 4 * 0.1
-)  # incident radiation power
+
+
+def source(t):
+    albedo = 0.3  # planetary albedo
+    F0 = 1366
+    return (
+        4 * np.pi * r_earth ** 2 * F0 * (1 - albedo) / 4 * 0.1
+    )  # incident radiation power
+
 
 # set up the specifications for the evolver
 # parameters that are not specified will be assigend a
@@ -73,7 +77,7 @@ evolver_specs = {
     "end": end_time,  # --> end time
     "eps": 0.25,  # --> time step refinement parameter
     "order": 2,  # --> order of integration scheme
-    "source": L_in,  # --> external energy source
+    "source": source,  # --> external energy source
     "acc": 1e-5,  # --> accuracy of energy iteration
     "write": True,  # --> write timeline data to file
 }
@@ -82,16 +86,6 @@ evolver_specs = {
 # Model creation and execution
 #######################################################################
 
-# Perform time evolution
-planetary_params.update({"T_surface_should": 400})
-iterator_specs.update(
-    {
-        "val_should": [
-            planetary_params["M_surface_should"] * m_earth,
-            planetary_params["T_surface_should"],
-        ]
-    }
-)
 # Initialize a telluric planet instance with the specified properties
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
 
@@ -110,20 +104,11 @@ del pl
 df = pd.DataFrame(data)
 
 print(df.head())
+
 #######################################################################
 # Model inspection
 #######################################################################
 
-tl = planet_evolution.TimeLine()
-tl.set_up(
-    iterator_specs=iterator_specs,
-    planetary_params=planetary_params,
-    evolver_specs=evolver_specs,
-)
-tl.create()
-
-df = pd.DataFrame(tl.data)
-print (df.head())
 # # Plot the time line
 # file_path = os.getcwd()
 # plot_tools.plot_timeline(df,

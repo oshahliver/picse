@@ -7,7 +7,7 @@ Created on Tue Dec  4 14:05:05 2018
 
 import matplotlib.ticker
 from matplotlib import pyplot as plt
-from pics.physicalparams import (
+from picse.physicalparams import (
     T0_list,
     K0_list,
     K0prime_list,
@@ -37,7 +37,7 @@ from pics.physicalparams import (
     Mg_number_solar,
 )
 
-from pics.runparams import (
+from picse.runparams import (
     eps_Psurf,
     eps_Mtot,
     eps_layer,
@@ -50,15 +50,15 @@ import numpy as np
 import time
 
 # import eos
-import pics.utils.function_tools.functionTools as ftool
+import picse.utils.function_tools.functionTools as ftool
 import sys
 from tabulate import tabulate
 from decimal import Decimal
-import pics.atmos.Atmosphere as Atmosphere
+import picse.atmos.Atmosphere as Atmosphere
 import astropy.table
 from astropy.io import ascii
 import warnings
-import pics.materials.material as material
+import picse.materials.material as material
 
 # import eosfort
 
