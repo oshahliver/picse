@@ -19,7 +19,8 @@ fort_objects = [
     "class_table_new",
     "phase",
     "eosfort",
-    "functions",
+    "integrator",
+    "utils",
     "eosmat",
     "fortshell",
     "fortlayer",
@@ -35,9 +36,9 @@ ext1 = Extension(
 )
 
 ext2 = Extension(
-    name="{}.utils.fortfunctions".format(PACKAGE_NAME),
-    sources=["{}/fortran/functionsPy.f95".format(SRC_DIR)],
-    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["LinAlg"]],
+    name="{}.utils.fortutils".format(PACKAGE_NAME),
+    sources=["{}/fortran/utils.f95".format(SRC_DIR)],
+    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["constants", "LinAlg"]],
     f2py_options=["--quiet"],
 )
 

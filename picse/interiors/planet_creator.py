@@ -10,7 +10,6 @@ from picse.utils.print_tools.print_tools import print_planet
 from picse.utils.plot_tools.plot_tools import plot_structure
 from tabulate import tabulate
 from picse.utils.file_tools.internal_data import get_eos_dir
-from picse.interiors import core_creator
 import random
 
 # from picse.utils import functionTools as ftool
@@ -27,6 +26,7 @@ from picse.runparams import (
 from picse.utils.calibration_tools.initial_conditions import predict_initials
 from picse.utils.file_tools.internal_data import get_predictor_model
 from picse.utils import fortplanet
+from picse.utils import fortutils
 from picse.materials import material
 from picse.physicalparams import (
     material_list_fort,
@@ -467,9 +467,9 @@ class Planet:
         x_Ol = material.xi_Ol(SiMg, FeMg, lay = 3)
         x_Perov = material.xi_Perov(SiMg, FeMg, lay = 2)
         
-        self.fractions[2][0:1] = 1 - x_Perov, x_Perov
-        self.fractions[3][0:1] = x_Ol, 1 - x_Ol
-
+        self.fractions[2][0:2] = 1 - x_Perov, x_Perov
+        self.fractions[3][0:2] = x_Ol, 1 - x_Ol
+        
         self.M_ocean_should = self.M_surface_should * 10 ** self.ocean_fraction_should
 
         if self.label == "aqua":
@@ -498,9 +498,23 @@ class Planet:
             # integration from the solidus of iron-alloys
             
             # compute total core mass from bulk composition
-            self.layer_masses[0] = self.compute_core_mass(M_IC=0.0, x_all_core = [1., 0., 0., 0., 0.])
-            self.layer_masses[1] = self.compute_core_mass(M_IC=0.0, x_all_core = self.x_all_core)
-            # print ("core mass =", self.layer_masses[0], self.layer_masses[1])
+            # If only inner core:
+            kwargs = dict(
+                m_surface=self.M_surface_should,
+                mg_number=self.Mg_number_should,
+                m_inner_core = 0.,
+                mantle_contents=self.contents[2],
+                mantle_fractions= self.fractions[2],
+                fe_number_mantle=self.Fe_number_mantle,
+                m_ocean=10**self.ocean_fraction_should*self.M_surface_should,
+                x_all_core=[1., 0., 0., 0., 0.],
+            )
+            self.layer_masses[0] = fortutils.fortfunctions.compute_core_mass(**kwargs)
+            
+            # If only outer core:
+            kwargs.update({"x_all_core":self.x_all_core})
+            self.layer_masses[1] = fortutils.fortfunctions.compute_core_mass(**kwargs)
+
         # Use more sophisticated multilinear regression models to predict the
         # core mass, central pressure, and central temperature. This can be used
         # if the composition of the core or mantle are not known prior to integration
@@ -555,24 +569,7 @@ class Planet:
 
         self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
-
-    def compute_core_mass(self, x_all_core = [1., 0., 0., 0., 0.], n=2, M_IC=0.0):
-        """Computes the core mass of a planet at given total mass, composition and
-        value for Mg#
-        """
-
-        params = dict(
-            M_surface_should=self.M_surface_should,
-            Mg_number_should=self.Mg_number_should,
-            contents=self.contents,
-            Fe_number_mantle=self.Fe_number_mantle,
-            Si_number_mantle=self.Si_number_mantle,
-            ocean_fraction_should=self.ocean_fraction_should,
-            x_all_core=x_all_core,
-        )
-
-        return core_creator.compute_core_mass(params, n=n, M_IC=M_IC)
-
+            
     def update(self, default=False):
         """Computes all dependant planetary parameters"""
         self.update_composition()
@@ -816,6 +813,20 @@ class TelluricPlanet(BaseTypePlanet):
             **kwargs,
         )
 
+        # If custom compositions are passed, check if number of layers is consistent
+        try:
+            n_lay = len(planetary_params["contents"])
+            if n_lay != 4:
+                raise ValueError(f"Invalid number of layers {n_lay} instead of 4 in contents for telluric planet.")
+        except KeyError:
+            pass
+
+        try:
+            n_lay = len(planetary_params["fractions"])
+            if n_lay != 4:
+                raise ValueError(f"Invalid number of layers {n_lay} instead of 4 in fractions for telluric planet.")
+        except KeyError:
+            pass
 
 class AquaPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}, **kwargs):
@@ -827,13 +838,26 @@ class AquaPlanet(BaseTypePlanet):
             **kwargs,
         )
 
+        # If custom compositions are passed, check if number of layers is consistent
+        try:
+            n_lay = len(planetary_params["contents"])
+            if n_lay != 5:
+                raise ValueError(f"Invalid number of layers {n_lay} instead of 5 in contents for aqua planet.")
+        except KeyError:
+            pass
+
+        try:
+            n_lay = len(planetary_params["fractions"])
+            if n_lay != 5:
+                raise ValueError(f"Invalid number of layers {n_lay} instead of 5 in fractions for aqua planet.")
+        except KeyError:
+            pass
 
 class PureSphere(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):
         BaseTypePlanet.__init__(
             self, label="pure", planetary_params=planetary_params, run_params=run_params
         )
-
 
 class YourPlanet(BaseTypePlanet):
     def __init__(self, planetary_params={}, run_params={}):

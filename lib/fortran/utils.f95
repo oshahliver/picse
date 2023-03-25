@@ -1,284 +1,218 @@
-MODULE functionsPy
+MODULE fortfunctions
 
-   ! use constants
+   use constants
    ! use run_params
    ! use eosfort
    use linalg
 
    implicit none
    private
-   public :: construct_abundance_matrix, compute_abundance_vector
-
+   public :: construct_abundance_matrix, compute_abundance_vector, compute_core_mass,&
+   eta_general, compute_eta, compute_xi, xi_general, at2mat, update_all_fractions, &
+   mat2at_core, at2wt_core, at2mat_max
 contains
 
-!########################################################################
-   ! subroutine progress_bar(j, n)
+   function eta_general(xi, m, n_mats) result(y)
+   !Compute weight fractions from mole fractions of different components.
 
-   !    integer :: j, k, perc, dec1, dec2
-   !    real(8) :: jj
-   !    integer, intent(in) :: n
-   !    character(len=72) :: bar = "???.??% |                                                   |"
+      implicit none
 
-   !    jj = real(j)/real(n)
-   !    perc = int(jj*100)
-   !    dec1 = int(((jj*1d2) - real(perc))*1d1)
-   !    dec2 = int(((jj*1d2) - real(perc))*1d2)
-   !    dec2 = dec2 - 10*dec1
+      integer :: i, n_mats
+      real(8), dimension(n_mats) :: y
+      real(8) :: m_tilde
+      real(8), intent(in), dimension(n_mats) :: xi, m
 
-   !    write (unit=bar(1:3), fmt="(i3)") perc
-   !    write (unit=bar(5:5), fmt="(i1)") dec1
-   !    write (unit=bar(6:6), fmt="(i1)") dec2
+      y = 0d0
+      m_tilde = 0d0
 
-   !    do k = 1, perc/2
-   !       bar(9 + k:9 + k + 1) = "=>"
-   !    end do
+      do i = 1, n_mats
+         m_tilde = m_tilde + m(i)*xi(i)
+      end do
 
-   !    write (unit=6, fmt="(a1, a72)", advance="no") char(13), bar
+      do i = 1, n_mats
+         y(i) = xi(i)*m(i)/m_tilde
+      end do
 
-   !    if (jj /= 100d0) then
-   !       flush (unit=6)
+   end function eta_general
 
-   !    else
-
-   !       write (unit=6, fmt=*)
-
-   !    end if
-   !    return
-
-   ! end subroutine progress_bar
-
-!    function fnc(x) result(y)
-!       implicit none
-!       real(8), intent(in) :: X
-!       real(8) :: y
-
-!       y = x
-
-!    end function fnc
-
-! ! ########################################################################
-!    function MOI_integrand_linear(r1, r2, rho1, rho2) result(moi)
-
-!       implicit none
-
-!       real(8), intent(in) :: r1, r2, rho1, rho2
-!       real(8) :: moi
-!       real(8) :: dr, a, moi1, moi2
-
-!       dr = r2 - r1
-!       a = (rho2 - rho1)/dr
-
-!       moi1 = 1d0/5d0*rho1*r1**5 + 1d0/6d0*a*r1**6 - 1d0/5d0*a*r1*r1**5
-!       moi2 = 1d0/5d0*rho1*r2**5 + 1d0/6d0*a*r2**6 - 1d0/5d0*a*r1*r2**5
-
-!       moi = moi2 - moi1
-
-!    end function MOI_integrand_linear
 
 ! !########################################################################
-!    function eta_general(xi, m, n_mats) result(y)
-! !Compute weight fractions from mole fractions of different components.
+   function xi_general(eta, m, n_mats) result(y)
+!Compute mole fractions from weight fractions of different components.
 
-!       implicit none
+      implicit none
 
-!       integer :: i, n_mats
-!       real(8), dimension(n_mats) :: y
-!       real(8) :: m_tilde
-!       real(8), intent(in), dimension(n_mats) :: xi, m
+      integer :: i, n_mats
+      real(8), dimension(n_mats) :: y
+      real(8) :: dummy
+      real(8), intent(in), dimension(n_mats) :: eta, m
+      dummy = 0d0
+      do i = 1, n_mats
+         dummy = dummy + eta(i)/m(i)
+      end do
 
-!       y = 0d0
-!       m_tilde = 0d0
+      do i = 1, n_mats
+         y(i) = eta(i)/m(i)/dummy
+      end do
 
-!       do i = 1, n_mats
-!          m_tilde = m_tilde + m(i)*xi(i)
-!       end do
-
-!       do i = 1, n_mats
-!          y(i) = xi(i)*m(i)/m_tilde
-!       end do
-
-!    end function eta_general
-
-! !########################################################################
-!    function xi_general(eta, m, n_mats) result(y)
-! !Compute mole fractions from weight fractions of different components.
-
-!       implicit none
-
-!       integer :: i, n_mats
-!       real(8), dimension(n_mats) :: y
-!       real(8) :: dummy
-!       real(8), intent(in), dimension(n_mats) :: eta, m
-
-!       print *, 'eta =', eta
-
-!       dummy = 0d0
-!       do i = 1, n_mats
-!          dummy = dummy + eta(i)/m(i)
-!       end do
-
-!       do i = 1, n_mats
-!          y(i) = eta(i)/m(i)/dummy
-!       end do
-
-!    end function xi_general
+   end function xi_general
 
 ! !#######################################################################
-!    function at2mat(at, n_mats) result(y)
-! !Convert atomic mole fractions to molecular mole fractions. The atomic
-! !composition of the molecular species is given by the matrix N and is
-! !fixed to represent the outer core composition at this point. In future
-! !versions it could be passed as an argument to allow for a more diverse
-! !compositions.
+   function at2mat(at, n_mats) result(y)
+!Convert atomic mole fractions to molecular mole fractions. The atomic
+!composition of the molecular species is given by the matrix N and is
+!fixed to represent the outer core composition at this point. In future
+!versions it could be passed as an argument to allow for a more diverse
+!compositions.
 
-!       integer, intent(in) :: n_mats
-!       real(8), dimension(n_mats) :: y, x
-!       real(8), dimension(n_mats, n_mats) :: matrix, N
-!       integer :: i, j, k
-!       real(8), dimension(n_mats), intent(in) :: at
+      integer, intent(in) :: n_mats
+      real(8), dimension(n_mats) :: y, x
+      real(8), dimension(n_mats, n_mats) :: matrix, N
+      integer :: i, j, k
+      real(8), dimension(n_mats), intent(in) :: at
 
-! !Initiate matrix
-!       do i = 1, n_mats
-!          do j = 1, n_mats
-!             matrix(i, j) = 0d0
-!             if (i == j) then
-!                N(i, j) = 1d0
-!             else
-!                N(i, j) = 0d0
-!             end if
+!Initiate matrix
+      do i = 1, n_mats
+         do j = 1, n_mats
+            matrix(i, j) = 0d0
+            if (i == j) then
+               N(i, j) = 1d0
+            else
+               N(i, j) = 0d0
+            end if
 
-!             if (i == 1) then
-!                N(i, j) = 1d0
-!             end if
+            if (i == 1) then
+               N(i, j) = 1d0
+            end if
 
-!          end do
-!       end do
+         end do
+      end do
 
-! !Compute matrix elements
-!       do i = 1, n_mats
-!          x(i) = 0d0
-!          do j = 1, n_mats
-!             do k = 1, n_mats
-!                matrix(i, j) = matrix(i, j) + N(k, j)*at(i)
-!             end do
-!             matrix(i, j) = matrix(i, j) - N(i, j)
-!          end do
-!       end do
+!Compute matrix elements
+      do i = 1, n_mats
+         x(i) = 0d0
+         do j = 1, n_mats
+            do k = 1, n_mats
+               matrix(i, j) = matrix(i, j) + N(k, j)*at(i)
+            end do
+            matrix(i, j) = matrix(i, j) - N(i, j)
+         end do
+      end do
 
-!       x(1) = 1d0
-!       call solve_linear_system(n=n_mats, l=n_mats, matrix=matrix, b=x, x=y)
+      x(1) = 1d0
+      call solve_linear_system(n=n_mats, l=n_mats, matrix=matrix, b=x, x=y)
 
-!    end function at2mat
-
-! !#######################################################################
-!    function at2mat_max(at, n_mats) result(y)
-! !Convert atomic mole fractions to molecular mole fractions. The atomic
-! !composition of the molecular species is given by the matrix N and is
-! !fixed to represent the outer core composition at this point. In future
-! !versions it could be passed as an argument to allow for a more diverse
-! !compositions. For a composition of the form Fe, FeM1, FeM2, ... the
-! !maximum concentration of lighter elements is acheived for Fe = 0. If
-! !Fe < 0. the Fe content is set to zero and the other fractions rescaled
-! !to satisfy the normalization criteria.
-
-!       integer, intent(in) :: n_mats
-!       real(8) :: norm
-!       real(8), dimension(n_mats) :: y, x
-!       real(8), dimension(n_mats, n_mats) :: matrix, N
-!       integer :: i, j, k
-!       real(8), dimension(n_mats), intent(in) :: at
-
-! !Initiate matrix
-!       do i = 1, n_mats
-!          do j = 1, n_mats
-!             matrix(i, j) = 0d0
-!             if (i == j) then
-!                N(i, j) = 1d0
-!             else
-!                N(i, j) = 0d0
-!             end if
-
-!             if (i == 1) then
-!                N(i, j) = 1d0
-!             end if
-!          end do
-!       end do
-
-! !Compute matrix elements
-!       do i = 1, n_mats
-!          x(i) = 0d0
-!          do j = 1, n_mats
-!             do k = 1, n_mats
-!                matrix(i, j) = matrix(i, j) + N(k, j)*at(i)
-!             end do
-!             matrix(i, j) = matrix(i, j) - N(i, j)
-!          end do
-!       end do
-
-!       do i = 1, n_mats
-!          matrix(1, i) = 1d0
-!       end do
-
-!       x(1) = 1d0
-!       call solve_linear_system(n=n_mats, l=1, matrix=matrix, b=x, x=y)
-
-! !Check if too much lighter elements are present and rescale molecular
-! !mole fractions to satisfy normalization criteria.
-!       if (y(1) .lt. 0d0) then
-!          y(1) = 0d0
-!          norm = sum(y)
-!          do i = 1, n_mats
-!             y(i) = y(i)/norm
-!          end do
-!       end if
-
-!    end function at2mat_max
+   end function at2mat
 
 ! !#######################################################################
-!    function mat2at_core(xi, n_mats) result(y)
-! !Takes the material fractions (Fe, FeS, FeSi, FeO) and converts it to
-! !atomic fractions xiFe, xiS, xiSi, xiO.
+   function at2mat_max(at, n_mats) result(y)
+!Convert atomic mole fractions to molecular mole fractions. The atomic
+!composition of the molecular species is given by the matrix N and is
+!fixed to represent the outer core composition at this point. In future
+!versions it could be passed as an argument to allow for a more diverse
+!compositions. For a composition of the form Fe, FeM1, FeM2, ... the
+!maximum concentration of lighter elements is acheived for Fe = 0. If
+!Fe < 0. the Fe content is set to zero and the other fractions rescaled
+!to satisfy the normalization criteria.
 
-!       integer, intent(in) :: n_mats
-!       integer :: i
-!       real(8), dimension(n_mats), intent(in) :: xi
-!       real(8), dimension(n_mats) :: y, dummy
+      integer, intent(in) :: n_mats
+      real(8) :: norm
+      real(8), dimension(n_mats) :: y, x
+      real(8), dimension(n_mats, n_mats) :: matrix, N
+      integer :: i, j, k
+      real(8), dimension(n_mats), intent(in) :: at
 
-!       dummy(1) = 1d0 - (sum(xi) - xi(1))
-!       do i = 1, n_mats - 1
-!          dummy(i + 1) = xi(i + 1)
-!       end do
+!Initiate matrix
+      do i = 1, n_mats
+         do j = 1, n_mats
+            matrix(i, j) = 0d0
+            if (i == j) then
+               N(i, j) = 1d0
+            else
+               N(i, j) = 0d0
+            end if
 
-!       do i = 1, n_mats
-!          y(i) = dummy(i)/sum(dummy)
-!       end do
+            if (i == 1) then
+               N(i, j) = 1d0
+            end if
+         end do
+      end do
 
-!    end function mat2at_core
+!Compute matrix elements
+      do i = 1, n_mats
+         x(i) = 0d0
+         do j = 1, n_mats
+            do k = 1, n_mats
+               matrix(i, j) = matrix(i, j) + N(k, j)*at(i)
+            end do
+            matrix(i, j) = matrix(i, j) - N(i, j)
+         end do
+      end do
+
+      do i = 1, n_mats
+         matrix(1, i) = 1d0
+      end do
+
+      x(1) = 1d0
+      call solve_linear_system(n=n_mats, l=1, matrix=matrix, b=x, x=y)
+
+!Check if too much lighter elements are present and rescale molecular
+!mole fractions to satisfy normalization criteria.
+      if (y(1) .lt. 0d0) then
+         y(1) = 0d0
+         norm = sum(y)
+         do i = 1, n_mats
+            y(i) = y(i)/norm
+         end do
+      end if
+
+   end function at2mat_max
 
 ! !#######################################################################
-!    function at2wt_core(at, m, n_mats) result(y)
-! !Takes atomic mole fractions xiFe, xiS, xiSi, xiO and converts
-! !them to weight fractions (Fe, S, Si, O)
+   function mat2at_core(xi, n_mats) result(y)
+!Takes the material fractions (Fe, FeS, FeSi, FeO) and converts it to
+!atomic fractions xiFe, xiS, xiSi, xiO.
 
-!       integer, intent(in) :: n_mats
-!       integer :: i
-!       real(8), dimension(n_mats), intent(in) :: at
-!       real(8), dimension(4) :: m
-!       real(8), dimension(n_mats) :: y
-!       real(8) :: m_tilde
+      integer, intent(in) :: n_mats
+      integer :: i
+      real(8), dimension(n_mats), intent(in) :: xi
+      real(8), dimension(n_mats) :: y, dummy
 
-!       m = (/mFe, mS, mSi, mO/)
-!       m_tilde = 0d0
+      dummy(1) = 1d0 - (sum(xi) - xi(1))
+      do i = 1, n_mats - 1
+         dummy(i + 1) = xi(i + 1)
+      end do
 
-!       do i = 1, n_mats
-!          m_tilde = m_tilde + at(i)*m(i)
-!       end do
-!       print *, 'm_tilde =', m_tilde
-!       do i = 1, n_mats
-!          y(i) = at(i)*m(i)/m_tilde
-!       end do
+      do i = 1, n_mats
+         y(i) = dummy(i)/sum(dummy)
+      end do
 
-!    end function at2wt_core
+   end function mat2at_core
+
+! !#######################################################################
+   function at2wt_core(at, m, n_mats) result(y)
+!Takes atomic mole fractions xiFe, xiS, xiSi, xiO and converts
+!them to weight fractions (Fe, S, Si, O)
+
+      integer, intent(in) :: n_mats
+      integer :: i
+      real(8), dimension(n_mats), intent(in) :: at
+      real(8), dimension(4) :: m
+      real(8), dimension(n_mats) :: y
+      real(8) :: m_tilde
+
+      m = (/mFe, mS, mSi, mO/)
+      m_tilde = 0d0
+
+      do i = 1, n_mats
+         m_tilde = m_tilde + at(i)*m(i)
+      end do
+
+      do i = 1, n_mats
+         y(i) = at(i)*m(i)/m_tilde
+      end do
+
+   end function at2wt_core
 
 ! !#######################################################################
 !    function wt2mol_core(wt, xiH) result(y)
@@ -298,32 +232,33 @@ contains
 !    end function wt2mol_core
 
 ! !########################################################################
-!    function compute_xi(eta, m1, m2) result(y)
-! !Computes mole fractions from mass fraction of species 2 where species 1
-! !has molar abundance of (1-xi)
+   function compute_xi(eta, m1, m2) result(y)
+!Computes mole fractions from mass fraction of species 2 where species 1
+!has molar abundance of (1-xi)
 
-!       implicit none
+      implicit none
 
-!       real(kind=8) :: y
-!       real(kind=8), intent(in) :: m1, m2, eta
+      real(kind=8) :: y
+      real(kind=8), intent(in) :: m1, m2, eta
 
-!       y = m1*eta/(eta*m1 - eta*m2 + m2)
+      y = m1*eta/(eta*m1 - eta*m2 + m2)
 
-!    end function compute_xi
+   end function compute_xi
 
 ! !########################################################################
-!    function compute_eta(xi, m1, m2) result(y)
-! !Compute mass fraction from mole fraction of species 2 where species 1
-! !has a weight abundance of (1-eta)
+   function compute_eta(xi, m1, m2) result(y)
+!Compute mass fraction from mole fraction of species 2 where species 1
+!has a weight abundance of (1-eta)
 
-!       implicit none
+      implicit none
 
-!       real(kind=8) :: y
-!       real(kind=8), intent(in) :: xi, m1, m2
+      real(kind=8) :: y
+      real(kind=8), intent(in) :: xi, m1, m2
 
-!       y = xi*m2/((1.0d0 - xi)*m1 + xi*m2)
+      y = xi*m2/((1.0d0 - xi)*m1 + xi*m2)
 
-!    end function compute_eta
+   end function compute_eta
+
 
 ! !#######################################################################
 !    function epsilon_ki(T, k, i) result(eps)
@@ -411,7 +346,7 @@ contains
 
 !    end function partition_coefficient_i
 
-! !########################################################################
+! ! !########################################################################
 !    function xi_FeO(T, P, xi) result(xiFeO)
 ! !Compute mole fraction of FeO in the mantle at given T, P and Fe and O
 ! !content in the core assuming chemical equ. between core and mantle from
@@ -429,7 +364,7 @@ contains
 
 !    end function xi_FeO
 
-! !#######################################################################
+! ! !#######################################################################
 !    function xi_SiO2(T, P, xi) result(xiSiO2)
 ! !Compute mole fraction of siO2 in the mantle at given T, P and Fe and O
 ! !and Si content in the core assuming chemical equ. between core and mantle
@@ -453,21 +388,21 @@ contains
 
 !    end function xi_SiO2
 
-! !#######################################################################
-!    function compute_XH2O_melt(T) result(XH2O)
-! !Computes H2O content in silicate melt as function of temperature
-! !according to Fei 2020 (Fig. 3). The result is in wt fraction.
+! ! !#######################################################################
+! !    function compute_XH2O_melt(T) result(XH2O)
+! ! !Computes H2O content in silicate melt as function of temperature
+! ! !according to Fei 2020 (Fig. 3). The result is in wt fraction.
 
-!       implicit none
+! !       implicit none
 
-!       real(8), intent(in) :: T
-!       real(8) :: XH2O
+! !       real(8), intent(in) :: T
+! !       real(8) :: XH2O
 
-!       XH2O = (10d0 + 250d0*(1d3/T - 0.408d0))/100d0
+! !       XH2O = (10d0 + 250d0*(1d3/T - 0.408d0))/100d0
 
-!    end function compute_XH2O_melt
+! !    end function compute_XH2O_melt
 
-! !########################################################################
+! ! !########################################################################
 !    function Si_number_mantle(T, P, xi) result(Si_number)
 ! !Compute Si# in the mantle from Fe, O and Si content in the core and the
 ! !P and T at the CMB assuming chemical equ. between core and mantle from
@@ -482,7 +417,7 @@ contains
 !       xiSiO2 = xi_SiO2(T, P, xi)
 !       xiFeO = xi_FeO(T, P, xi)
 !       Fe_num = xiFeO/(1d0 - xiSiO2)
-!       Fe_num = min(Fe_num, xi_Fe_mantle_max)
+!       ! Fe_num = min(Fe_num, xi_Fe_mantle_max)
 !       Fe_num = max(Fe_num, 0d0)
 !       SiMg = xiSiO2/(1d0 - xiFeO - xiSiO2)
 
@@ -494,7 +429,7 @@ contains
 !       Si_number = max(Si_number, 1d0/(3d0 - 2d0*Fe_num)*1.0001d0)
 !    end function Si_number_mantle
 
-! !#######################################################################
+! ! !#######################################################################
 !    function Fe_number_mantle(T, P, xi) result(Fe_number)
 ! !Compute Si# in the mantle from Fe, O and Si content in the core and the
 ! !P and T at the CMB assuming chemical equ. between core and mantle from
@@ -504,7 +439,7 @@ contains
 
 !       real(8), intent(in) :: T, P
 !       real(8), dimension(5), intent(in) :: xi
-!       real(8) :: Fe_number, SiMg, xiSiO2, xiFeO
+!       real(8) :: Fe_number, xiSiO2, xiFeO
 
 !       xiSiO2 = xi_SiO2(T, P, xi)
 !       xiFeO = xi_FeO(T, P, xi)
@@ -515,9 +450,9 @@ contains
 ! !~ Fe_number = min(Fe_number, xi_Fe_mantle_max)
 ! !~ Fe_number = max(Fe_number, 0d0)
 
-!       if (Fe_number < 0d0 .or. Fe_number > xi_Fe_mantle_max) then
-!          Fe_number = xi_Fe_mantle_max
-!       end if
+!       ! if (Fe_number < 0d0 .or. Fe_number > xi_Fe_mantle_max) then
+!       !    Fe_number = xi_Fe_mantle_max
+!       ! end if
 
 !    end function Fe_number_mantle
 
@@ -692,73 +627,73 @@ contains
 !    end function compute_xiH2O
 
 ! !#######################################################################
-!    SUBROUTINE update_all_fractions(X_new, weight_fractions, fractions, &
-!                                    molar_masses, n_mats)
-! !Uses the newly computed weight fraction of the impurity and updates all
-! !other weight fractions and all mole fractions. new_last_frac is the
-! !weight fraction of the impurity (last material)
+   SUBROUTINE update_all_fractions(X_new, weight_fractions, fractions, &
+                                   molar_masses, n_mats)
+!Uses the newly computed weight fraction of the impurity and updates all
+!other weight fractions and all mole fractions. new_last_frac is the
+!weight fraction of the impurity (last material)
 
-!       real(8), intent(in) :: X_new
-!       real(8) :: xi_new
-!       integer, intent(in) :: n_mats
-!       real(8), intent(inout), dimension(n_mats) :: weight_fractions, fractions
-!       real(8), intent(in), dimension(n_mats) :: molar_masses
-!       real(8), dimension(n_mats) :: olds
-!       real(8) :: sum_others, m_others, m_impurity, delta
-!       integer :: i
+      real(8), intent(in) :: X_new
+      real(8) :: xi_new
+      integer, intent(in) :: n_mats
+      real(8), intent(inout), dimension(n_mats) :: weight_fractions, fractions
+      real(8), intent(in), dimension(n_mats) :: molar_masses
+      real(8), dimension(n_mats) :: olds
+      real(8) :: sum_others, m_others, m_impurity, delta
+      integer :: i
 
-! !First update the weight fractions
-!       olds = weight_fractions
-!       weight_fractions(n_mats) = X_new
+!First update the weight fractions
+      olds = weight_fractions
+      weight_fractions(n_mats) = X_new
 
-! !Compute normalization factor
-!       sum_others = 0d0
-!       do i = 1, n_mats - 1
-!          sum_others = sum_others + olds(i)
-!       end do
+!Compute normalization factor
+      sum_others = 0d0
+      do i = 1, n_mats - 1
+         sum_others = sum_others + olds(i)
+      end do
 
-! !Compute weight fractions
-!       do i = 1, n_mats - 1
-!          weight_fractions(i) = olds(i)*(1d0 - X_new)/sum_others
-!       end do
+!Compute weight fractions
+      do i = 1, n_mats - 1
+         weight_fractions(i) = olds(i)*(1d0 - X_new)/sum_others
+      end do
 
-! !Compute the normalized mass of the non-impurities for the conversion
-! !to mole fraction
-!       m_others = 0d0
+!Compute the normalized mass of the non-impurities for the conversion
+!to mole fraction
+      m_others = 0d0
 
-!       do i = 1, 2
-! !The layer itself does not contain the right fractions so they have to
-! !be taken from the shells. Since the first two material fractions will
-! !be constant we can just take the first shell.
-!          delta = molar_masses(i)
-!          m_others = m_others + delta*fractions(i)
-!       end do
+      do i = 1, 2
+!The layer itself does not contain the right fractions so they have to
+!be taken from the shells. Since the first two material fractions will
+!be constant we can just take the first shell.
+         delta = molar_masses(i)
+         m_others = m_others + delta*fractions(i)
+      end do
 
-! !Normalized mass of the non-impurities
-!       m_others = m_others/(fractions(1) + fractions(2))
+!Normalized mass of the non-impurities
+      m_others = m_others/(fractions(1) + fractions(2))
 
-! !Mass of the impurity (last material)
-!       m_impurity = molar_masses(n_mats)
+!Mass of the impurity (last material)
+      m_impurity = molar_masses(n_mats)
 
-! !Compute the mole fraction of the impurity
-!       xi_new = compute_xi(eta=X_new, m1=m_others, m2=m_impurity)
+!Compute the mole fraction of the impurity
+      xi_new = compute_xi(eta=X_new, m1=m_others, m2=m_impurity)
 
-! !Use this to compute all the other mole fractions
-!       olds = fractions
-!       fractions(n_mats) = xi_new
+!Use this to compute all the other mole fractions
+      olds = fractions
+      fractions(n_mats) = xi_new
 
-! !Compute normalization factors
-!       sum_others = 0d0
-!       do i = 1, n_mats - 1
-!          sum_others = sum_others + olds(i)
-!       end do
+!Compute normalization factors
+      sum_others = 0d0
+      do i = 1, n_mats - 1
+         sum_others = sum_others + olds(i)
+      end do
 
-! !Compute mole fractions
-!       do i = 1, n_mats - 1
-!          fractions(i) = olds(i)*(1d0 - xi_new)/sum_others
-!       end do
+!Compute mole fractions
+      do i = 1, n_mats - 1
+         fractions(i) = olds(i)*(1d0 - xi_new)/sum_others
+      end do
 
-!    END SUBROUTINE update_all_fractions
+   END SUBROUTINE update_all_fractions
 
 !########################################################################
    subroutine construct_abundance_matrix(SiMg, FeMg, n_mats, &
@@ -873,19 +808,9 @@ contains
          abundances_dummy(i, 1) = 0.0d0
       end do
 
-!~ print *, 'contents =', contents(:)
-!~ print *, 'xiAlSii =', xiAlSii(:)
-!~ print *, 'xiAlMgi =', xiAlMgi(:)
-!~ print *, 'FeMg =', FeMg
-!~ print *, 'SiMg =', SiMg
-!~ print *, 'xiH2Oi =', xiH2Oi
-!~ print *, 'xiFei =', xiFei
-!~ print *, 'additional =', additional_dummy
-
 !In the core the first material is pure iron. There no compositional
 !gradients are currently allowed and the fractions need not be computed
       if (contents(1) == 2 .or. contents(1) == 1) then
-!pass
 
       elseif (size(contents) == 1) then
          abundances(1) = 1d0
@@ -897,12 +822,7 @@ contains
                                          xiAlMgi=xiAlMgi, matrix=matrix, b=b_vec, &
                                          additional=additional_dummy)
 
-!call mat_print('matrix', matrix)
-!print *, 'b_vec =', b_vec
-
          call gauss_elimination(a=matrix, sol=abundances_dummy, b=b_vec)
-
-!print *, 'abundances =', abundances_dummy(:,1)
 
          do i = 1, n_mats
             abundances(i) = abundances_dummy(i, 1)
@@ -911,4 +831,84 @@ contains
 
    end subroutine compute_abundance_vector
 
-END MODULE functionsPy
+   !#############################################################################
+   subroutine compute_core_mass(mg_number, mantle_fractions, M_inner_core, &
+      M_surface, M_ocean, fe_number_mantle, mantle_contents, x_all_core, M)
+      ! Compute the core mass of a planet for a given bulk, mantle and core composition
+   
+      real(8) :: Q1, Q2, Q3, Q4, Q5, core_frac, FeMg
+      real(8), intent(out) :: M
+      real(8), dimension(5) :: molar_masses
+      integer :: i
+      real(8), intent(in) :: mg_number, fe_number_mantle, M_surface, M_ocean, M_inner_core
+      real(8), intent(in), dimension(2) :: mantle_fractions
+      integer, intent(in), dimension(2) :: mantle_contents
+      real(8), intent(in), dimension(5) :: x_all_core
+   
+      FeMg = (1e0 - mg_number)/mg_number
+   
+      !Compute number of moles of Mg per mole of silicates in the mantle
+      Q1 = 0d0
+      do i = 1, size(mantle_fractions)
+         Q1 = Q1 + mantle_fractions(i)* &
+              (1d0 - fe_number_mantle)* &
+              material_YMg(mantle_contents(i))
+      end do
+   
+      !Compute total normalized molar mass in the mantle
+      Q2 = 0d0
+      do i = 1, size(mantle_fractions)
+         Q2 = Q2 + mantle_fractions(i)* &
+              (1d0 - fe_number_mantle)* &
+              material_YMg(mantle_contents(i))*mMg
+      end do
+   
+      do i = 1, size(mantle_fractions)
+         Q2 = Q2 + mantle_fractions(i)* &
+              fe_number_mantle* &
+              material_YMg(mantle_contents(i))*mFe
+      end do
+   
+      do i = 1, size(mantle_fractions)
+         Q2 = Q2 + mantle_fractions(i)* &
+              material_YSi(mantle_contents(i))*mSi
+      end do
+   
+      do i = 1, size(mantle_fractions)
+         Q2 = Q2 + mantle_fractions(i)* &
+              material_YO(mantle_contents(i))*mO
+      end do
+   
+      do i = 1, size(mantle_fractions)
+         Q2 = Q2 + mantle_fractions(i)* &
+              material_YH(mantle_contents(i))*mH
+      end do
+   
+      !Compute mole fraction of Fe in the mantle
+      Q3 = 0d0
+      do i = 1, size(mantle_fractions)
+         Q3 = Q3 + mantle_fractions(i)* &
+              fe_number_mantle* &
+              material_YMg(mantle_contents(i))
+      end do
+   
+      !Compute mole fraction of Fe in the outer core
+      Q4 = x_all_core(1)
+   
+      !Compute total normalized molar mass in the outer core
+      molar_masses = (/mFe, mH, mS, mSi, mO/)
+      Q5 = 0d0
+   
+      do i = 1, size(x_all_core)
+         Q5 = Q5 + molar_masses(i)*x_all_core(i)
+      end do
+   
+      !Compute core mass fraction
+      core_frac = (1d0 - M_ocean/M_surface)
+      core_frac = core_frac*(Q3/Q2 - Q1/Q2*FeMg)
+      core_frac = core_frac + M_inner_core/M_surface* (1e0/mFe - Q4/Q5)
+      core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
+      M = core_frac * M_surface
+   end subroutine compute_core_mass
+
+END MODULE

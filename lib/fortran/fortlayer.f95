@@ -191,8 +191,8 @@ contains
       self%fractions = self%shells(self%shell_count)%fractions
       self%gradients = self%shells(self%shell_count)%gradients
 
+      !TODO. change indigenous mass unit to m_earth everywhere for consistency!
       self%indigenous_mass = 0.0d0
-
       do i = 1, self%shell_count
          self%indigenous_mass = self%indigenous_mass + &
                                 self%shells(i)%indigenous_mass

@@ -1,7 +1,8 @@
 MODULE class_shell
 
    use class_mixture
-   use functions
+   use integrator
+   use fortfunctions
    use constants
    use class_dict
 

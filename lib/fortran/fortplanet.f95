@@ -1,5 +1,7 @@
 MODULE class_planet
 
+   ! use functions
+   use fortfunctions
    use run_params
    use constants
    use phase
@@ -722,93 +724,98 @@ contains
 !Updates the core mass for a given bulk composition
 
       type(planet), intent(inout) :: self
-      real(8) :: Q1, Q2, Q3, Q4, Q5, core_frac, FeMg, reldev, M
-      real(8), dimension(5) :: molar_masses
+      real(8) :: core_frac, FeMg, reldev, core_mass, inner_core_mass
+      ! real(8), dimension(5) :: molar_masses
       real(8), dimension(4) :: dummy, masses, dummy_1
-      real(8), dimension(self%layer_dims(2)) :: wt_fractions_dummy
+      ! real(8), dimension(self%layer_dims(2)) :: wt_fractions_dummy
       integer :: i
 
-      FeMg = (1e0 - self%Mg_number_should)/self%Mg_number_should
-      masses = (/mFe, mS, mSi, mO/)
-!Compute mole fraction of Mg in the mantle
-      Q1 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q1 = Q1 + self%fractions%axes(3)%real_array(i)* &
-              (1d0 - self%Fe_number_layers(3))* &
-              material_YMg(self%contents%axes(3)%int_array(i))
-      end do
+!       FeMg = (1e0 - self%Mg_number_should)/self%Mg_number_should
+!       masses = (/mFe, mS, mSi, mO/)
+! !Compute mole fraction of Mg in the mantle
+!       Q1 = 0d0
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q1 = Q1 + self%fractions%axes(3)%real_array(i)* &
+!               (1d0 - self%Fe_number_layers(3))* &
+!               material_YMg(self%contents%axes(3)%int_array(i))
+!       end do
 
-!Compute total normalized mass in the mantle
-      Q2 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
-              (1d0 - self%Fe_number_layers(3))* &
-              material_YMg(self%contents%axes(3)%int_array(i))*mMg
-      end do
+! !Compute total normalized mass in the mantle
+!       Q2 = 0d0
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+!               (1d0 - self%Fe_number_layers(3))* &
+!               material_YMg(self%contents%axes(3)%int_array(i))*mMg
+!       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
-              self%Fe_number_layers(3)* &
-              material_YMg(self%contents%axes(3)%int_array(i))*mFe
-      end do
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+!               self%Fe_number_layers(3)* &
+!               material_YMg(self%contents%axes(3)%int_array(i))*mFe
+!       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
-              material_YSi(self%contents%axes(3)%int_array(i))*mSi
-      end do
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+!               material_YSi(self%contents%axes(3)%int_array(i))*mSi
+!       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
-              material_YO(self%contents%axes(3)%int_array(i))*mO
-      end do
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+!               material_YO(self%contents%axes(3)%int_array(i))*mO
+!       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
-              material_YH(self%contents%axes(3)%int_array(i))*mH
-      end do
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+!               material_YH(self%contents%axes(3)%int_array(i))*mH
+!       end do
 
-!Compute mole fraction of Fe in the mantle
-      Q3 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q3 = Q3 + self%fractions%axes(3)%real_array(i)* &
-              self%Fe_number_layers(3)* &
-              material_YMg(self%contents%axes(3)%int_array(i))
-      end do
+! !Compute mole fraction of Fe in the mantle
+!       Q3 = 0d0
+!       do i = 1, size(self%fractions%axes(3)%real_array)
+!          Q3 = Q3 + self%fractions%axes(3)%real_array(i)* &
+!               self%Fe_number_layers(3)* &
+!               material_YMg(self%contents%axes(3)%int_array(i))
+!       end do
 
-!Compute mole fraction of Fe in the outer core
-      Q4 = self%xi_all_core(1)
+! !Compute mole fraction of Fe in the outer core
+!       Q4 = self%xi_all_core(1)
 
-!Compute total normalized mass in the outer core
-      molar_masses = (/mFe, mH, mS, mSi, mO/)
-      Q5 = 0d0
+! !Compute total normalized mass in the outer core
+!       molar_masses = (/mFe, mH, mS, mSi, mO/)
+!       Q5 = 0d0
 
-      do i = 1, size(self%xi_all_core)
-         Q5 = Q5 + molar_masses(i)*self%xi_all_core(i)
-      end do
+!       do i = 1, size(self%xi_all_core)
+!          Q5 = Q5 + molar_masses(i)*self%xi_all_core(i)
+!       end do
 
-! print *, 'Q1, Q2, Q3, Q4, Q5 =', Q1, Q2, Q3, Q4, Q5
-! print *, 'Q3 / Q2, Q4/Q5 =', Q3/Q2, Q4 / Q5
-! print *, 'xi all core =', self%xi_all_core
-! print *, "FeMg =", FeMg
-!~ print *, 'factor =', self%layers(1)%indigenous_mass / self%M_surface_should * (1d0 / mFe - Q4 / Q5)
-! print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
-! print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
-! print *, 'fractions =', self%fractions%axes(3)%real_array
-! print *, 'inner core mass =', self%layers(1)%indigenous_mass/m_earth
-! print *, "M_surface should =", self%M_surface_should
-!Compute core mass fraction
-      core_frac = (1d0 - self%M_ocean_should/self%M_surface_should)
-      ! print *, 'core_frac =', core_frac
-      core_frac = core_frac*(Q3/Q2 - Q1/Q2*FeMg)
-      ! print *, 'core_frac =', core_frac
-      core_frac = core_frac + (self%layers(1)%indigenous_mass / m_earth)/self%M_surface_should* &
-                  (1e0/mFe - Q4/Q5)
-      ! print *, 'core_frac =', core_frac
-      core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
-      ! print *, 'core_frac =', core_frac
+! ! print *, 'Q1, Q2, Q3, Q4, Q5 =', Q1, Q2, Q3, Q4, Q5
+! ! print *, 'Q3 / Q2, Q4/Q5 =', Q3/Q2, Q4 / Q5
+! ! print *, 'xi all core =', self%xi_all_core
+! ! print *, "FeMg =", FeMg
+! !~ print *, 'factor =', self%layers(1)%indigenous_mass / self%M_surface_should * (1d0 / mFe - Q4 / Q5)
+! ! print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
+! ! print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
+! ! print *, 'fractions =', self%fractions%axes(3)%real_array
+! ! print *, 'inner core mass =', self%layers(1)%indigenous_mass/m_earth
+! ! print *, "M_surface should =", self%M_surface_should
+! !Compute core mass fraction
+!       core_frac = (1d0 - self%M_ocean_should/self%M_surface_should)
+!       ! print *, 'core_frac =', core_frac
+!       core_frac = core_frac*(Q3/Q2 - Q1/Q2*FeMg)
+!       ! print *, 'core_frac =', core_frac
+!       core_frac = core_frac + (self%layers(1)%indigenous_mass / m_earth)/self%M_surface_should* &
+!                   (1e0/mFe - Q4/Q5)
+!       ! print *, 'core_frac =', core_frac
+!       core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
+!       ! print *, 'core_frac =', core_frac
 
-      M = core_frac*self%M_surface_should
+!       core_mass = core_frac*self%M_surface_should
+!       print *, "old computed core mass =", core_mass
       ! print *, 'Computed core mass in fortplanet:', M
+      inner_core_mass = self%layers(1)%indigenous_mass / m_earth
+      call compute_core_mass(self%Mg_number_should,  self%fractions%axes(3)%real_array, &
+      inner_core_mass, self%M_surface_should, self%M_ocean_should, self%Fe_number_layers(3), &
+      self%contents%axes(3)%int_array, self%xi_all_core, core_mass)
 
 !Decide which strategy is to be employed to probe the total core mass.
 !By default the initial inner core mass in layer_masses is set to the
@@ -829,8 +836,9 @@ contains
 !If redistribution of lighter elements is not accounted for:
 !Total core mass must be updated.
 ! print *, 'iCS =', self%inner_core_segregation_model
+         
          if (.not. self%inner_core_segregation_model) then
-            self%layer_masses(2) = core_frac*self%M_surface_should!/m_earth
+            self%layer_masses(2) = core_mass!core_frac*self%M_surface_should!/m_earth
 !If redistribution of lighter elements is accoutned for:
 !Outer core fractions need to be updated.
          else
@@ -1132,29 +1140,29 @@ contains
 !~                 chemical equilibrium between core and mantle. If CS-model
 !~                 is deactivated the mantle composition is computed from the inputs
 !~                 Si_number_layers and Fe_number_layers
-               if (self%core_segregation_model) then
-                  if (self%lay == 9) then
-                     print *, ''
-                     print *, 'Doing the CS shit.... !!!!!!!'
-                     print *, ''
-                     print *, 'Si#, Fe# before:', self%Si_number_layers(3), self%Fe_number_layers(3)
-                     !~                         print *, 'fractions =', self%fractions%axes(self%lay)%real_array
-                     !~                         print *, 'fractions =', self%fractions%axes(3)%real_array
-                     !~                         print *, 'xi_all core =', self%xi_all_core
-                     self%Si_number_layers(3) = Si_number_mantle(self%T_CS, &
-                                                                 self%P_CS, &
-                                                                 self%xi_all_core)
-                     self%Si_number_layers(4) = self%Si_number_layers(3)
-                     print *, 'computed Si# in the mantle:', self%Si_number_layers(self%lay + 1)
+               ! if (self%core_segregation_model) then
+               !    if (self%lay == 9) then
+               !       print *, ''
+               !       print *, 'Doing the CS shit.... !!!!!!!'
+               !       print *, ''
+               !       print *, 'Si#, Fe# before:', self%Si_number_layers(3), self%Fe_number_layers(3)
+               !       !~                         print *, 'fractions =', self%fractions%axes(self%lay)%real_array
+               !       !~                         print *, 'fractions =', self%fractions%axes(3)%real_array
+               !       !~                         print *, 'xi_all core =', self%xi_all_core
+               !       self%Si_number_layers(3) = Si_number_mantle(self%T_CS, &
+               !                                                   self%P_CS, &
+               !                                                   self%xi_all_core)
+               !       self%Si_number_layers(4) = self%Si_number_layers(3)
+               !       print *, 'computed Si# in the mantle:', self%Si_number_layers(self%lay + 1)
 
-                     self%Fe_number_layers(3) = Fe_number_mantle(self%T_CS, &
-                                                                 self%P_CS, &
-                                                                 self%xi_all_core)
-                     !self%Fe_number_layers(3) = 1d-1
-                     self%Fe_number_layers(4) = self%Fe_number_layers(3)
-                     print *, 'computed Fe# in the mantle:', self%Fe_number_layers(self%lay + 1)
-                  end if
-               end if
+               !       self%Fe_number_layers(3) = Fe_number_mantle(self%T_CS, &
+               !                                                   self%P_CS, &
+               !                                                   self%xi_all_core)
+               !       !self%Fe_number_layers(3) = 1d-1
+               !       self%Fe_number_layers(4) = self%Fe_number_layers(3)
+               !       print *, 'computed Fe# in the mantle:', self%Fe_number_layers(self%lay + 1)
+               !    end if
+               ! end if
                !Initiate next layer lay+1
                call init_layer(self=self%layers(self%lay + 1), &
                                n_mats=size(self%contents%axes(self%lay + 1)%int_array), &

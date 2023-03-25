@@ -1,6 +1,7 @@
 MODULE class_unit
 
-   use functions
+   ! use functions
+   use fortfunctions
    use eosfort
    use constants
    use phase
