@@ -498,6 +498,19 @@ def at2mat(at):
 
     return x
 
+def at2mat_(at, formulas):
+    """
+    """
+    matrix = np.ones([len(formulas), len(at)])
+
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            matrix[i][j] = formulas[i][j]
+
+    y = at
+
+    a = np.linalg.solve(matrix, y)
+
 
 def at2mat_max(at):
     """Converts atomic mole fractions into material mole fractions. The composition
@@ -1651,10 +1664,12 @@ def xi_Br(SiMg=None, FeMg=None, lay=1):
         return 0.0
 
 
+
 def xi_Ol(SiMg=None, FeMg=None, xi_H2O_Ol=0.0, lay=1):
     """Computes mole fraction of olivine at given ratios Si/Mg and Fe/Mg
     for hydration model type 1
     """
+    
     # check consistency if FeMg and SiMg in given mantel
     if FeMg < Fe2Mg_min(SiMg, lay=lay) or FeMg > Fe2Mg_max(SiMg, lay=lay):
         print("WARNING: given Fe/Mg out of range!")

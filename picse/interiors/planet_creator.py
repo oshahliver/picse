@@ -173,8 +173,8 @@ class PlanetaryInputParams(Parameters):
             "R_surface_should": 1.0,
             "ener_tot_should": -1.0,
             "ocean_fraction_should": -10,
-            "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
-            "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
+            "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],
+            "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
             "layer_masses": [0.25, 0.25, 0.0, 100.0],
             "temperature_jumps": [0.0, 0.0, 0.0, 0.0],
             "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26],
@@ -231,10 +231,10 @@ class PlanetaryInputParams(Parameters):
                 )
             )
             new_specs = dict(
-                contents=[[2], [2, 9, 9, 9, 9], [4, 5], [6, 7], [1]],
+                contents=[[2], [2, 8, 10, 9], [4, 5], [6, 7], [1]],
                 fractions=[
                     [1.0],
-                    [1.0, 0.0, 0.0, 0.0, 0.0],
+                    [1.0, 0.0, 0.0, 0.0],
                     [0.75, 0.25],
                     [0.5, 0.5],
                     [1.0],
@@ -457,6 +457,19 @@ class Planet:
             self.Fe_number_mantle,
         ]
 
+        # Compute mole fractions of the mantle from the iron and silicon number
+        # Note. the fortplanet routine needs the correct fractions as input!
+        # It does not compute them from the compositions itself. But this might
+        # be an option for a better handling of the layer compositions in the future.
+        # TODO. this is super ugly. implement a generalized framework
+        SiMg = self.Si_number_mantle / (1- self.Si_number_mantle)
+        FeMg = self.Fe_number_mantle / (1- self.Fe_number_mantle)
+        x_Ol = material.xi_Ol(SiMg, FeMg, lay = 3)
+        x_Perov = material.xi_Perov(SiMg, FeMg, lay = 2)
+        
+        self.fractions[2][0:1] = 1 - x_Perov, x_Perov
+        self.fractions[3][0:1] = x_Ol, 1 - x_Ol
+
         self.M_ocean_should = self.M_surface_should * 10 ** self.ocean_fraction_should
 
         if self.label == "aqua":
@@ -469,10 +482,10 @@ class Planet:
             self.layer_masses[3] = self.M_surface_should - self.M_ocean_should
             # Outermost layer is defined via surface conditions and not layer mass
             self.layer_masses[4] = 100.0
-
+        
         try:
             self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
-
+            
             self.eta_all_core = material.at2wt_core(self.x_all_core)
 
         except IndexError:
@@ -483,13 +496,14 @@ class Planet:
             # compute inner core mass from bulk composition
             # Note: inner core mass will be updated during the structure
             # integration from the solidus of iron-alloys
-
+            
             # compute total core mass from bulk composition
-            self.layer_masses[0] = self.compute_core_mass(M_IC=1.0)
-            self.layer_masses[1] = self.compute_core_mass(M_IC=0.0)
-
+            self.layer_masses[0] = self.compute_core_mass(M_IC=0.0, x_all_core = [1., 0., 0., 0., 0.])
+            self.layer_masses[1] = self.compute_core_mass(M_IC=0.0, x_all_core = self.x_all_core)
+            # print ("core mass =", self.layer_masses[0], self.layer_masses[1])
         # Use more sophisticated multilinear regression models to predict the
-        # core mass, central pressure, and central temperature.
+        # core mass, central pressure, and central temperature. This can be used
+        # if the composition of the core or mantle are not known prior to integration
         elif self.initial_predictor == 1:
             M_inner_core = self.M_core * self.inner_core_frac
             M_outer_core = self.M_core - self.M_inner_core
@@ -542,7 +556,7 @@ class Planet:
         self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
 
-    def compute_core_mass(self, n=3, M_IC=0.0):
+    def compute_core_mass(self, x_all_core = [1., 0., 0., 0., 0.], n=2, M_IC=0.0):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
@@ -554,7 +568,7 @@ class Planet:
             Fe_number_mantle=self.Fe_number_mantle,
             Si_number_mantle=self.Si_number_mantle,
             ocean_fraction_should=self.ocean_fraction_should,
-            x_all_core=self.x_all_core,
+            x_all_core=x_all_core,
         )
 
         return core_creator.compute_core_mass(params, n=n, M_IC=M_IC)
@@ -694,7 +708,9 @@ class Planet:
         # update planetary output parameters
         for key, value in zip(fortplanet_output_keys, output):
             setattr(self, key, value)
-
+        
+        self.fractions = [[self.fractions[i][j] for j in range(len(self.contents[i]))] for i in range(len(self.contents))]
+        
         self.update_layers(self.layer_properties_dummy)
         self.trim_profiles()
 

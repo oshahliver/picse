@@ -56,24 +56,24 @@ def print_planet(self, style=0, digits=3):
             )
 
             try:
-                print(
-                    "M_H2O [wt%]:",
-                    round(
-                        (self.H2O_count + self.H_count / 2.0)
-                        * mH2O
-                        / self.M_surface_is
-                        * 100,
-                        digits,
-                    ),
-                )
-                print(
-                    "M_H2O core [wt%]:",
-                    round(self.H_count / 2.0 * mH2O / self.M_surface_is * 100, digits),
-                )
-                print(
-                    "M_H2O mantle [wt%]:",
-                    round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
-                )
+                # print(
+                #     "M_H2O [wt%]:",
+                #     round(
+                #         (self.H2O_count + self.H_count / 2.0)
+                #         * mH2O
+                #         / self.M_surface_is
+                #         * 100,
+                #         digits,
+                #     ),
+                # )
+                # print(
+                #     "M_H2O core [wt%]:",
+                #     round(self.H_count / 2.0 * mH2O / self.M_surface_is * 100, digits),
+                # )
+                # print(
+                #     "M_H2O mantle [wt%]:",
+                #     round(self.H2O_count * mH2O / self.M_surface_is * 100, digits),
+                # )
                 print("Ocean fraction is:", round(10 ** self.ocean_fraction_is, digits))
                 print(
                     "Ocean fraction should:",

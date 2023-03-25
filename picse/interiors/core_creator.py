@@ -33,7 +33,7 @@ from picse.physicalparams import (
 )
 
 
-def compute_core_mass(props, n=3, M_IC=0.0):
+def compute_core_mass(props, n=2, M_IC=0.0):
     """Computes the core mass of a planet at given total mass, composition and
     value for Mg#
     """
@@ -58,8 +58,9 @@ def compute_core_mass(props, n=3, M_IC=0.0):
         contents=props["contents"][n],
         additional=[],
     )
+    
 
-    # Count
+    # Compute mole fraction of Mg in the mantle
     # Note that the indices are shifted by one because the original definition
     # of the arrays comes from the fortran code.
     Q1 = sum(
@@ -112,6 +113,7 @@ def compute_core_mass(props, n=3, M_IC=0.0):
         * mH
     )
 
+# Compute mole fraction of Fe in the mantle
     Q3 = sum(
         [
             fractions[i]
@@ -121,15 +123,26 @@ def compute_core_mass(props, n=3, M_IC=0.0):
         ]
     )
 
+# Compute mole fraction of Fe in the outer core
     Q4 = props["x_all_core"][0]
     m_core = [mFe, mH, mS, mSi, mO]
+    
+# Compute total normilized mass in the outer core
     Q5 = sum(
         [m_core[i] * props["x_all_core"][i] for i in range(len(props["x_all_core"]))]
     )
-
+    # print ("xi_all_core in compute core mass:", props["x_all_core"])
+    # print ("fractions in mantle =", fractions)
+    # print ("Q1, Q2, Q3, Q4, Q5 =", Q1, Q2, Q3, Q4, Q5)
+    # print ("Q3/Q2, Q4 / Q5 =", Q3/Q2, Q4/Q5)
+    # print ("FeMG =", FeMg)
+    # print("inner core mass =", M_IC)
     core_frac = 1.0 - 10 ** props["ocean_fraction_should"]
+    # print ("core_frac =", core_frac)
     core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
+    # print ("core_frac =", core_frac)
     core_frac += M_IC / props["M_surface_should"] * (1.0 / mFe - Q4 / Q5)
+    # print ("core_frac =", core_frac)
     core_frac /= Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2
-
+    # print ("core_frac =", core_frac)
     return core_frac * props["M_surface_should"]

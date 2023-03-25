@@ -761,7 +761,7 @@ class Table:
         """
         t0 = time.time()
         new_ll = [
-            1,
+            1, # H2O
             6,
             7,
             0,

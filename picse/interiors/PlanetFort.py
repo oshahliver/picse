@@ -376,14 +376,6 @@ def compute_core_mass(
 
 
 class Planet:
-    def __init__(self, run_params, planetary_params, **kwargs):
-        pass
-
-    def restore_params(self):
-        pass
-
-
-class Planet:
     def __init__(
         self,
         P_center=1.0e12,
@@ -761,7 +753,7 @@ class Planet:
             "L_eff_should": self.L_eff_is,
         }
 
-    def ComputeCoreMass(self, n=3):
+    def ComputeCoreMass(self, M_IC, n=3):
         # contents = None, Mg_number=None, M_surface = 1.,
         #                 Mg_number_mantle = None, SiMg = None, M_ocean=0.,
         #                 xi_H_core=0., impurity=[], xi_S_core=0., n=3,
@@ -875,11 +867,11 @@ class Planet:
             [m_core[i] * self.xi_all_core[i] for i in range(len(self.xi_all_core))]
         )
         # print ('Q =', Q1, Q2, Q3, Q4, Q5)
-        core_frac = 1.0 - M_ocean / self.M_surface_should
+        core_frac = 1.0 - 10**self.ocean_frac_should
         core_frac *= Q1 / Q2 - self.Mg_number_should * (Q1 / Q2 + Q3 / Q2)
         core_frac /= self.Mg_number_should * (Q4 / Q5 - Q1 / Q2 - Q3 / Q2) + Q1 / Q2
         # print ('core mass old =', core_frac * M_surface)
-        core_frac = 1.0 - M_ocean / self.M_surface_should
+        core_frac = 1.0 - 10**self.ocean_frac_should
         core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
         core_frac += M_IC / self.M_surface_should * (1.0 / mFe - Q4 / Q5)
         core_frac /= Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2

@@ -129,6 +129,8 @@ df = pd.DataFrame(inputs)
 print(df.head())
 ```
 
+Once the input parameters are generated for the core-segregation model they can be used to create planetary models using the `planet_creator` or `planet_workbench` module.
+
 ### Thermal evolution time lines
 
 The `TimeLine` class can be used to create thermal evolution models of planets. For this the energy balance equation is integrated over time assuming that the total power

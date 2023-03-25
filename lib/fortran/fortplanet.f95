@@ -775,10 +775,10 @@ contains
               material_YMg(self%contents%axes(3)%int_array(i))
       end do
 
-!Compute mole fraction of Fe in the core
+!Compute mole fraction of Fe in the outer core
       Q4 = self%xi_all_core(1)
 
-!Compute total normalized mass in the core
+!Compute total normalized mass in the outer core
       molar_masses = (/mFe, mH, mS, mSi, mO/)
       Q5 = 0d0
 
@@ -786,46 +786,51 @@ contains
          Q5 = Q5 + molar_masses(i)*self%xi_all_core(i)
       end do
 
-!~ print *, 'Q1, Q2, Q3, Q4, Q5, Q6 =', Q1, Q2, Q3, Q4, Q5, 1d0 / mFe
-!~ print *, 'Q4 / Q5 =', Q4 / Q5
-!~ print *, 'xi all core =', self%xi_all_core
+! print *, 'Q1, Q2, Q3, Q4, Q5 =', Q1, Q2, Q3, Q4, Q5
+! print *, 'Q3 / Q2, Q4/Q5 =', Q3/Q2, Q4 / Q5
+! print *, 'xi all core =', self%xi_all_core
+! print *, "FeMg =", FeMg
 !~ print *, 'factor =', self%layers(1)%indigenous_mass / self%M_surface_should * (1d0 / mFe - Q4 / Q5)
-!~ print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
-!~ print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
-!~ print *, 'fractions =', self%fractions%axes(3)%real_array
-
+! print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
+! print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
+! print *, 'fractions =', self%fractions%axes(3)%real_array
+! print *, 'inner core mass =', self%layers(1)%indigenous_mass/m_earth
+! print *, "M_surface should =", self%M_surface_should
 !Compute core mass fraction
       core_frac = (1d0 - self%M_ocean_should/self%M_surface_should)
+      ! print *, 'core_frac =', core_frac
       core_frac = core_frac*(Q3/Q2 - Q1/Q2*FeMg)
-      core_frac = core_frac + self%layers(1)%indigenous_mass/self%M_surface_should* &
+      ! print *, 'core_frac =', core_frac
+      core_frac = core_frac + (self%layers(1)%indigenous_mass / m_earth)/self%M_surface_should* &
                   (1e0/mFe - Q4/Q5)
+      ! print *, 'core_frac =', core_frac
       core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
-!~ print *, 'core_frac =', core_frac
+      ! print *, 'core_frac =', core_frac
 
-      M = core_frac*self%M_surface_should/m_earth
-!~ print *, 'Computed core mass in fortplanet:', M
+      M = core_frac*self%M_surface_should
+      ! print *, 'Computed core mass in fortplanet:', M
 
 !Decide which strategy is to be employed to probe the total core mass.
 !By default the initial inner core mass in layer_masses is set to the
 !total core mass assuming pure iron in the core. The outer core mass
 !in layer_masses is set to the core mass if only outer core exists.
       reldev = abs(self%layers(1)%indigenous_mass/m_earth - self%layer_masses(1))/self%layer_masses(1)
-!~ print *, 'IC mass =', self%layers(1)%indigenous_mass / m_earth
-!~ print *, 'layermasses(1) =', self%layer_masses(1)
+! print *, 'IC mass =', self%layers(1)%indigenous_mass / m_earth
+! print *, 'layermasses(1) =', self%layer_masses(1)
 !Case 1: Total core mass already reached in inner core. Outer core mass
 !must be set to inner core mass so that is skipped.
       if (reldev < eps_layer) then
-!~ print *, 'Case 1'
+! print *, 'Case 1'
          self%layer_masses(2) = self%layer_masses(1)
 
 !Case 2: Both inner and outer core exist.
       else if (reldev >= eps_layer) then
-!~ print *, 'Case 2'
+! print *, 'Case 2'
 !If redistribution of lighter elements is not accounted for:
 !Total core mass must be updated.
-!~ print *, 'iCS =', self%inner_core_segregation_model
+! print *, 'iCS =', self%inner_core_segregation_model
          if (.not. self%inner_core_segregation_model) then
-            self%layer_masses(2) = core_frac*self%M_surface_should/m_earth
+            self%layer_masses(2) = core_frac*self%M_surface_should!/m_earth
 !If redistribution of lighter elements is accoutned for:
 !Outer core fractions need to be updated.
          else
@@ -960,7 +965,7 @@ contains
       call get_layer_constraint(self=self, lay=self%lay, skip=0)
 ! print *, 'Layer constraint should =', self%constraint_value_should
 ! print *, 'Layer constraint is =', self%constraint_value_is
-! print *, 'layermasses =', self%layer_masses
+! print *, 'layermasses =', self%layer_masses*m_earth
       reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                self%constraint_value_should
 ! print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
@@ -1011,10 +1016,12 @@ contains
 !Layer transition reached
       else if (abs(reldev) .lt. eps_layer) then
    ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
+         ! If inner core boundary is reached, the outer core mass must be updated
+         ! to account for the impurities present there
          if (self%lay == 1) then
-!~   print *, 'layermasses(1) before update =', self%layer_masses(1)
-            !call update_core_mass(self=self)
-            !print *, 'layermasses after update core mass =', self%layer_masses
+            ! print *, 'layermasses before update =', self%layer_masses(2)
+            call update_core_mass(self=self)
+            ! print *, 'layermasses after update core mass =', self%layer_masses(2)
          end if
 !~   ! updat coefficients for T-profile in mantle using core radius
 !~   if(self%lay==1 .or. self%lay==2)then

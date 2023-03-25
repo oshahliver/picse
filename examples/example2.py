@@ -23,13 +23,14 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.2,  # desired total mass (in earth masses)
-    "T_surface_should": 320,  # desired surface temperature (in kelvin)
+    "M_surface_should": 1.,  # desired total mass (in earth masses)
+    "T_surface_should": 2300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
-    "Mg_number_should": 0.5,  # desired bulk magnesium number
-    "Fe_number_mantle": 0.0,  # iron number of the silicates
+    "Mg_number_should": 0.7,  # desired bulk magnesium number
+    "Fe_number_mantle": 0.,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
-    "contents": [[2], [2], [4, 5], [6, 7]],  # composition of each layer
+    "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
+    "fractions":[[1.], [1., 0.2, 0.1, 0.1], [.5, .25], [.5, .5]]
 }
 
 # set up specifications for the iterator
@@ -49,7 +50,7 @@ iterator_specs = {
     ],  # --> log or lin extrapolation for targets
     "all_howval_weights": ["exp", "exp"],  # --> exp or lin prediction for adjustables
     "acc": [1e-4, 1e-3],  # --> desired relative accuracies
-    "iterationLimit": 20,  # --> max. number of iterations
+    "iterationLimit": 10,  # --> max. number of iterations
     "deltaType": 0,  # --> mode for initial adjustment of adjustables
     "unpredictable": False,  # --> no effect at this point
 }
@@ -67,7 +68,7 @@ pl.construct()
 # Pass planet instance to iterator to match boundary conditions
 # NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, iterator_specs=iterator_specs)
-
+print (pl.contents, pl.fractions)
 #######################################################################
 # Model inspection
 #######################################################################
@@ -91,13 +92,13 @@ pl.print()
 # print("core mass fraction", pl.M_core_is / (pl.M_surface_is / m_earth))
 # print("desired core mass fraction", pl.M_core_should / pl.M_surface_should)
 
-# # # Plot the radial P, T, M, and rho profiles
-file_path = os.getcwd()
-pl.plot(
-    file_name="structure_profiles",
-    file_path=file_path,
-    write_html=True,
-    display=True,
-    write_image=True,
-    image_extension="pdf",
-)
+# # Plot the radial P, T, M, and rho profiles
+# file_path = os.getcwd()
+# pl.plot(
+#     file_name="structure_profiles",
+#     file_path=file_path,
+#     write_html=True,
+#     display=True,
+#     write_image=True,
+#     image_extension="pdf",
+# )
