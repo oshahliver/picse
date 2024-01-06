@@ -15,7 +15,7 @@ The true power of the PICSE package lies in the availability of a sphisticated l
 ### Create a base-type model
 
 ```python
-from pics.interiors import planet_iterator, planet_creator
+from picse.interiors import planet_iterator, planet_creator
 
 # Load the equations of state
 planet_creator.load_eos_tables()

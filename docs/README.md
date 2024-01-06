@@ -1,4 +1,4 @@
-# Documentation for the ```pics``` package
+# Documentation for the ```picse``` package
 
 ## Basic Usage
 
