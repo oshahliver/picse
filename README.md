@@ -30,7 +30,7 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 
 ### Understanding the model
 
-The current version of the PICS code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
+The current version of the PICSE code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
 
 | Parameter                             | Calibration Range     |
 | ------------------------------------- | --------------------- |
@@ -56,7 +56,7 @@ The given ranges are only approximate. You may use the code outside of these ran
 To set up a simple planetary model import the `planet_creator` (handles the planetary objects and their properties) and the `planet_iterator` (handles the matching of boundary conditions).
 
 ```python
-from pics.interiors import planet_iterator, planet_creator
+from picse.interiors import planet_iterator, planet_creator
 planet_creator.load_eos_tables()
 ```
 
