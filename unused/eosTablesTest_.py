@@ -3,7 +3,7 @@ import pandas as pd
 from PIMPphysicalparams import material_list
 import numpy as np
 import os
-import eosTables
+import picse.materials.eosTables_ as eosTables_
 import pics.materials.material as material
 from matplotlib import pyplot as plt
 import Feistel2006EOS
@@ -462,7 +462,7 @@ class Table:
                 if tab == None:
                     print("WARNING: No table given.")
                     print("Trying to locate table file...")
-                    self.tab = eosTables.Table()
+                    self.tab = eosTables_.Table()
                     self.tab.load("eos_" + str(ll) + ".tab")
                     print("Table file loaded successfully.")
 

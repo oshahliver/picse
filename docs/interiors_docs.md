@@ -8,8 +8,6 @@ The true power of the PICSE package lies in the availability of a sphisticated l
 
 3. Guarantees great flexibility for specifying planetary- and run parameters to explore a wide range of models and modelling strategies.
 
-4. Uses Machine-learning enhanced algorithms for predicting initial conditions and matching user specified boundary conditions over a wide parameter space that boost performance and stability.
-
 ## Basic usage
 
 ### Create a base-type model
@@ -31,8 +29,8 @@ pl = planet_creator.TelluricPlanet(planetary_params = planet_specs)
 pl.construct()
 
 # Pass planet to the iterator to match boundary conditions
-iterator_specs = dict(acc=[0.01, 0.01])
-iterator.iterate(planet=pl, iterator_specs = iterator_specs)
+iterator_specs = dict(acc = [0.01, 0.01])
+iterator.iterate(planet = pl, iterator_specs = iterator_specs)
 
 # Inspect the model
 pl.print()
@@ -91,16 +89,16 @@ pps = [
 types = ["telluric" for i in range(len(pps))]
 
 # Create an instance of the MassRadius class
-mrd = planet_workbench.MassRadius(tag="my_mass_radius_diagram")
+mrd = planet_workbench.MassRadius(tag = "my_mass_radius_diagram")
 
 # Set up mass radius curves with 5 data points per curve
 mrd.set_up(
-    5, planetary_params=pps, base_types=types, mass_range=mass_range, sampling="log"
+    5, planetary_params = pps, base_types = types, mass_range = mass_range, sampling = "log"
 )
 
 mrd.create(workbench.iterator)
 
-# Extract the data as and plot the mass-radius diagram
+# Extract the mass-radius data and plot the mass-radius diagram
 mrd.extract_data()
 mrd.plot()
 ```

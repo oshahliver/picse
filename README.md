@@ -30,7 +30,7 @@ For more detailed documentation, see [main documentation](./docs/README.md).
 
 ### Understanding the model
 
-The current version of the PICSE code uses a machine-learning enhanced algorithm for matching the boundary conditions. The model was calibrated and optimized for the following ranges for different parameters:
+The current version of the PICSE code was calibrated and optimized for the following ranges for different parameters:
 
 | Parameter                             | Calibration Range     |
 | ------------------------------------- | --------------------- |
@@ -42,14 +42,12 @@ The current version of the PICSE code uses a machine-learning enhanced algorithm
 | Bulk $\rm[Si]/[Si + Mg]$              | 0.33 - 0.67           |
 | Mantle $\rm[FeO]/[FeO + MgO]$         | 0 - 0.5               |
 | Mantle $\rm[SiO_2]/[SiO_2 + MgO]$     | 0.33 - 0.67           |
-| Mantle $\rm[CaO]/[CaO + MgO]$         | 0 - 0                 |
-| Mantle $\rm[Al_2O_3]/[Al_2O_3 + MgO]$ | 0 - 0                 |
-| Core $\rm[S]/[S + O + Si + H + Fe]$   | 0 - 0                 |
-| Core $\rm[O]/[S + O + Si + H + Fe]$   | 0 - 0                 |
-| Core $\rm[Si]/[S + O + Si + H + Fe]$  | 0 - 0                 |
-| Core $\rm[H]/[S + O + Si + H + Fe]$   | 0 - 0                 |
+| Core $\rm[S]/[S + O + Si + H + Fe]$   | 0 - 0 (coming soon!)  |
+| Core $\rm[O]/[S + O + Si + H + Fe]$   | 0 - 0 (coming soon!)  |
+| Core $\rm[Si]/[S + O + Si + H + Fe]$  | 0 - 0 (coming soon!)  |
+| Core $\rm[H]/[S + O + Si + H + Fe]$   | 0 - 0 (coming soon!)  |
 
-The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so.
+The given ranges are only approximate. You may use the code outside of these ranges but I cannot guarantee that your models will converge properly and efficiently if you do so. Feel free to do your own model calibrations beyond these ranges.
 
 ### Creating your first planet
 
@@ -77,8 +75,8 @@ Perform initial structure integration and pass the planet to the iterator to mat
 
 ```python
 pl.construct()
-iterator_specs = dict(acc=[0.01, 0.01])
-iterator.iterate(planet=pl, iterator_specs = iterator_specs)
+iterator_specs = dict(acc = [0.01, 0.01])
+iterator.iterate(planet = pl, iterator_specs = iterator_specs)
 ```
 
 If the iterator reached convergence you can inspect the planets properties:

@@ -19,7 +19,6 @@ from alive_progress import alive_bar
 
 planet_creator.load_eos_tables()
 
-
 class Toolkit:
     def __init__(self):
         self.iterator = planet_iterator.Toolkit()

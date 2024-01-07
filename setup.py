@@ -1,10 +1,14 @@
 from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
 import subprocess
+import shutil
 
 PACKAGE_NAME = "picse"
 LIB_DIR = "lib"
 SRC_DIR = "lib"
+
+# Remove previous build directory if it exists
+shutil.rmtree('build', ignore_errors=True)
 
 # Generate object files for static linking:
 subprocess.run(["make", "static"])
