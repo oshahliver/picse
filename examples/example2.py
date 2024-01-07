@@ -29,7 +29,7 @@ planetary_params = {
     "Mg_number_should": 0.5,  # desired bulk magnesium number
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
-    "contents": [[2], [2], [4, 5], [6, 7]],  # composition of each layer
+    "contents": [[2], [2, 8], [4, 5], [6, 7]],  # composition of each layer
 }
 
 # set up specifications for the iterator

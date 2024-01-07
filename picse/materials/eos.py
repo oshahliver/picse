@@ -8,7 +8,7 @@ Created on Fri Jan 18 14:26:56 2019
 import time
 import sys
 from picse.utils.function_tools import PIMPtools
-from picse.materials import eosTablesUse as eosTab
+from picse.materials import eos_tables as eosTab
 import numpy as np
 from matplotlib import pyplot as plt
 

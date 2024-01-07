@@ -468,21 +468,20 @@ class Planet:
             # Outermost layer is defined via surface conditions and not layer mass
             self.layer_masses[4] = 100.0
 
-        try:
-            self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
+        # try:
+        self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
+        self.eta_all_core = material.at2wt_core(self.x_all_core)
 
-            self.eta_all_core = material.at2wt_core(self.x_all_core)
-
-        except IndexError:
-            self.x_all_core = None
-            self.eta_all_core = None
+        # except IndexError:
+        #     self.x_all_core = None
+        #     self.eta_all_core = None
 
         if self.initial_predictor == 0:
             # compute inner core mass from bulk composition
             # Note: inner core mass will be updated during the structure
             # integration from the solidus of iron-alloys
 
-            # compute total core mass from bulk composition
+            # Compute total core mass from bulk composition
             self.layer_masses[0] = self.compute_core_mass(M_IC=1.0)
             self.layer_masses[1] = self.compute_core_mass(M_IC=0.0)
 

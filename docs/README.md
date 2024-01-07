@@ -1,14 +1,11 @@
 # Documentation for the ```picse``` package
 
-## Basic Usage
 
-Bla bla
-
-# Interiors
+## Interiors
 
  For more detailed documentation, see [interiors](./interiors_docs.md), and [materials](./materials_docs.md).
 
-## Single Planets
+### Single Planets
 
 To set up a simple planetary model import the ```planet_creator```, for handling of the planetary objects and their properties, and the ```planet_iterator```, for handling of the boundary conditions (For more details, see [interiors](.interiors_docs.md).).
 

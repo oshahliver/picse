@@ -31,6 +31,7 @@ fort_objects = [
 ]
 
 
+# Create extension for the fortplanet module
 ext1 = Extension(
     name="{}.utils.fortplanet".format(PACKAGE_NAME),
     sources=["{}/fortran/eosfort_wrapper.f95".format(SRC_DIR)],
@@ -39,6 +40,7 @@ ext1 = Extension(
     f2py_options=["--quiet"],
 )
 
+# Create extension for the fortfunctions module
 ext2 = Extension(
     name="{}.utils.fortfunctions".format(PACKAGE_NAME),
     sources=["{}/fortran/functionsPy.f95".format(SRC_DIR)],
