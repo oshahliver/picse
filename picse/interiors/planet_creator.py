@@ -171,6 +171,7 @@ class PlanetaryInputParams(Parameters):
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
             "ocean_fraction_should": -10,
+            "inner_core_mass_fraction_should": 1e-3,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
             "layer_masses": [0.25, 0.25, 0.0, 100.0],
@@ -468,13 +469,10 @@ class Planet:
             # Outermost layer is defined via surface conditions and not layer mass
             self.layer_masses[4] = 100.0
 
-        # try:
         self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
         self.eta_all_core = material.at2wt_core(self.x_all_core)
 
-        # except IndexError:
-        #     self.x_all_core = None
-        #     self.eta_all_core = None
+        print(f'x_all_core = {self.x_all_core}')
 
         if self.initial_predictor == 0:
             # compute inner core mass from bulk composition
@@ -482,8 +480,12 @@ class Planet:
             # integration from the solidus of iron-alloys
 
             # Compute total core mass from bulk composition
-            self.layer_masses[0] = self.compute_core_mass(M_IC=1.0)
-            self.layer_masses[1] = self.compute_core_mass(M_IC=0.0)
+            self.layer_masses[1] = self.compute_core_mass()
+            # self.layer_masses[0] = self.compute_core_mass(inner_core_mass_fraction = self.inner_core_mass_fraction)
+            self.layer_masses[0] = self.inner_core_mass_fraction_should * self.layer_masses[1]
+            
+            print(f'predicted inner core mass fraction = {self.layer_masses[0]}')
+            print(f'predicted core mass = {self.layer_masses[1]}')
 
         # Use more sophisticated multilinear regression models to predict the
         # core mass, central pressure, and central temperature.
@@ -557,7 +559,7 @@ class Planet:
             x_all_core=self.x_all_core,
         )
 
-        return core_creator.compute_core_mass(params, n=n, M_IC=M_IC)
+        return core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should)
 
     def update(self, default=False):
         """Computes all dependant planetary parameters"""

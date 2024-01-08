@@ -29,7 +29,9 @@ planetary_params = {
     "Mg_number_should": 0.5,  # desired bulk magnesium number
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
-    "contents": [[2], [2, 8], [4, 5], [6, 7]],  # composition of each layer
+    "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
+    "fractions": [[1], [.9, .1, 0.1, 0.], [.5, .5], [.5, .5]],
+    "inner_core_mass_fraction_should": .01,
 }
 
 # set up specifications for the iterator
@@ -73,7 +75,7 @@ iterator.iterate(planet=pl, iterator_specs=iterator_specs)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-pl.print()
+pl.print(digits=4)
 
 # You can also access individual parameters as attributes. for instance:
 # print("total radius (km):", pl.R_surface_is * 1e-3)
