@@ -78,6 +78,8 @@ def print_planet(self, style=0, digits=3):
                     "Core mass fraction:",
                     round(self.M_core_is / self.M_surface_is * m_earth, digits),
                 )
+                print("Inner core mass fraction should:", round(self.inner_core_mass_fraction_should, digits))
+                print("Inner core mass fraction is:", round(self.layer_properties[0]["indigenous_mass"] / m_earth / self.M_core_is, digits))
                 print(
                     "Core radius [km]:",
                     round(self.layer_properties[1]["R_outer"] / 1000, digits),

@@ -33,7 +33,7 @@ from picse.physicalparams import (
 )
 
 
-def compute_core_mass(props, n=3, M_IC=0.0, inner_core_mass_fraction = 0.):
+def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None):
     """Computes the core mass of a planet at given total mass, composition and
     value for Mg#
     """
@@ -127,16 +127,20 @@ def compute_core_mass(props, n=3, M_IC=0.0, inner_core_mass_fraction = 0.):
         [m_core[i] * props["x_all_core"][i] for i in range(len(props["x_all_core"]))]
     )
 
-    # Compute core mass fraction with total inner core mass
-    # core_frac = 1.0 - 10 ** props["ocean_fraction_should"]
-    # core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
-    # core_frac += M_IC / props["M_surface_should"] * (1.0 / mFe - Q4 / Q5)
-    # core_frac /= Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2
+    if not M_IC == None and inner_core_mass_fraction == None:
+        # Compute core mass fraction with total inner core mass
+        core_frac = 1.0 - 10 ** props["ocean_fraction_should"]
+        core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
+        core_frac += M_IC / props["M_surface_should"] * (1.0 / mFe - Q4 / Q5)
+        core_frac /= Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2
 
-    # Compute core mass fraction with inner core mass fraction
-    core_frac = 1.0 - 10 ** props["ocean_fraction_should"]
-    core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
-    # core_frac += M_IC / props["M_surface_should"] * (1.0 / mFe - Q4 / Q5)
-    core_frac /= (Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2) + inner_core_mass_fraction * (Q4 / Q5 - 1. / mFe)
+    if not inner_core_mass_fraction == None and M_IC == None:
+        # Compute core mass fraction with inner core mass fraction
+        core_frac = 1.0 - 10 ** props["ocean_fraction_should"]
+        core_frac *= Q3 / Q2 - Q1 / Q2 * FeMg
+        # core_frac += M_IC / props["M_surface_should"] * (1.0 / mFe - Q4 / Q5)
+        core_frac /= (Q3 / Q2 - Q4 / Q5 - FeMg * Q1 / Q2) + inner_core_mass_fraction * (Q4 / Q5 - 1. / mFe)
 
+    else:
+        raise ValueError("Both inner_core_mass_fraction and M_IC are passed to function.")
     return core_frac * props["M_surface_should"]

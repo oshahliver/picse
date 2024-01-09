@@ -544,7 +544,7 @@ class Planet:
         self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
 
-    def compute_core_mass(self, n=3, M_IC=0.0):
+    def compute_core_mass(self, n=3, M_IC=None):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
