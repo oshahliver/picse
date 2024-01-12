@@ -902,12 +902,17 @@ contains
       integer, allocatable :: ymg(:), ysi(:)
       integer :: i
 
+      ! By default, the lower mantle will be used
+      ! TODO. Change to input argument
       lay = 3
       n_mats = size(contents)
+
+      ! Allocate the arrays
       allocate(fractions(n_mats))
       allocate(ymg(n_mats))
       allocate(ysi(n_mats))
       
+      ! Get the stoichometric numbers for the relevant materials
       do i=1, n_mats
          ymg(i) = material_YMg(contents(i))
          ysi(i) = material_YSi(contents(i))
@@ -924,6 +929,7 @@ contains
        contents=contents,&
        additional=additional)
 
+      ! Compute the coefficients for the core mass computation based on the composition
       Q = get_core_mass_q_vector(Fe_numbers(lay), xi_all_core, fractions, contents)
 
       ! Compute core mass from the absolut inner core mass

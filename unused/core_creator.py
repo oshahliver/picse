@@ -33,7 +33,7 @@ from picse.physicalparams import (
 )
 
 
-def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None):
+def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None, mode = 1):
     """Computes the core mass of a planet at given total mass, composition and
     value for Mg#
     """
@@ -43,6 +43,21 @@ def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None):
     FeMg_mantle = (1.0 - Mg_number_mantle) / Mg_number_mantle
     FeMg = (1.0 - props["Mg_number_should"]) / props["Mg_number_should"]
     SiMg = props["Si_number_mantle"] / (1.0 - props["Si_number_mantle"])
+
+    core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = props["M_surface_should"],
+                                                            ocean_frac = props["ocean_fraction_should"],
+                                                            femg = FeMg,
+                                                            simg = SiMg,
+                                                            femg_mantle = FeMg_mantle,
+                                                            fe_numbers = [1.0 - Mg_number_mantle for i in props["contents"][n]],
+                                                            xi_all_core = props["x_all_core"],
+                                                            contents = props["contents"][n],
+                                                            inner_core_mass_fraction = inner_core_mass_fraction,
+                                                            inner_core_mass = M_IC,
+                                                            mode = mode,
+                                                            additional = [])
+    return core_mass
+
     # Compute the fractions in the mantle
     fractions = fortfunctions.functionspy.compute_abundance_vector(
         simg=SiMg,
@@ -57,19 +72,7 @@ def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None):
         contents=props["contents"][n],
         additional=[],
     )
-    core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = props["M_surface_should"],
-                                                            ocean_frac = props["ocean_fraction_should"],
-                                                            femg = FeMg,
-                                                            simg = SiMg,
-                                                            femg_mantle = FeMg_mantle,
-                                                            fe_numbers = [1.0 - Mg_number_mantle for i in props["contents"][n]],
-                                                            xi_all_core = props["x_all_core"],
-                                                            contents = props["contents"][n],
-                                                            inner_core_mass_fraction = inner_core_mass_fraction,
-                                                            inner_core_mass = M_IC,
-                                                            mode = 2,
-                                                            additional = [])
-    
+
     print ("core mass test =", core_mass)
     # Count
     # Note that the indices are shifted by one because the original definition

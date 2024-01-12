@@ -6,11 +6,12 @@ This is a temporary script file.
 """
 
 import itertools
+from picse.utils import fortfunctions
+
 from picse.utils.print_tools.print_tools import print_planet
 from picse.utils.plot_tools.plot_tools import plot_structure
 from tabulate import tabulate
 from picse.utils.file_tools.internal_data import get_eos_dir
-from picse.interiors import core_creator
 import random
 
 # from picse.utils import functionTools as ftool
@@ -480,7 +481,7 @@ class Planet:
             # integration from the solidus of iron-alloys
 
             # Compute total core mass from bulk composition
-            self.layer_masses[1] = self.compute_core_mass()
+            self.layer_masses[1] = self.compute_core_mass(mode = 2)
             # self.layer_masses[0] = self.compute_core_mass(inner_core_mass_fraction = self.inner_core_mass_fraction)
             self.layer_masses[0] = self.inner_core_mass_fraction_should * self.layer_masses[1]
             
@@ -544,24 +545,43 @@ class Planet:
         self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
 
-    def compute_core_mass(self, n=2, M_IC=None):
+    def compute_core_mass(self, n=2, M_IC=None, mode = 1):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
 
-        params = dict(
-            M_surface_should=self.M_surface_should,
-            Mg_number_should=self.Mg_number_should,
-            contents=self.contents,
-            Fe_number_mantle=self.Fe_number_mantle,
-            Si_number_mantle=self.Si_number_mantle,
-            ocean_fraction_should=self.ocean_fraction_should,
-            x_all_core=self.x_all_core,
-        )
-        print ("fractions in compute_core_mass planet:", self.fractions)
-        core_mass = core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should)
-        test_core_mass = core_creator.compute_core_mass(params, n=n, M_IC = core_mass * self.inner_core_mass_fraction_should, inner_core_mass_fraction=None)
-        print ("test core mass =", test_core_mass)
+        # params = dict(
+        #     M_surface_should=self.M_surface_should,
+        #     Mg_number_should=self.Mg_number_should,
+        #     contents=self.contents,
+        #     Fe_number_mantle=self.Fe_number_mantle,
+        #     Si_number_mantle=self.Si_number_mantle,
+        #     ocean_fraction_should=self.ocean_fraction_should,
+        #     x_all_core=self.x_all_core,
+        # )
+        # core_mass = core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should, mode = mode)
+        
+        # print ("core mass before =", core_mass)
+
+        Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.9999999999)
+        FeMg_mantle = (1.0 - Mg_number_mantle) / Mg_number_mantle
+        FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
+        SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
+
+        core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = self.M_surface_should,
+                                                                ocean_frac = self.ocean_fraction_should,
+                                                                femg = FeMg,
+                                                                simg = SiMg,
+                                                                femg_mantle = FeMg_mantle,
+                                                                fe_numbers = [1.0 - Mg_number_mantle for i in self.contents[n]],
+                                                                xi_all_core = self.x_all_core,
+                                                                contents = self.contents[n],
+                                                                inner_core_mass_fraction = self.inner_core_mass_fraction_should,
+                                                                inner_core_mass = M_IC,
+                                                                mode = mode,
+                                                                additional = [])
+
+        # print ("core mass after =", core_mass)
         return core_mass
     
     def update(self, default=False):
