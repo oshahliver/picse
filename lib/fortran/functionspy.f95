@@ -762,7 +762,7 @@ contains
 !    END SUBROUTINE update_all_fractions
 
 !########################################################################
-   subroutine construct_abundance_matrix(SiMg, FeMg, n_mats, &
+   subroutine construct_abundance_matrix(SiMg, n_mats, &
                                          YMgi, YSii, matrix, b, xiFei, additional)
 
 !Constructs linear system of equations to solve for the individual
@@ -775,7 +775,7 @@ contains
       integer, dimension(n_mats), intent(in) :: YMgi, YSii
       real(kind=8), dimension(n_mats), intent(in) :: xiFei
       real(8), intent(in) :: additional(:)
-      real(kind=8), intent(in) :: SiMg, FeMg
+      real(kind=8), intent(in) :: SiMg
       real(kind=8), dimension(n_mats, n_mats), intent(out) :: matrix
       real(8), intent(out) :: b(:, :)
       integer :: i, j
@@ -812,7 +812,7 @@ contains
    end subroutine construct_abundance_matrix
 
 !########################################################################
-   subroutine compute_abundance_vector(SiMg, FeMg, n_mats, &
+   subroutine compute_abundance_vector(SiMg, n_mats, &
                                        YMgi, YSii, xiFei, abundances, &
                                        contents, additional)
 
@@ -830,7 +830,7 @@ contains
       integer, intent(in) :: n_mats
       integer, dimension(n_mats), intent(in) :: YMgi, YSii, contents
       real(kind=8), dimension(n_mats), intent(in) :: xiFei
-      real(kind=8), intent(in) :: SiMg, FeMg
+      real(kind=8), intent(in) :: SiMg
       real(kind=8), dimension(n_mats, n_mats) :: matrix
       real(kind=8), dimension(n_mats), intent(out) :: abundances
       real(kind=8), dimension(n_mats, 1) :: abundances_dummy
@@ -868,7 +868,7 @@ contains
 
       else
 
-         call construct_abundance_matrix(SiMg=SiMg, FeMg=FeMg, n_mats=n_mats, &
+         call construct_abundance_matrix(SiMg=SiMg, n_mats=n_mats, &
                                          YMgi=YMgi, YSii=YSii, xiFei=xiFei, &
                                          matrix=matrix, b=b_vec, &
                                          additional=additional_dummy)
@@ -912,7 +912,7 @@ contains
       allocate(ymg(n_mats))
       allocate(ysi(n_mats))
       
-      ! Get the stoichometric numbers for the relevant materials
+      ! Get the stoichometric for the relevant materials
       do i=1, n_mats
          ymg(i) = material_YMg(contents(i))
          ysi(i) = material_YSi(contents(i))
@@ -920,7 +920,6 @@ contains
 
       ! Compute the fractions in the mantle
       call compute_abundance_vector(SiMg=SiMg,&
-       FeMg=FeMg_mantle, &
        n_mats=n_mats, &
        YMgi=ymg, &
        YSii=ysi, &

@@ -815,7 +815,6 @@ contains
 
       ! Compute the fractions in the mantle
       call compute_abundance_vector(SiMg=SiMg,&
-       FeMg=FeMg, &
        n_mats=n_mats, &
        YMgi=self%YMg_layers%axes(n)%int_array(:), &
        YSii=self%YSi_layers%axes(n)%int_array(:), &
@@ -903,6 +902,19 @@ contains
       core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
 ! print *, 'core_frac in fortran =', core_frac
       M = core_frac*self%M_surface_should
+
+
+      ! M = compute_core_mass(M_tot = self%M_surface_should, &
+      ! ocean_frac = self%ocean_frac_should, &
+      ! FeMg = 0e0, &
+      ! SiMg = 0e0, &
+      ! FeMg_mantle = 0e0, &
+      ! Fe_numbers = 0e0, &
+      ! xi_all_core = self%xi_all_core, &
+      ! contents = self%contents(3), &
+      ! inner_core_mass_fraction = 0e0, &
+      ! inner_core_mass = 0e0, &
+      ! mode = 1)
 
 !Decide which strategy is to be employed to probe the total core mass.
 !By default the initial inner core mass in layer_masses is set to the

@@ -326,7 +326,6 @@ contains
 
       if (self%lay > 2) then
          call compute_abundance_vector(SiMg=self%SiMg, &
-                                       FeMg=self%FeMg, &
                                        n_mats=size(self%contents), &
                                        YSii=self%YSi, &
                                        YMgi=self%YMg, &

@@ -549,7 +549,6 @@ class Planet:
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
-
         # params = dict(
         #     M_surface_should=self.M_surface_should,
         #     Mg_number_should=self.Mg_number_should,
