@@ -827,7 +827,6 @@ contains
                      Fe_numbers = xiFei, &
                      xi_all_core = self%xi_all_core, &
                      contents = self%contents%axes(n)%int_array(:), &
-                     inner_core_mass_fraction = 0d0, &
                      inner_core_mass = self%layers(1)%indigenous_mass/m_earth, &
                      mode = 1)
 

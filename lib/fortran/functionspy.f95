@@ -933,17 +933,14 @@ contains
 
       ! Compute the coefficients for the core mass computation based on the composition
       Q = get_core_mass_q_vector(Fe_number_mantle, xi_all_core, fractions, contents)
-      print *, 'Q1, Q2, Q3, Q4, Q5 2 =', Q(1), Q(2), Q(3), Q(4), Q(5)
+
       ! Compute core mass from the absolut inner core mass
       if (mode == 1 .and. present(inner_core_mass)) then
          core_fraction = (1d0 - M_ocean / M_tot)
-         ! print *, 'core_frac in fortran 2=', core_fraction
          core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
-         ! print *, 'core_frac in fortran 2 =', core_fraction
          core_fraction = core_fraction + inner_core_mass / M_tot * (1e0 / mFe - Q(4) / Q(5))
-         ! print *, 'core_frac in fortran 2 =', core_fraction
          core_fraction = core_fraction / (Q(3) / Q(2) - Q(4) / Q(5) - FeMg * Q(1) / Q(2))
-         ! print *, 'core_frac in fortran 2 =', core_fraction
+         
       ! Compute core mass from the inner core mass fraction
       elseif (mode == 2 .and. present(inner_core_mass_fraction)) then
          core_fraction = (1d0 - M_ocean / M_tot)

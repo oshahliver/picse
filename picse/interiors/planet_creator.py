@@ -549,20 +549,8 @@ class Planet:
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
-        # params = dict(
-        #     M_surface_should=self.M_surface_should,
-        #     Mg_number_should=self.Mg_number_should,
-        #     contents=self.contents,
-        #     Fe_number_mantle=self.Fe_number_mantle,
-        #     Si_number_mantle=self.Si_number_mantle,
-        #     ocean_fraction_should=self.ocean_fraction_should,
-        #     x_all_core=self.x_all_core,
-        # )
-        # core_mass = core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should, mode = mode)
-        
-        # print ("core mass before =", core_mass)
 
-        Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.9999999999)
+        Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.99999999999)
         FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
         SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
 
@@ -578,7 +566,6 @@ class Planet:
                                                                 mode = mode,
                                                                 additional = [])
 
-        # print ("core mass after =", core_mass)
         return core_mass
     
     def update(self, default=False):

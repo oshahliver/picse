@@ -31,11 +31,11 @@ planetary_params = {
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "temperature_jumps":[0, 1800, 0, 0],
     "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
-    "fractions": [[1], [0, .1, 0.1, 0.1], [.5, .5], [.5, .5]],
+    "fractions": [[1], [0, .2, 0.05, 0.1], [.5, .5], [.5, .5]],
     "inner_core_mass_fraction_should": .387,
 }
 
-run_params = {"layer_constraints": [1, 1, 3, 1]}
+run_params = {"layer_constraints": [4, 1, 3, 1]}
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a
