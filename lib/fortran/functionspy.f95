@@ -838,7 +838,7 @@ contains
       real(8), intent(in), optional :: additional(:)
       real(8), allocatable :: additional_dummy(:)
       integer :: i
-
+     
       if (n_mats > 2) then
          allocate (additional_dummy(n_mats - 2))
          if (present(additional)) then
@@ -867,7 +867,6 @@ contains
          abundances(1) = 1d0
 
       else
-
          call construct_abundance_matrix(SiMg=SiMg, n_mats=n_mats, &
                                          YMgi=YMgi, YSii=YSii, xiFei=xiFei, &
                                          matrix=matrix, b=b_vec, &
@@ -884,16 +883,17 @@ contains
 
 
 !###################################################################################
-   function compute_core_mass(M_tot, ocean_frac, FeMg, SiMg, FeMg_mantle, Fe_numbers, xi_all_core, contents,&
+   function compute_core_mass(M_tot, M_ocean, FeMg, SiMg, Fe_numbers, xi_all_core, contents,&
        inner_core_mass_fraction, inner_core_mass, additional, mode) result(core_mass)
 
       real(8), intent(in), optional :: inner_core_mass_fraction, inner_core_mass
-      real(8), intent(in) :: M_tot, ocean_frac, FeMg, SiMg, FeMg_mantle
+      real(8), intent(in) :: M_tot, M_ocean, FeMg, SiMg
       real(8) :: core_mass
       integer :: n_mats, lay
       real(8), dimension(5) :: Q
       real(8), dimension(5), intent(in) :: xi_all_core
       real(8), intent(in) :: Fe_numbers(:)
+      real(8) :: Fe_number_mantle
       integer, intent(in) :: contents(:)
       real(8), intent(in), optional :: additional(:)
       real(8) :: core_fraction
@@ -928,18 +928,25 @@ contains
        contents=contents,&
        additional=additional)
 
-      ! Compute the coefficients for the core mass computation based on the composition
-      Q = get_core_mass_q_vector(Fe_numbers(lay), xi_all_core, fractions, contents)
+      ! Fe number is assumed homogeneous in mantle so it does not matter which one we take here
+      Fe_number_mantle = Fe_numbers(1)
 
+      ! Compute the coefficients for the core mass computation based on the composition
+      Q = get_core_mass_q_vector(Fe_number_mantle, xi_all_core, fractions, contents)
+      print *, 'Q1, Q2, Q3, Q4, Q5 2 =', Q(1), Q(2), Q(3), Q(4), Q(5)
       ! Compute core mass from the absolut inner core mass
       if (mode == 1 .and. present(inner_core_mass)) then
-         core_fraction = (1e0 - 10**ocean_frac)
+         core_fraction = (1d0 - M_ocean / M_tot)
+         ! print *, 'core_frac in fortran 2=', core_fraction
          core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
+         ! print *, 'core_frac in fortran 2 =', core_fraction
          core_fraction = core_fraction + inner_core_mass / M_tot * (1e0 / mFe - Q(4) / Q(5))
+         ! print *, 'core_frac in fortran 2 =', core_fraction
          core_fraction = core_fraction / (Q(3) / Q(2) - Q(4) / Q(5) - FeMg * Q(1) / Q(2))
+         ! print *, 'core_frac in fortran 2 =', core_fraction
       ! Compute core mass from the inner core mass fraction
       elseif (mode == 2 .and. present(inner_core_mass_fraction)) then
-         core_fraction = (1e0 - 10**ocean_frac)
+         core_fraction = (1d0 - M_ocean / M_tot)
          core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
          core_fraction = core_fraction / ((Q(3) / Q(2) - Q(4) / Q(5) - FeMg * Q(1) / Q(2)) &
           + inner_core_mass_fraction * (Q(4) / Q(5) - 1e0 / mFe))
@@ -958,7 +965,6 @@ contains
       integer, intent(in) :: contents(:)
       ! Compute mole fraction of Mg in the mantle
       Q(1) = 0d0
-
       do i=1, size(fractions)
          mat = contents(i)
          frac = fractions(i)

@@ -563,15 +563,13 @@ class Planet:
         # print ("core mass before =", core_mass)
 
         Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.9999999999)
-        FeMg_mantle = (1.0 - Mg_number_mantle) / Mg_number_mantle
         FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
         SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
 
         core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = self.M_surface_should,
-                                                                ocean_frac = self.ocean_fraction_should,
+                                                                m_ocean = self.M_surface_should*10**self.ocean_fraction_should,
                                                                 femg = FeMg,
                                                                 simg = SiMg,
-                                                                femg_mantle = FeMg_mantle,
                                                                 fe_numbers = [1.0 - Mg_number_mantle for i in self.contents[n]],
                                                                 xi_all_core = self.x_all_core,
                                                                 contents = self.contents[n],

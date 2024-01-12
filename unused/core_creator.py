@@ -45,10 +45,9 @@ def compute_core_mass(props, n=3, M_IC=None, inner_core_mass_fraction = None, mo
     SiMg = props["Si_number_mantle"] / (1.0 - props["Si_number_mantle"])
 
     core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = props["M_surface_should"],
-                                                            ocean_frac = props["ocean_fraction_should"],
+                                                            m_ocean = props["M_surface_should"]*10**props["ocean_fraction_should"],
                                                             femg = FeMg,
                                                             simg = SiMg,
-                                                            femg_mantle = FeMg_mantle,
                                                             fe_numbers = [1.0 - Mg_number_mantle for i in props["contents"][n]],
                                                             xi_all_core = props["x_all_core"],
                                                             contents = props["contents"][n],
