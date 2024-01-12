@@ -24,12 +24,12 @@ fort_objects = [
     "phase",
     "eosfort",
     "functions",
+    "functionspy",
     "eosmat",
     "fortshell",
     "fortlayer",
     "fortplanet",
 ]
-
 
 # Create extension for the fortplanet module
 ext1 = Extension(
@@ -43,8 +43,8 @@ ext1 = Extension(
 # Create extension for the fortfunctions module
 ext2 = Extension(
     name="{}.utils.fortfunctions".format(PACKAGE_NAME),
-    sources=["{}/fortran/functionsPy.f95".format(SRC_DIR)],
-    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["LinAlg"]],
+    sources=["{}/fortran/functionspy.f95".format(SRC_DIR)],
+    extra_objects=["{}/fortran/{}.o".format(LIB_DIR, fo) for fo in ["LinAlg", "constants"]],
     # libraries=['three'], # --> does not work!
     f2py_options=["--quiet"],
 )

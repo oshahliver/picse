@@ -1,6 +1,7 @@
 MODULE class_unit
 
    use functions
+   use functionspy
    use eosfort
    use constants
    use phase
@@ -330,9 +331,9 @@ contains
                                        YSii=self%YSi, &
                                        YMgi=self%YMg, &
                                        xiFei=self%xi_Fe, &
-                                       xiH2Oi=self%xi_H2O, &
-                                       xiAlMgi=self%xi_AlMg, &
-                                       xiAlSii=self%xi_AlSi, &
+                                       ! xiH2Oi=self%xi_H2O, &
+                                       ! xiAlMgi=self%xi_AlMg, &
+                                       ! xiAlSii=self%xi_AlSi, &
                                        abundances=self%fractions, &
                                        contents=self%contents, &
                                        additional=additional)

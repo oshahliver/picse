@@ -1,13 +1,14 @@
-MODULE functionsPy
+MODULE functionspy
 
    ! use constants
    ! use run_params
    ! use eosfort
    use linalg
+   use constants
 
    implicit none
    private
-   public :: construct_abundance_matrix, compute_abundance_vector
+   public :: construct_abundance_matrix, compute_abundance_vector, compute_core_mass, get_core_mass_q_vector
 
 contains
 
@@ -762,7 +763,7 @@ contains
 
 !########################################################################
    subroutine construct_abundance_matrix(SiMg, FeMg, n_mats, &
-                                         YMgi, YSii, xiH2Oi, matrix, b, xiFei, xiAlSii, xiAlMgi, additional)
+                                         YMgi, YSii, matrix, b, xiFei, additional)
 
 !Constructs linear system of equations to solve for the individual
 !molar abundances for fixed atomic abundances and materials in a
@@ -772,8 +773,7 @@ contains
 
       integer, intent(in) :: n_mats
       integer, dimension(n_mats), intent(in) :: YMgi, YSii
-      real(kind=8), dimension(n_mats), intent(in) :: xiH2Oi, xiAlSii, xiAlMgi, &
-                                                     xiFei
+      real(kind=8), dimension(n_mats), intent(in) :: xiFei
       real(8), intent(in) :: additional(:)
       real(kind=8), intent(in) :: SiMg, FeMg
       real(kind=8), dimension(n_mats, n_mats), intent(out) :: matrix
@@ -781,12 +781,9 @@ contains
       integer :: i, j
 
       do j = 1, n_mats
-         matrix(1, j) = (1.0d0 - xiH2Oi(j))*(SiMg*(1.0d0 - xiAlMgi(j))* &
-                                             (1.0d0 - xiFei(j))*YMgi(j) - (1.0d0 - xiAlSii(j))*YSii(j))
-
-         !matrix(2,j) = (1.0d0-xiH2Oi(j))*(FeMg*(1.0d0-xiAlMgi(j))*&
-         ! (1.0d0-xiFei(j))*YMgi(j) - (1.0d0-xiAlMgi(j))*xiFei(j)*YMgi(j))
-
+         ! matrix(1, j) = (1.0d0 - xiH2Oi(j))*(SiMg*(1.0d0 - xiAlMgi(j))* &
+         !                                     (1.0d0 - xiFei(j))*YMgi(j) - (1.0d0 - xiAlSii(j))*YSii(j))
+         matrix(1, j) = SiMg * (1.0d0 - xiFei(j))*YMgi(j) - YSii(j)
          matrix(2, j) = 1.0d0
 
       end do
@@ -812,22 +809,11 @@ contains
       b(1, 1) = 0d0
       b(2, 1) = 1d0
 
-!b(1,1)=-xiStv*(1.0d0-xiH2Oi(n_mats))*(SiMg*&
-!(1.0d0-xiAlMgi(n_mats))*(1.0d0-xiFei(n_mats))*YMgi(n_mats) - &
-!(1.0d0-xiAlSii(n_mats))*YSii(n_mats))
-
-!-xiStv
-
-!print *, 'matrix'
-!do i=1, n_mats - 1
-      ! print*, matrix(i,:)
-!enddo
-
    end subroutine construct_abundance_matrix
 
 !########################################################################
    subroutine compute_abundance_vector(SiMg, FeMg, n_mats, &
-                                       YMgi, YSii, xiH2Oi, xiFei, xiAlSii, xiAlMgi, abundances, &
+                                       YMgi, YSii, xiFei, abundances, &
                                        contents, additional)
 
 !Here the molar abundances of the individual components of a mixture
@@ -843,8 +829,7 @@ contains
 
       integer, intent(in) :: n_mats
       integer, dimension(n_mats), intent(in) :: YMgi, YSii, contents
-      real(kind=8), dimension(n_mats), intent(in) :: xiH2Oi, xiAlSii, xiAlMgi, &
-                                                     xiFei
+      real(kind=8), dimension(n_mats), intent(in) :: xiFei
       real(kind=8), intent(in) :: SiMg, FeMg
       real(kind=8), dimension(n_mats, n_mats) :: matrix
       real(kind=8), dimension(n_mats), intent(out) :: abundances
@@ -852,7 +837,7 @@ contains
       real(8), dimension(n_mats, 1) :: b_vec
       real(8), intent(in), optional :: additional(:)
       real(8), allocatable :: additional_dummy(:)
-      integer :: i, j
+      integer :: i
 
       if (n_mats > 2) then
          allocate (additional_dummy(n_mats - 2))
@@ -873,15 +858,6 @@ contains
          abundances_dummy(i, 1) = 0.0d0
       end do
 
-!~ print *, 'contents =', contents(:)
-!~ print *, 'xiAlSii =', xiAlSii(:)
-!~ print *, 'xiAlMgi =', xiAlMgi(:)
-!~ print *, 'FeMg =', FeMg
-!~ print *, 'SiMg =', SiMg
-!~ print *, 'xiH2Oi =', xiH2Oi
-!~ print *, 'xiFei =', xiFei
-!~ print *, 'additional =', additional_dummy
-
 !In the core the first material is pure iron. There no compositional
 !gradients are currently allowed and the fractions need not be computed
       if (contents(1) == 2 .or. contents(1) == 1) then
@@ -893,16 +869,11 @@ contains
       else
 
          call construct_abundance_matrix(SiMg=SiMg, FeMg=FeMg, n_mats=n_mats, &
-                                         YMgi=YMgi, YSii=YSii, xiH2Oi=xiH2Oi, xiFei=xiFei, xiAlSii=xiAlSii, &
-                                         xiAlMgi=xiAlMgi, matrix=matrix, b=b_vec, &
+                                         YMgi=YMgi, YSii=YSii, xiFei=xiFei, &
+                                         matrix=matrix, b=b_vec, &
                                          additional=additional_dummy)
 
-!call mat_print('matrix', matrix)
-!print *, 'b_vec =', b_vec
-
          call gauss_elimination(a=matrix, sol=abundances_dummy, b=b_vec)
-
-!print *, 'abundances =', abundances_dummy(:,1)
 
          do i = 1, n_mats
             abundances(i) = abundances_dummy(i, 1)
@@ -910,5 +881,134 @@ contains
       end if
 
    end subroutine compute_abundance_vector
+
+
+!###################################################################################
+   function compute_core_mass(M_tot, ocean_frac, FeMg, SiMg, FeMg_mantle, Fe_numbers, xi_all_core, contents,&
+       inner_core_mass_fraction, inner_core_mass, additional, mode) result(core_mass)
+
+      real(8), intent(in), optional :: inner_core_mass_fraction, inner_core_mass
+      real(8), intent(in) :: M_tot, ocean_frac, FeMg, SiMg, FeMg_mantle
+      real(8) :: core_mass
+      integer :: n_mats, lay
+      real(8), dimension(5) :: Q
+      real(8), dimension(5), intent(in) :: xi_all_core
+      real(8), intent(in) :: Fe_numbers(:)
+      integer, intent(in) :: contents(:)
+      real(8), intent(in), optional :: additional(:)
+      real(8) :: core_fraction
+      integer, intent(in) :: mode
+      real(8), allocatable :: fractions(:)
+      integer, allocatable :: ymg(:), ysi(:)
+      integer :: i
+
+      lay = 3
+      n_mats = size(contents)
+      allocate(fractions(n_mats))
+      allocate(ymg(n_mats))
+      allocate(ysi(n_mats))
+      
+      do i=1, n_mats
+         ymg(i) = material_YMg(contents(i))
+         ysi(i) = material_YSi(contents(i))
+      enddo
+
+      ! Compute the fractions in the mantle
+      call compute_abundance_vector(SiMg=SiMg,&
+       FeMg=FeMg_mantle, &
+       n_mats=n_mats, &
+       YMgi=ymg, &
+       YSii=ysi, &
+       xiFei=Fe_numbers, &
+       abundances=fractions, &
+       contents=contents,&
+       additional=additional)
+
+      Q = get_core_mass_q_vector(Fe_numbers(lay), xi_all_core, fractions, contents)
+
+      ! Compute core mass from the absolut inner core mass
+      if (mode == 1 .and. present(inner_core_mass)) then
+         core_fraction = (1e0 - 10**ocean_frac)
+         core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
+         core_fraction = core_fraction + inner_core_mass / M_tot * (1e0 / mFe - Q(4) / Q(5))
+         core_fraction = core_fraction / (Q(3) / Q(2) - Q(4) / Q(5) - FeMg * Q(1) / Q(2))
+      ! Compute core mass from the inner core mass fraction
+      elseif (mode == 2 .and. present(inner_core_mass_fraction)) then
+         core_fraction = (1e0 - 10**ocean_frac)
+         core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
+         core_fraction = core_fraction / ((Q(3) / Q(2) - Q(4) / Q(5) - FeMg * Q(1) / Q(2)) &
+          + inner_core_mass_fraction * (Q(4) / Q(5) - 1e0 / mFe))
+      endif
+      core_mass = M_tot * core_fraction
+   end function compute_core_mass
+
+! ##################################################################################
+   function get_core_mass_q_vector(Fe_number, xi_all_core, fractions, contents) result(Q)
+      real(8), dimension(5) :: Q
+      real(8), dimension(5) :: masses = (/mFe, mH, mS, mSi, mO/)
+      integer :: i, mat
+      real(8) :: frac
+      real(8), intent(in) :: Fe_number
+      real(8), intent(in) :: fractions(:), xi_all_core(:)
+      integer, intent(in) :: contents(:)
+      ! Compute mole fraction of Mg in the mantle
+      Q(1) = 0d0
+
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(1) = Q(1) + frac * (1d0 - Fe_number) * material_YMg(mat)
+      enddo
+      ! Compute total normalized mass in the mantle
+      Q(2) = 0d0
+
+      ! Contribution of Mg
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(2) = Q(2) + frac * (1d0 - Fe_number) * material_YMg(mat) * mMg
+      enddo
+      ! Contribution of Fe
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(2) = Q(2) + frac * Fe_number * material_YMg(mat) * mFe
+      enddo
+      ! Contribution of Si
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(2) = Q(2) + frac * material_YSi(mat) * mSi
+      enddo
+      ! Contribution of O
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(2) = Q(2) + frac * material_YO(mat) * mO
+      enddo
+      ! Contribution of H
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(2) = Q(2) + frac * material_YH(mat) * mH
+      enddo
+      ! Compute mole fraction of Fe in the mantle
+      Q(3) = 0d0
+      do i=1, size(fractions)
+         mat = contents(i)
+         frac = fractions(i)
+         Q(3) = Q(3) + frac * Fe_number * material_YMg(mat)
+      enddo
+      ! Compute total fraction of Fe in the core
+      Q(4) = xi_all_core(1)
+
+      ! Compute total normalized mass in the core
+      Q(5) = 0d0
+      do i=1, size(xi_all_core)
+         Q(5) = Q(5) + masses(i) * xi_all_core(i)
+      enddo
+
+   end function get_core_mass_q_vector
+
 
 END MODULE functionsPy

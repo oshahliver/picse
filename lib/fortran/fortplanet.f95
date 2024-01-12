@@ -5,6 +5,8 @@ MODULE class_planet
    use phase
    use class_layer
    use class_weird_array
+   use functions
+   use functionspy
 
    implicit none
 
@@ -776,65 +778,105 @@ contains
 !#######################################################################
    SUBROUTINE update_core_mass(self)
 !Updates the core mass for a given bulk composition
+! TODO. Move this into a standalone utility function
 
       type(planet), intent(inout) :: self
-      real(8) :: Q1, Q2, Q3, Q4, Q5, core_frac, FeMg, reldev, M
+      real(8), dimension(5) :: Q
+      real(8) :: Q1, Q2, Q3, Q4, Q5, core_frac, FeMg, reldev, M, SiMg
       real(8), dimension(5) :: molar_masses
       real(8), dimension(4) :: dummy, masses, dummy_1
-      real(8), dimension(self%layer_dims(2)) :: wt_fractions_dummy
-      integer :: i
+      ! real(8), dimension(self%layer_dims(2)) :: wt_fractions_dummy
+      real(kind=8), allocatable :: fractions(:)
+      integer :: i, n_mats, n
+      real(8), allocatable :: additional(:)
+
+      ! This part should be handled as standalone routine
+      ! ###########################################################
+      n = 3
+      ! Get number of components in lower mantle 
+      n_mats = size(self%contents%axes(3)%int_array)
+
+      ! Allocate fraction array for lower mantle
+      allocate(fractions(n_mats))
+      allocate(additional(n_mats - 2))
+
+      !Here additional contains only one component. In principle it could
+      !contain as many additional materials as desired.
+      if (size(self%fractions%axes(n)%real_array) > 2) then
+         do i = 1, n_mats - 2
+            additional(i) = self%fractions%axes(n)%real_array(2 + i)
+         end do
+      else
+         additional(:) = 0d0
+      end if
 
       FeMg = (1e0 - self%Mg_number_should)/self%Mg_number_should
+      SiMg = self%Si_number_layers(n) / (1e0 - self%Si_number_layers(n))
+
+      ! Compute the fractions in the mantle
+      call compute_abundance_vector(SiMg=SiMg,&
+       FeMg=FeMg, &
+       n_mats=n_mats, &
+       YMgi=self%YMg_layers%axes(n)%int_array(:), &
+       YSii=self%YSi_layers%axes(n)%int_array(:), &
+       xiFei=self%Fe_number_layers(n), &
+       abundances=fractions, &
+       contents=self%contents%axes(n)%int_array(:),&
+       additional=additional)
+      ! #########################################################
+
+      ! Get molar masses of atomic species in outer core
       masses = (/mFe, mS, mSi, mO/)
-!Compute mole fraction of Mg in the mantle
+
+      !Compute mole fraction of Mg in the mantle
       Q1 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q1 = Q1 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q1 = Q1 + fractions(i)* &
               (1d0 - self%Fe_number_layers(3))* &
               material_YMg(self%contents%axes(3)%int_array(i))
       end do
 
-!Compute total normalized mass in the mantle
+      !Compute total normalized mass in the mantle
       Q2 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q2 = Q2 + fractions(i)* &
               (1d0 - self%Fe_number_layers(3))* &
               material_YMg(self%contents%axes(3)%int_array(i))*mMg
       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q2 = Q2 + fractions(i)* &
               self%Fe_number_layers(3)* &
               material_YMg(self%contents%axes(3)%int_array(i))*mFe
       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q2 = Q2 + fractions(i)* &
               material_YSi(self%contents%axes(3)%int_array(i))*mSi
       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q2 = Q2 + fractions(i)* &
               material_YO(self%contents%axes(3)%int_array(i))*mO
       end do
 
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q2 = Q2 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q2 = Q2 + fractions(i)* &
               material_YH(self%contents%axes(3)%int_array(i))*mH
       end do
 
-!Compute mole fraction of Fe in the mantle
+      !Compute mole fraction of Fe in the mantle
       Q3 = 0d0
-      do i = 1, size(self%fractions%axes(3)%real_array)
-         Q3 = Q3 + self%fractions%axes(3)%real_array(i)* &
+      do i = 1, size(fractions)
+         Q3 = Q3 + fractions(i)* &
               self%Fe_number_layers(3)* &
               material_YMg(self%contents%axes(3)%int_array(i))
       end do
 
-!Compute mole fraction of Fe in the core
+      !Compute mole fraction of Fe in the core
       Q4 = self%xi_all_core(1)
 
-!Compute total normalized mass in the core
+      !Compute total normalized mass in the core
       molar_masses = (/mFe, mH, mS, mSi, mO/)
       Q5 = 0d0
 
@@ -842,46 +884,43 @@ contains
          Q5 = Q5 + molar_masses(i)*self%xi_all_core(i)
       end do
 
-!~ print *, 'Q1, Q2, Q3, Q4, Q5, Q6 =', Q1, Q2, Q3, Q4, Q5, 1d0 / mFe
-!~ print *, 'Q4 / Q5 =', Q4 / Q5
-!~ print *, 'xi all core =', self%xi_all_core
-!~ print *, 'factor =', self%layers(1)%indigenous_mass / self%M_surface_should * (1d0 / mFe - Q4 / Q5)
-!~ print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
-!~ print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
-!~ print *, 'fractions =', self%fractions%axes(3)%real_array
-
+! print *, 'Q1, Q2, Q3, Q4, Q5, Q6 =', Q1, Q2, Q3, Q4, Q5, 1d0 / mFe
+! print *, 'Q4 / Q5 =', Q4 / Q5
+! print *, 'xi all core =', self%xi_all_core
+! print *, 'factor =', self%layers(1)%indigenous_mass / self%M_surface_should * (1d0 / mFe - Q4 / Q5)
+! print *, 'M_ocean, M_tot =', self%M_ocean_should, self%M_surface_should
+! print *, 'Mg mantle, Mg tot =', 1d0 - self%Fe_number_layers(3), self%Mg_number_should
+! print *, 'fractions =', self%fractions%axes(3)%real_array
+! print *, "indigenous mass =", self%layers(1)%indigenous_mass
 !Compute core mass fraction
       core_frac = (1d0 - self%M_ocean_should/self%M_surface_should)
+      ! print *, 'core_frac in fortran =', core_frac      
       core_frac = core_frac*(Q3/Q2 - Q1/Q2*FeMg)
-      core_frac = core_frac + self%layers(1)%indigenous_mass/self%M_surface_should* &
+      ! print *, 'core_frac in fortran =', core_frac
+      core_frac = core_frac + self%layers(1)%indigenous_mass/m_earth/self%M_surface_should* &
                   (1e0/mFe - Q4/Q5)
+      ! print *, 'core_frac in fortran =', core_frac
       core_frac = core_frac/(Q3/Q2 - Q4/Q5 - FeMg*Q1/Q2)
-!~ print *, 'core_frac =', core_frac
-
-      M = core_frac*self%M_surface_should/m_earth
-!~ print *, 'Computed core mass in fortplanet:', M
+! print *, 'core_frac in fortran =', core_frac
+      M = core_frac*self%M_surface_should
 
 !Decide which strategy is to be employed to probe the total core mass.
 !By default the initial inner core mass in layer_masses is set to the
 !total core mass assuming pure iron in the core. The outer core mass
 !in layer_masses is set to the core mass if only outer core exists.
-      reldev = abs(self%layers(1)%indigenous_mass/m_earth - self%layer_masses(1))/self%layer_masses(1)
-!~ print *, 'IC mass =', self%layers(1)%indigenous_mass / m_earth
-!~ print *, 'layermasses(1) =', self%layer_masses(1)
+      reldev = abs(self%layers(1)%indigenous_mass/m_earth - self%layer_masses(2))/self%layer_masses(1)
 !Case 1: Total core mass already reached in inner core. Outer core mass
 !must be set to inner core mass so that is skipped.
       if (reldev < eps_layer) then
-!~ print *, 'Case 1'
          self%layer_masses(2) = self%layer_masses(1)
 
 !Case 2: Both inner and outer core exist.
       else if (reldev >= eps_layer) then
-!~ print *, 'Case 2'
 !If redistribution of lighter elements is not accounted for:
 !Total core mass must be updated.
 !~ print *, 'iCS =', self%inner_core_segregation_model
          if (.not. self%inner_core_segregation_model) then
-            self%layer_masses(2) = core_frac*self%M_surface_should/m_earth
+            self%layer_masses(2) = M
 !If redistribution of lighter elements is accoutned for:
 !Outer core fractions need to be updated.
          else
@@ -1068,9 +1107,9 @@ contains
       else if (abs(reldev) .lt. eps_layer) then
    ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
          if (self%lay == 1) then
-!~   print *, 'layermasses(1) before update =', self%layer_masses(1)
-            !call update_core_mass(self=self)
-            !print *, 'layermasses after update core mass =', self%layer_masses
+            ! print *, 'layermasses before update core mass =', self%layer_masses
+            call update_core_mass(self=self)
+            ! print *, 'layermasses after update core mass =', self%layer_masses
          end if
 !~   ! updat coefficients for T-profile in mantle using core radius
 !~   if(self%lay==1 .or. self%lay==2)then

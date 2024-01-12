@@ -24,15 +24,18 @@ iterator = planet_iterator.Toolkit()
 # default value for the corresponding base type
 planetary_params = {
     "M_surface_should": 1.0,  # desired total mass (in earth masses)
-    "T_surface_should": 300.0,  # desired surface temperature (in kelvin)
+    "T_surface_should": 1200.0,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
-    "Mg_number_should": 0.5,  # desired bulk magnesium number
+    "Mg_number_should": 0.5162,  # desired bulk magnesium number
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
+    "temperature_jumps":[0, 1800, 0, 0],
     "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
     "fractions": [[1], [0, .1, 0.1, 0.1], [.5, .5], [.5, .5]],
     "inner_core_mass_fraction_should": .387,
 }
+
+run_params = {"layer_constraints": [1, 1, 3, 1]}
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a
@@ -61,7 +64,7 @@ iterator_specs = {
 #######################################################################
 
 # Initialize a telluric planet instance with the specified properties
-pl = planet_creator.TelluricPlanet(planetary_params=planetary_params)
+pl = planet_creator.TelluricPlanet(planetary_params=planetary_params, run_params = run_params)
 
 # Perform initial structure integration
 pl.construct()
@@ -69,13 +72,14 @@ pl.construct()
 # Pass planet instance to iterator to match boundary conditions
 # NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, iterator_specs=iterator_specs)
-
+print ("fractions in the end:" , pl.fractions)
 #######################################################################
 # Model inspection
 #######################################################################
 
 # print fundamental planeatary properties to standard output
 pl.print(digits=4)
+# pl.plot()
 
 # You can also access individual parameters as attributes. for instance:
 # print("total radius (km):", pl.R_surface_is * 1e-3)

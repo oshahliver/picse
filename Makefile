@@ -7,7 +7,7 @@ PROJDIR := $(realpath $(CURDIR)/..)
 SRCDIR := ./lib/fortran
 TARGETDIR := ./lib/fortran
 
-_SRC=my_types.f95 run_params.f95 constants.f95 LinAlg.f95 class_table_new.f95 phase.f95 eosfort.f95 functions.f95 eosmat.f95 fortshell.f95 fortlayer.f95 fortplanet.f95
+_SRC=my_types.f95 run_params.f95 constants.f95 LinAlg.f95 class_table_new.f95 phase.f95 eosfort.f95 functions.f95 functionspy.f95 eosmat.f95 fortshell.f95 fortlayer.f95 fortplanet.f95
 _OBJ=${_SRC:.f95=.o}
 
 SRC=$(patsubst %, ${SRCDIR}/%,${_SRC})
@@ -30,7 +30,7 @@ static:
 #Create python wrapper from static library using f2py
 wrapper:
 	python3 -m numpy.f2py -c -I${TARGETDIR} ${SRCDIR}/eosfort_wrapper.f95 ${OBJ} -m ${OUTFILE}
-	f2py -c -I${TARGETDIR} ${SRCDIR}/functionsPy.f95 ${OBJ} -m fortfunctions
+	f2py -c -I${TARGETDIR} ${SRCDIR}/functionspy.f95 ${OBJ} -m fortfunctions
 	@mkdir -p ${TARGETDIR}
 	@mv ./*.so ${TARGETDIR}
 	

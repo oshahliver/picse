@@ -4,6 +4,7 @@ MODULE class_shell
    use functions
    use constants
    use class_dict
+   use functionspy
 
    implicit none
 

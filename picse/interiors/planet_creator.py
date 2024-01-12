@@ -350,7 +350,7 @@ class Planet:
 
         # initialize run parameters
         if run_params is not None:
-            for key, value in run_params.__dict__.items():
+            for key, value in run_params.default_values.items():
                 if not key in omit_keys:
                     setattr(self, key, value)
 
@@ -544,7 +544,7 @@ class Planet:
         self.xi_SiO2_mantle = (1.0 - self.xi_FeO_mantle) * self.Si_number_mantle
         self.xi_MgO_mantle = 1.0 - self.xi_FeO_mantle - self.xi_SiO2_mantle
 
-    def compute_core_mass(self, n=3, M_IC=None):
+    def compute_core_mass(self, n=2, M_IC=None):
         """Computes the core mass of a planet at given total mass, composition and
         value for Mg#
         """
@@ -558,9 +558,12 @@ class Planet:
             ocean_fraction_should=self.ocean_fraction_should,
             x_all_core=self.x_all_core,
         )
-
-        return core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should)
-
+        print ("fractions in compute_core_mass planet:", self.fractions)
+        core_mass = core_creator.compute_core_mass(params, n=n, M_IC=M_IC, inner_core_mass_fraction=self.inner_core_mass_fraction_should)
+        test_core_mass = core_creator.compute_core_mass(params, n=n, M_IC = core_mass * self.inner_core_mass_fraction_should, inner_core_mass_fraction=None)
+        print ("test core mass =", test_core_mass)
+        return core_mass
+    
     def update(self, default=False):
         """Computes all dependant planetary parameters"""
         self.update_composition()
