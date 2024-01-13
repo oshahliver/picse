@@ -7,6 +7,7 @@ Created on Tue Jan  8 14:40:45 2019
 """
 
 import inspect
+import random
 import time
 import numpy as np
 from scipy.interpolate import interp1d
@@ -251,6 +252,10 @@ def my_colorbar(mappable, size="5%", pad=0.1, label="a colorbar", fnts=12):
     cbar.set_label(label, fontsize=fnts)
     cbar.ax.tick_params(labelsize=fnts)
     return cbar
+
+def sample_log_uniform(low, high):
+    """Sample a value uniformly on a logarithmic scale."""
+    return np.exp(random.uniform(np.log(low), np.log(high)))
 
 
 def extract_value_range(data=None, scalings=None, hard_mins=None, hard_maxs=None):

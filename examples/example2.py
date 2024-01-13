@@ -29,13 +29,14 @@ planetary_params = {
     "Mg_number_should": 0.5162,  # desired bulk magnesium number
     "Fe_number_mantle": 0.0,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
-    "temperature_jumps":[0, 1800, 0, 0],
+    "temperature_jumps":[0, 1800, 0, 0], # Temperature jumps across each layer transition
     "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
-    "fractions": [[1], [0, .2, 0.05, 0.1], [.5, .5], [.5, .5]],
-    "inner_core_mass_fraction_should": .387,
+    "fractions": [[1], [0, .2, 0.05, 0.1], [.5, .5], [.5, .5]], # Mole fractions in each layer
+    "inner_core_mass_fraction_should": .387, # The mass fraction of the inner core relative to the core
 }
 
-run_params = {"layer_constraints": [4, 1, 3, 1]}
+run_params = {"layer_constraints": [4, 1, 3, 1], # Layer constraint type for each layer transition
+              }
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a

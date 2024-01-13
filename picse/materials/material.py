@@ -663,7 +663,32 @@ def probe_mantle_comps(N=100):
     return data
 
 
-def mantle_comp(P_CS, ocmf):
+def compute_model(pres_core_seg):
+    """Compute a single valid model."""
+    valid_composition = False
+    while not valid_composition:
+        # Randomly sample core composition components on a log scale
+        xiFeS = ftool.sample_log_uniform(0.001, 0.5)
+        xiFeSi = ftool.sample_log_uniform(0.001, 0.3)
+        xiFeO = ftool.sample_log_uniform(0.001, 0.2)
+
+        xi_all_core = [0.0, xiFeS, xiFeSi, xiFeO]
+        
+        # Compute mantle composition from core composition using the partitioning model
+        Fe_number_mantle, Si_number_mantle = calc_equilibrium_mantle_comp(pres_core_seg, xi_all_core)
+
+        # Check if the composition is within the feasible range
+        simmin = Si_number_mantle_min(Fe_number_mantle)
+        simmax = Si_number_mantle_max(Fe_number_mantle)
+        femmin = 0.0
+        femmax = 0.5
+
+        if simmin <= Si_number_mantle <= simmax and femmin <= Fe_number_mantle <= femmax:
+            valid_composition = True
+            return (Fe_number_mantle, Si_number_mantle, xiFeS, xiFeSi, xiFeO)
+
+
+def calc_equilibrium_mantle_comp(P_CS, ocmf):
     """
     Computes the mantle composition according to the single
     stage core-segregation model.
@@ -1158,6 +1183,11 @@ def Fe_number_mantle(P, T, xi):
         result = xi_Fe_mantle_max
     return result
 
+def Si_number_mantle_max(xiFe):
+    return 1. / (2. - xiFe)
+
+def Si_number_mantle_min(xiFe):
+    return 1. / (3. - 2. * xiFe)
 
 def Si_number_mantle(P, T, xi):
     """
