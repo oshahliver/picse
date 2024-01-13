@@ -668,9 +668,9 @@ def compute_model(pres_core_seg):
     valid_composition = False
     while not valid_composition:
         # Randomly sample core composition components on a log scale
-        xiFeS = ftool.sample_log_uniform(0.001, 0.5)
-        xiFeSi = ftool.sample_log_uniform(0.001, 0.3)
-        xiFeO = ftool.sample_log_uniform(0.001, 0.2)
+        xiFeS = ftool.sample_log_uniform(1e-4, 0.5)
+        xiFeSi = ftool.sample_log_uniform(1e-4, 0.3)
+        xiFeO = ftool.sample_log_uniform(1e-4, 0.3)
 
         xi_all_core = [0.0, xiFeS, xiFeSi, xiFeO]
         

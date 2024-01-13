@@ -8,12 +8,15 @@ from picse.utils.file_tools import file_manager
 from picse.utils.plot_tools.plot_tools import plot_mr
 from picse.utils.file_tools import internal_data
 from picse.physicalparams import r_earth, m_earth
+from picse.utils.function_tools import functionTools as ftool
 from picse.materials.material import silicon_number_max, silicon_number_min
 import sys
 import numpy as np
 import pandas as pd
 import os
 import copy
+import multiprocessing
+from picse.materials import material
 
 from alive_progress import alive_bar
 
@@ -22,6 +25,27 @@ planet_creator.load_eos_tables()
 class Toolkit:
     def __init__(self):
         self.iterator = planet_iterator.Toolkit()
+        self.valid_compositions = []
+
+    @staticmethod
+    def compute_model_wrapper(pres_core_seg):
+        """Static wrapper function for compute_model to be used with multiprocessing."""
+        return material.compute_model(pres_core_seg)
+
+    def create_core_mantle_composition(self, total_mass, num_models=10):
+        # Here an array of pressures should be defined. On value for each model
+        pres_core_seg = np.array([ftool.sample_lin_uniform(3e10, 7e10) for _ in range(num_models)])
+        pres_core_seg = material.P_CS(total_mass, P0 = pres_core_seg)
+
+        # pres_core_seg = 1e10
+
+        # Use multiprocessing pool
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+            # Using starmap to pass additional arguments to the static method
+            args = [(pres,) for pres in pres_core_seg]
+            valid_compositions = pool.starmap(self.compute_model_wrapper, args)
+        self.valid_compositions = valid_compositions
+        return valid_compositions, pres_core_seg
 
     def create_population(self):
         pass
@@ -31,7 +55,6 @@ class Toolkit:
 
     def create_mass_radius_relation(self):
         pass
-
 
 class DataSet:
     def __init__(self, tag):

@@ -257,6 +257,9 @@ def sample_log_uniform(low, high):
     """Sample a value uniformly on a logarithmic scale."""
     return np.exp(random.uniform(np.log(low), np.log(high)))
 
+def sample_lin_uniform(low, high):
+    """Sample a value uniformly on a logarithmic scale."""
+    return random.uniform(low, high)
 
 def extract_value_range(data=None, scalings=None, hard_mins=None, hard_maxs=None):
     """
