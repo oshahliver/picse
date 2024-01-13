@@ -172,7 +172,7 @@ class PlanetaryInputParams(Parameters):
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
             "ocean_fraction_should": -10,
-            "inner_core_mass_fraction_should": 1e-3,
+            "inner_core_mass_fraction_should": 1e-4,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
             "layer_masses": [0.25, 0.25, 0.0, 100.0],
@@ -483,9 +483,34 @@ class Planet:
             # Compute total core mass from bulk composition
             self.layer_masses[1] = self.compute_core_mass(mode = 2)
             # self.layer_masses[0] = self.compute_core_mass(inner_core_mass_fraction = self.inner_core_mass_fraction)
-            self.layer_masses[0] = self.inner_core_mass_fraction_should * self.layer_masses[1]
             
-            print(f'predicted inner core mass fraction = {self.layer_masses[0]}')
+            if self.core_segregation_type == 0:
+                print ("check 1")
+                self.layer_masses[0] = self.inner_core_mass_fraction_should * self.layer_masses[1]
+           
+            elif self.core_segregation_type == 1:
+                print ("check 2")
+                Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.99999999999)
+                FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
+                SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
+                n = 3
+                core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = self.M_surface_should,
+                                                                        m_ocean = self.M_surface_should*10**self.ocean_fraction_should,
+                                                                        femg = FeMg,
+                                                                        simg = SiMg,
+                                                                        fe_numbers = [1.0 - Mg_number_mantle for _ in self.contents[n]],
+                                                                        xi_all_core = [1., 0., 0., 0., 0.],
+                                                                        contents = self.contents[n],
+                                                                        inner_core_mass_fraction = 1.0,
+                                                                        inner_core_mass = 0.0,
+                                                                        mode = 1,
+                                                                        additional = [])
+
+                self.layer_masses[0] = core_mass
+                
+
+            print(f'predicted inner core mass fraction = {self.layer_masses[0] / self.layer_masses[1]}')
+            print (f'predicted inner core mass = {self.layer_masses[0]}')
             print(f'predicted core mass = {self.layer_masses[1]}')
 
         # Use more sophisticated multilinear regression models to predict the

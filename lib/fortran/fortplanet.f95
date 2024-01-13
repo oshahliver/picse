@@ -967,7 +967,6 @@ contains
          else
             self%direction = -1
          end if
-
       end if
 
    END SUBROUTINE get_layer_constraint
@@ -1033,24 +1032,15 @@ contains
 
 !Layer transition reached
       else if (abs(reldev) .lt. eps_layer) then
-   ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
+         ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
+         ! print *, 'Layer constraint should =', self%constraint_value_should
+         ! print *, 'Layer constraint is =', self%constraint_value_is
          if (self%lay == 1) then
             ! print *, 'layermasses before update core mass =', self%layer_masses
             call update_core_mass(self=self)
             ! print *, 'layermasses after update core mass =', self%layer_masses
          end if
-!~   ! updat coefficients for T-profile in mantle using core radius
-!~   if(self%lay==1 .or. self%lay==2)then
-!~         a = self%external_temp_profile(4,1)
-!~         b = self%external_temp_profile(4,2)
-!~         c = self%external_temp_profile(4,3)
-!~         r = self%layers(self%lay)%radius * 1e-3
-!~         print *, "update temp coeff =", self%external_temp_profile(4,:)
-!~         self%external_temp_profile(4,1) = a - b * r + c * r**2
-!~         print *, "update temp coeff =", self%external_temp_profile(4,:)
-!~         self%external_temp_profile(4,2) = b - 2 * c * r
-!~         print *, "update temp coeff =", self%external_temp_profile(4,:)
-!~   end if
+
 !~   print *, 'layermasses(1) after update =', self%layer_masses(1)
          self%layer_complete = .true.
          self%shell_iteration = .false.
@@ -1077,40 +1067,40 @@ contains
             !subsequent layer
             skip = 0
             skip_count = 0
+
             !Check layer transitions for all remaining layers
             do i = 1, size(self%contents%axes) - self%lay
-!~     print *, 'i =', i
                call get_layer_constraint(self=self, lay=self%lay, skip=i)
-               !   print *, 'Next layer constraint should =', self%constraint_value_should
-               !   print *, 'Next layer constraint is =', self%constraint_value_is
+               ! print *, 'Next layer constraint should =', self%constraint_value_should
+               ! print *, 'Next layer constraint is =', self%constraint_value_is
                reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                         self%constraint_value_should
 
                if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                   skip = skip + 1
-               !   print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
+                  ! print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
                   if (self%lay + skip == size(self%contents%axes)) then
                      self%layer_iteration = .false.
                      skip = skip - 1
                   end if
 
-                  !Check again for layer 2 --> 3 because layer 3 has two layer
-                  !constraints that could lead to 3 --> 4: pressure and mass
-                  !but only relevant if layer 3 is not already skipped.
+               !Check again for layer 2 --> 3 because layer 3 has two layer
+               !constraints that could lead to 3 --> 4: pressure and mass
+               !but only relevant if layer 3 is not already skipped.
                else
                   if (self%lay <= 2) then
                      old_layer_constraint = self%layer_constraints(3)
                      self%layer_constraints(3) = 3
                      call get_layer_constraint(self=self, lay=self%lay, skip=i)
                      self%layer_constraints(3) = old_layer_constraint
-                                 ! print *, 'Next layer constraint should =', self%constraint_value_should
-                                 ! print *, 'Next layer constraint is =', self%constraint_value_is
+                     ! print *, 'Next layer constraint should =', self%constraint_value_should
+                     ! print *, 'Next layer constraint is =', self%constraint_value_is
                      reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                               self%constraint_value_should
 
                      if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                         skip = skip + 1
-                                 !   print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
+                        ! print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
                         if (self%lay + skip == size(self%contents%axes)) then
                            self%layer_iteration = .false.
                            skip = skip - 1
@@ -1118,19 +1108,19 @@ contains
                      end if
                   end if
                end if
+
                !If one of the next layertransitions is not yet reached,
                !don't check for the subsequent ones as the iteration has
                !to continue in the next layer anyways. Also if it checks the
                !subsequent layers it's possible that a layer is not reached
                !but a later one is which leads to errors.
                if (skip < i) then
-!~           print *, 'break'
                   exit
                end if
             end do
 
             do i = 1, skip + 1
-!~           print *, 'Layer reached at M =', self%layers(self%lay)%mass/m_earth
+               ! print *, 'Layer reached at M =', self%layers(self%lay)%mass/m_earth
                radius = self%layers(self%lay)%radius
                mass = self%layers(self%lay)%mass
                pres = self%layers(self%lay)%pres
@@ -1148,29 +1138,31 @@ contains
 !~                 chemical equilibrium between core and mantle. If CS-model
 !~                 is deactivated the mantle composition is computed from the inputs
 !~                 Si_number_layers and Fe_number_layers
-               if (self%core_segregation_model) then
-                  if (self%lay == 9) then
-                     print *, ''
-                     print *, 'Doing the CS shit.... !!!!!!!'
-                     print *, ''
-                     print *, 'Si#, Fe# before:', self%Si_number_layers(3), self%Fe_number_layers(3)
-                     !~                         print *, 'fractions =', self%fractions%axes(self%lay)%real_array
-                     !~                         print *, 'fractions =', self%fractions%axes(3)%real_array
-                     !~                         print *, 'xi_all core =', self%xi_all_core
-                     self%Si_number_layers(3) = Si_number_mantle(self%T_CS, &
-                                                                 self%P_CS, &
-                                                                 self%xi_all_core)
-                     self%Si_number_layers(4) = self%Si_number_layers(3)
-                     print *, 'computed Si# in the mantle:', self%Si_number_layers(self%lay + 1)
+               ! if (self%core_segregation_model) then
+               !    if (self%lay == 9) then
+               !       print *, ''
+               !       print *, 'Doing the CS shit.... !!!!!!!'
+               !       print *, ''
+               !       print *, 'Si#, Fe# before:', self%Si_number_layers(3), self%Fe_number_layers(3)
+               !       !~                         print *, 'fractions =', self%fractions%axes(self%lay)%real_array
+               !       !~                         print *, 'fractions =', self%fractions%axes(3)%real_array
+               !       !~                         print *, 'xi_all core =', self%xi_all_core
+               !       self%Si_number_layers(3) = Si_number_mantle(self%T_CS, &
+               !                                                   self%P_CS, &
+               !                                                   self%xi_all_core)
+               !       self%Si_number_layers(4) = self%Si_number_layers(3)
+               !       print *, 'computed Si# in the mantle:', self%Si_number_layers(self%lay + 1)
 
-                     self%Fe_number_layers(3) = Fe_number_mantle(self%T_CS, &
-                                                                 self%P_CS, &
-                                                                 self%xi_all_core)
-                     !self%Fe_number_layers(3) = 1d-1
-                     self%Fe_number_layers(4) = self%Fe_number_layers(3)
-                     print *, 'computed Fe# in the mantle:', self%Fe_number_layers(self%lay + 1)
-                  end if
-               end if
+               !       self%Fe_number_layers(3) = Fe_number_mantle(self%T_CS, &
+               !                                                   self%P_CS, &
+               !                                                   self%xi_all_core)
+               !       !self%Fe_number_layers(3) = 1d-1
+               !       self%Fe_number_layers(4) = self%Fe_number_layers(3)
+               !       print *, 'computed Fe# in the mantle:', self%Fe_number_layers(self%lay + 1)
+               !    end if
+               ! end if
+
+               ! print *, "Instantiating layer ", self%lay + 1
                !Initiate next layer lay+1
                call init_layer(self=self%layers(self%lay + 1), &
                                n_mats=size(self%contents%axes(self%lay + 1)%int_array), &
@@ -1203,7 +1195,6 @@ contains
                                external_temp_profile=self%external_temp_profile(self%lay + 1, :))
 
                self%n_shells_layers(self%lay) = self%layers(self%lay)%shell_count
-
                self%lay = self%lay + 1
             end do
          end if

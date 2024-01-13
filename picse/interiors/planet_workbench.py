@@ -37,8 +37,6 @@ class Toolkit:
         pres_core_seg = np.array([ftool.sample_lin_uniform(3e10, 7e10) for _ in range(num_models)])
         pres_core_seg = material.P_CS(total_mass, P0 = pres_core_seg)
 
-        # pres_core_seg = 1e10
-
         # Use multiprocessing pool
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             # Using starmap to pass additional arguments to the static method

@@ -668,9 +668,9 @@ def compute_model(pres_core_seg):
     valid_composition = False
     while not valid_composition:
         # Randomly sample core composition components on a log scale
-        xiFeS = ftool.sample_log_uniform(1e-4, 0.5)
-        xiFeSi = ftool.sample_log_uniform(1e-4, 0.3)
-        xiFeO = ftool.sample_log_uniform(1e-4, 0.3)
+        xiFeS = ftool.sample_log_uniform(1e-5, 5e-1)
+        xiFeSi = ftool.sample_log_uniform(1e-5, 3e-1)
+        xiFeO = ftool.sample_log_uniform(1e-5, 2e-1)
 
         xi_all_core = [0.0, xiFeS, xiFeSi, xiFeO]
         
@@ -685,6 +685,7 @@ def compute_model(pres_core_seg):
 
         if simmin <= Si_number_mantle <= simmax and femmin <= Fe_number_mantle <= femmax:
             valid_composition = True
+            # return (0., .4, .0, .0, .0)
             return (Fe_number_mantle, Si_number_mantle, xiFeS, xiFeSi, xiFeO)
 
 

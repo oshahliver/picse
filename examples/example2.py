@@ -35,8 +35,8 @@ planetary_params = {
     "inner_core_mass_fraction_should": .387, # The mass fraction of the inner core relative to the core
 }
 
-run_params = {"layer_constraints": [4, 1, 3, 1], # Layer constraint type for each layer transition
-              }
+run_params = {"layer_constraints": [1, 1, 3, 1], # Layer constraint type for each layer transition
+              "core_segregation_type": 1}
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a
