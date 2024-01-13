@@ -172,7 +172,7 @@ class PlanetaryInputParams(Parameters):
             "P_surface_should": 1e5,
             "R_surface_should": 1.0,
             "ocean_fraction_should": -10,
-            "inner_core_mass_fraction_should": 1e-4,
+            "inner_core_mass_fraction_should": 1e-2,
             "contents": [[2], [2, 9, 9, 9, 9], [4, 5], [6, 7]],
             "fractions": [[1.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.5, 0.5], [0.5, 0.5]],
             "layer_masses": [0.25, 0.25, 0.0, 100.0],
@@ -473,23 +473,29 @@ class Planet:
         self.x_all_core = material.mat2at_core(xi=self.fractions[1], xiH=0.0)
         self.eta_all_core = material.at2wt_core(self.x_all_core)
 
-        print(f'x_all_core = {self.x_all_core}')
-
         if self.initial_predictor == 0:
             # compute inner core mass from bulk composition
             # Note: inner core mass will be updated during the structure
             # integration from the solidus of iron-alloys
 
-            # Compute total core mass from bulk composition
-            self.layer_masses[1] = self.compute_core_mass(mode = 2)
             # self.layer_masses[0] = self.compute_core_mass(inner_core_mass_fraction = self.inner_core_mass_fraction)
             
             if self.core_segregation_type == 0:
-                print ("check 1")
+                # Compute total core mass from bulk composition
+                self.layer_masses[1] = self.compute_core_mass(mode = 2)
                 self.layer_masses[0] = self.inner_core_mass_fraction_should * self.layer_masses[1]
            
             elif self.core_segregation_type == 1:
-                print ("check 2")
+                # The inner core mass is initially set to the total core mass the planet would have
+                # if the core was pure iron. If the iron-melting point is not reached in the core,
+                # this will be exactly the core mass the planet needs to match the Mg#.
+                # The outer core mass fraction is likewise set to the core mass the planet would have
+                # if there was no inner core.
+                
+                self.inner_core_mass_fraction_should = 0.
+                # Compute total core mass from bulk composition
+                self.layer_masses[1] = self.compute_core_mass(mode = 2)
+                
                 Mg_number_mantle = min(1.0 - self.Fe_number_mantle, 0.99999999999)
                 FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
                 SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
@@ -506,6 +512,7 @@ class Planet:
                                                                         mode = 1,
                                                                         additional = [])
 
+                self.inner_core_mass_fraction_should = np.nan
                 self.layer_masses[0] = core_mass
                 
 

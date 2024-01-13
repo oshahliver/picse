@@ -38,7 +38,7 @@ milliseconds = int((elapsed_time - minutes * 60 - seconds) * 1000)
 print(f"Elapsed Time: {minutes} min, {seconds} sec, {milliseconds} ms")
 
 planetary_params = [{"M_surface_should":1.0,
-                    "T_surface_should": 2000.0,
+                    "T_surface_should": 1800.0,
                     "Mg_number_should": 0.5162,
                     "Fe_number_mantle": vc[0],
                     "Si_number_mantle": vc[1],
