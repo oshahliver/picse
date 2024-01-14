@@ -39,9 +39,7 @@ MODULE class_planet
       character(len=20) :: status, major_constraint
       integer, dimension(:), allocatable :: layer_constraints, n_shells_layers, &
                                             layer_dims
-      real(8), dimension(5, 3) :: external_temp_profile
       logical :: silence = .false.
-      logical :: constant_Fe = .true.
       integer :: shell_iteration_count = 1
       integer :: layer_iteration_count = 1
       logical :: change_bisec = .true., bisec = .false.
@@ -73,7 +71,7 @@ contains
                           Fe_number_layers, omega, xi_H_core_predicted, &
                           subphase_res, xi_Stv, X_impurity_0_layers, X_impurity_slope_layers, &
                           xi_all_core, X_all_core, P_CS, core_segregation_model, &
-                          M_ocean_should, inner_core_segregation_model, external_temp_profile)
+                          M_ocean_should, inner_core_segregation_model)
 
       type(planet), intent(inout) :: self
       integer, intent(in) :: n_layers
@@ -107,7 +105,6 @@ contains
       logical :: alloc = .true.
       integer :: layer_dims(n_layers)
       integer :: core_segregation_model, inner_core_segregation_model
-      real(8), dimension(5, 3), intent(in), optional :: external_temp_profile
 
       allocate (self%layer_dims(n_layers))
       allocate (self%ambient_mixtures(n_layers))
@@ -130,15 +127,6 @@ contains
       allocate (self%X_impurity_0_layers(n_layers))
       allocate (self%X_impurity_slope_layers(n_layers))
 
-      if (present(external_temp_profile)) then
-         self%external_temp_profile = external_temp_profile
-
-      else
-         self%external_temp_profile = &
-            reshape((/0d0, 0d0, 0d0, 0d0, 0d0, 0d0, 0d0, 0d0, 0d0, 0d0, 0d0, &
-                      0d0, 0d0, 0d0, 0d0/), shape(external_temp_profile))
-      end if
-
       if (present(subphase_res)) then
          self%subphase_res = subphase_res
       else
@@ -150,18 +138,6 @@ contains
       else
          self%major_constraint = 'P_surface'
       end if
-
-! if(present(P_surface_should))then
-!   self%P_surface_should = P_surface_should
-! else
-!   self%P_surface_should = 1.0d5
-! endif
-
-! if(present(T_surface_should))then
-!   self%T_surface_should = T_surface_should
-! else
-!   self%T_surface_should = 300.0d0
-! endif
 
       self%M_surface_should = M_surface_should
       self%M_ocean_should = M_ocean_should
@@ -312,21 +288,7 @@ contains
 !Compute core segregation temperature assuming chemical equilibration
 !to have taken place at the pyrolite liquidus
       self%T_CS = T_liquidus_pyrolite(self%P_CS)
-!~ print *, 'T_CS (K) / P_CS (GPa)=', self%T_CS, self%P_CS*1d-9
-!Update contents to ensure the right eos tables are used in case
-!the Fe content in the mantle is chosen to be variable
-!!if (.not.self%constant_Fe)then
-!!        do i=1, n_layers
-!!                do j=1, layer_dims(i)
-!!                        c=self%contents%axes(i)%int_array(j)
-!!                        self%contents%axes(i)%int_array(j)=eos_translation(c)
-!!                enddo
-!!        enddo
-!!endif
 
-!~ do i=1, n_layers
-!~         print *, 'fractions ',i, ' =', self%fractions%axes(i)%real_array
-!~ enddo
       do i = 1, n_layers
 !~ print *, "init mixture for layer", i
 !~ print *, "conts =", self%contents%axes(i)%int_array
@@ -407,8 +369,7 @@ contains
                          xi_H=self%xi_H_layers(self%lay), &
                          xi_Stv=self%xi_Stv_layers(self%lay), &
                          X_impurity_0=self%X_impurity_0_layers(self%lay), &
-                         X_impurity_slope=self%X_impurity_slope_layers(self%lay), &
-                         external_temp_profile=self%external_temp_profile(self%lay, :))
+                         X_impurity_slope=self%X_impurity_slope_layers(self%lay))
 
          call update_layer(self=self%layers(i))
 
@@ -480,35 +441,6 @@ contains
    END SUBROUTINE compute_E_int
 
 !#######################################################################
-   ! SUBROUTINE compute_MOI(self)
-
-   !    type(planet), intent(inout) :: self
-   !    real(8) :: dr, r1, r2, rho1, rho2, moi
-   !    integer :: i, j
-
-   !    self%MOI_is = 2d0/5d0*self%layers(1)%shells(1)%mass* &
-   !                  self%layers(1)%shells(1)%radius**2
-
-   !    do i = 1, self%lay
-   !       do j = 2, self%layers(i)%shell_count
-
-   !          r1 = self%layers(i)%shells(j - 1)%radius
-   !          rho1 = self%layers(i)%shells(j - 1)%dens
-
-   !          r2 = self%layers(i)%shells(j)%radius
-   !          rho2 = self%layers(i)%shells(j)%dens
-
-   !          moi = MOI_integrand_linear(r1=r1, r2=r2, rho1=rho1, rho2=rho2)
-   !          self%MOI_is = self%MOI_is + 8.0d0/3.0d0*PI*moi
-
-   !       end do
-   !    end do
-
-   !    self%MOI_is = self%MOI_is/(self%M_surface_is*self%R_surface_is**2)
-
-   ! END SUBROUTINE compute_MOI
-
-!#######################################################################
    SUBROUTINE get_profiles(self)
 
       type(planet), intent(inout) :: self
@@ -570,132 +502,132 @@ contains
    END SUBROUTINE get_profiles
 
 !#######################################################################
-   SUBROUTINE compute_P_H2(self, average)
-!Compute hydrogen partial pressure at the CMB according to Wu et al. 2018
-!Note that in the paper it is stated, that this proceedure is only valid
-!for P_H2 < 10MPa. However, Roskosz et al. 2013 have compared the Sievert's
-!law to experimental data for nitrogen in Fe up to pressures of 20 GPa
-!at temperatures of 2000-3000 K. They find very good agreement between
-!the experiments and the predictions from Sivert's law. They find Nitrogen
-!contents of up to ~14 wt% or ~40 mol%. At 3000 K and 20 GPa the density
-!of iron is ~8.6 gcc. Using the ideal gas law to estimate the order of magnitude
-!of the partial pressure P_N at these conditions yields  up to ~ 10³MPa.
-!This implies that the Sievert's law extrapoaltes well to higher partial
-!gas pressures. It is not clear if this is also true for hydrogen in iron.
-!But given the simplicity of both system we assume that the hydrogen
-!solubility in Fe extrapolates well to higher pressures just as for nitrogen.
+!    SUBROUTINE compute_P_H2(self, average)
+! !Compute hydrogen partial pressure at the CMB according to Wu et al. 2018
+! !Note that in the paper it is stated, that this proceedure is only valid
+! !for P_H2 < 10MPa. However, Roskosz et al. 2013 have compared the Sievert's
+! !law to experimental data for nitrogen in Fe up to pressures of 20 GPa
+! !at temperatures of 2000-3000 K. They find very good agreement between
+! !the experiments and the predictions from Sivert's law. They find Nitrogen
+! !contents of up to ~14 wt% or ~40 mol%. At 3000 K and 20 GPa the density
+! !of iron is ~8.6 gcc. Using the ideal gas law to estimate the order of magnitude
+! !of the partial pressure P_N at these conditions yields  up to ~ 10³MPa.
+! !This implies that the Sievert's law extrapoaltes well to higher partial
+! !gas pressures. It is not clear if this is also true for hydrogen in iron.
+! !But given the simplicity of both system we assume that the hydrogen
+! !solubility in Fe extrapolates well to higher pressures just as for nitrogen.
 
-      type(planet), intent(inout) :: self
-      logical, intent(in), optional :: average
-      logical :: average_dummy
-      real(8) :: V_mantle, V_innermost_shell, &
-                 N_H2O_innermost_shell, N_H2O_mantle, T_CMB, R_CMB, rho_H2, test
-      integer :: i, j, lay
-      print *, 'computing pH2 in layer ', self%lay
-      if (.not. (present(average))) then
-         average_dummy = .false.
-      else
-         average_dummy = average
-      end if
-!If mantle exists, compute H2 partial pressure in the lowermost shell
-!of the mantle or the average H2 partial pressure in the entire mantle
-      if (.not. size(self%layers(2)%shells) .eq. 0) then
-         T_CMB = self%layers(2)%temp
-         R_CMB = self%layers(2)%radius
-         print *, 'Outer core exists'
-      else
-         print *, 'No outer core exists'
-         T_CMB = self%layers(1)%temp
-         R_CMB = self%layers(1)%radius
-      end if
+!       type(planet), intent(inout) :: self
+!       logical, intent(in), optional :: average
+!       logical :: average_dummy
+!       real(8) :: V_mantle, V_innermost_shell, &
+!                  N_H2O_innermost_shell, N_H2O_mantle, T_CMB, R_CMB, rho_H2, test
+!       integer :: i, j, lay
+!       print *, 'computing pH2 in layer ', self%lay
+!       if (.not. (present(average))) then
+!          average_dummy = .false.
+!       else
+!          average_dummy = average
+!       end if
+! !If mantle exists, compute H2 partial pressure in the lowermost shell
+! !of the mantle or the average H2 partial pressure in the entire mantle
+!       if (.not. size(self%layers(2)%shells) .eq. 0) then
+!          T_CMB = self%layers(2)%temp
+!          R_CMB = self%layers(2)%radius
+!          print *, 'Outer core exists'
+!       else
+!          print *, 'No outer core exists'
+!          T_CMB = self%layers(1)%temp
+!          R_CMB = self%layers(1)%radius
+!       end if
 
-!Only core exists
-      if (self%lay <= 2) then
-         self%P_H2 = 0d0
-         print *, 'No mantle exists'
-         self%mantle_exists = .false.
+! !Only core exists
+!       if (self%lay <= 2) then
+!          self%P_H2 = 0d0
+!          print *, 'No mantle exists'
+!          self%mantle_exists = .false.
 
-      else
-         ! No lower mantle
-         if (self%layers(3)%shells(1)%volume .eq. 0d0) then
-            print *, 'Setting lay to 4'
-            lay = 4
-         else
-            lay = 3
-         end if
-         V_innermost_shell = 4d0/3d0*PI*(self%layers(lay)%shells(1)%radius**3 - &
-                                         R_CMB**3)
-         N_H2O_innermost_shell = self%layers(lay)%shells(1)%N_H2O
-         N_H2O_innermost_shell = self%layers(lay)%shells(1)%indigenous_mass
-         !N_H2O_innermost_shell = N_H2O_innermost_shell * 2d-1/(mH*2d0+mO)
-         V_mantle = 4d0/3d0*PI*(self%layers(4)%radius**3 - R_CMB**3)
-         N_H2O_mantle = 0d0
+!       else
+!          ! No lower mantle
+!          if (self%layers(3)%shells(1)%volume .eq. 0d0) then
+!             print *, 'Setting lay to 4'
+!             lay = 4
+!          else
+!             lay = 3
+!          end if
+!          V_innermost_shell = 4d0/3d0*PI*(self%layers(lay)%shells(1)%radius**3 - &
+!                                          R_CMB**3)
+!          N_H2O_innermost_shell = self%layers(lay)%shells(1)%N_H2O
+!          N_H2O_innermost_shell = self%layers(lay)%shells(1)%indigenous_mass
+!          !N_H2O_innermost_shell = N_H2O_innermost_shell * 2d-1/(mH*2d0+mO)
+!          V_mantle = 4d0/3d0*PI*(self%layers(4)%radius**3 - R_CMB**3)
+!          N_H2O_mantle = 0d0
 
-         !Comptue the average water content in the mantle
-         if (average_dummy) then
-            do i = 3, 4
-               do j = 1, self%layers(i)%shell_count
-                  N_H2O_mantle = N_H2O_mantle + self%layers(i)%shells(j)%N_H2O
-               end do
-            end do
+!          !Comptue the average water content in the mantle
+!          if (average_dummy) then
+!             do i = 3, 4
+!                do j = 1, self%layers(i)%shell_count
+!                   N_H2O_mantle = N_H2O_mantle + self%layers(i)%shells(j)%N_H2O
+!                end do
+!             end do
 
-            self%P_H2 = N_H2O_mantle*NA*kB*T_CMB/V_mantle
-            rho_H2 = N_H2O_mantle*mH*2d0/V_mantle
+!             self%P_H2 = N_H2O_mantle*NA*kB*T_CMB/V_mantle
+!             rho_H2 = N_H2O_mantle*mH*2d0/V_mantle
 
-            !Compute the partial pressure in the lowermost shell
-         else
-            self%P_H2 = N_H2O_innermost_shell*NA*kB*T_CMB/ &
-                        V_innermost_shell
-            rho_H2 = N_H2O_innermost_shell*mH*2d0/V_innermost_shell
-         end if
-!~         print *, 'rho_H2 =', rho_H2
-         !Use van der Waal equation to estimate partial H2 pressure. Note that
-         !using the IGL can yield deviations in the resulting hydrogen content
-         !in the core of up to ~50% for 0-10 earth mass planets.
-         self%P_H2 = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
-!~         print *, 'P_H2 =', self%P_H2
-!~         print *, 'T_CMB =', T_CMB
-         !This is a stupid way to prevent P_H2 < 0 in the case where eps_H2O = 0
-         !and large X_impurity. Since impurities are currently only intruduced
-         !for the anhydrous case this is kinda enough at this point. (But it's
-         !still stupid!)
-         self%P_H2 = self%P_H2*self%eps_H2O
+!             !Compute the partial pressure in the lowermost shell
+!          else
+!             self%P_H2 = N_H2O_innermost_shell*NA*kB*T_CMB/ &
+!                         V_innermost_shell
+!             rho_H2 = N_H2O_innermost_shell*mH*2d0/V_innermost_shell
+!          end if
+! !~         print *, 'rho_H2 =', rho_H2
+!          !Use van der Waal equation to estimate partial H2 pressure. Note that
+!          !using the IGL can yield deviations in the resulting hydrogen content
+!          !in the core of up to ~50% for 0-10 earth mass planets.
+!          self%P_H2 = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
+! !~         print *, 'P_H2 =', self%P_H2
+! !~         print *, 'T_CMB =', T_CMB
+!          !This is a stupid way to prevent P_H2 < 0 in the case where eps_H2O = 0
+!          !and large X_impurity. Since impurities are currently only intruduced
+!          !for the anhydrous case this is kinda enough at this point. (But it's
+!          !still stupid!)
+!          self%P_H2 = self%P_H2*self%eps_H2O
 
-      end if
+!       end if
 
-      test = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
-!print *, 'N_H2O_innermost_shell =', N_H2O_innermost_shell
-!print *, 'V_innermost_shell =', V_innermost_shell
-!print *, 'P_H2 =', self%P_H2
-!print *, 'test P_H2 =', test
-!print *, 'deviation =', (sqrt(test)-sqrt(self%P_H2))/sqrt(self%P_H2)
-   END SUBROUTINE compute_P_H2
+!       test = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
+! !print *, 'N_H2O_innermost_shell =', N_H2O_innermost_shell
+! !print *, 'V_innermost_shell =', V_innermost_shell
+! !print *, 'P_H2 =', self%P_H2
+! !print *, 'test P_H2 =', test
+! !print *, 'deviation =', (sqrt(test)-sqrt(self%P_H2))/sqrt(self%P_H2)
+!    END SUBROUTINE compute_P_H2
 
 !#######################################################################
-   SUBROUTINE compute_xi_H_core(self)
-!Compute molar hydrogen abundance in the core according to Wu et al. 2018
+!    SUBROUTINE compute_xi_H_core(self)
+! !Compute molar hydrogen abundance in the core according to Wu et al. 2018
 
-      type(planet), intent(inout) :: self
-      real(8) :: T_CMB
+!       type(planet), intent(inout) :: self
+!       real(8) :: T_CMB
 
-      T_CMB = self%layers(2)%temp
+!       T_CMB = self%layers(2)%temp
 
-      call compute_P_H2(self=self)
+!       call compute_P_H2(self=self)
 
-!Compute parameter x in Wu et al 2018: (x/2+1) Fe + x/2 H2O
-!P0 is 1 bar
-      self%xi_H_core = sqrt(self%P_H2/1d5)*exp((-31.8d3 - T_CMB*38.1d0)/(Rgas*T_CMB))
+! !Compute parameter x in Wu et al 2018: (x/2+1) Fe + x/2 H2O
+! !P0 is 1 bar
+!       self%xi_H_core = sqrt(self%P_H2/1d5)*exp((-31.8d3 - T_CMB*38.1d0)/(Rgas*T_CMB))
 
-!self%xi_H_core = 2d-1
+! !self%xi_H_core = 2d-1
 
-!Here the actual molar abundance xi_H of H in the core is computed
-!With this the core composition is (1-xi_H) Fe + xi_H H
-!It is defined as H/(H+Fe)
-      self%xi_H_core = self%xi_H_core/(self%xi_H_core + 1d0)!*self%eps_H2O
+! !Here the actual molar abundance xi_H of H in the core is computed
+! !With this the core composition is (1-xi_H) Fe + xi_H H
+! !It is defined as H/(H+Fe)
+!       self%xi_H_core = self%xi_H_core/(self%xi_H_core + 1d0)!*self%eps_H2O
 
-      self%xi_H_core = 0d0
-      print *, 'remember: xi_H_core is set to 0 for Venus!'
-   END SUBROUTINE compute_xi_H_core
+!       self%xi_H_core = 0d0
+!       print *, 'remember: xi_H_core is set to 0 for Venus!'
+!    END SUBROUTINE compute_xi_H_core
 
 !#######################################################################
    SUBROUTINE remove_stuff(self)
@@ -1134,33 +1066,6 @@ contains
                !Compute temperature after temperature jump
                deltaT = self%temp_jumps(self%lay)
                temp = max(temp - deltaT, T_zero)
-!~                 Update Si# and Fe# in the mantle from metal-silicate partitioning assuming
-!~                 chemical equilibrium between core and mantle. If CS-model
-!~                 is deactivated the mantle composition is computed from the inputs
-!~                 Si_number_layers and Fe_number_layers
-               ! if (self%core_segregation_model) then
-               !    if (self%lay == 9) then
-               !       print *, ''
-               !       print *, 'Doing the CS shit.... !!!!!!!'
-               !       print *, ''
-               !       print *, 'Si#, Fe# before:', self%Si_number_layers(3), self%Fe_number_layers(3)
-               !       !~                         print *, 'fractions =', self%fractions%axes(self%lay)%real_array
-               !       !~                         print *, 'fractions =', self%fractions%axes(3)%real_array
-               !       !~                         print *, 'xi_all core =', self%xi_all_core
-               !       self%Si_number_layers(3) = Si_number_mantle(self%T_CS, &
-               !                                                   self%P_CS, &
-               !                                                   self%xi_all_core)
-               !       self%Si_number_layers(4) = self%Si_number_layers(3)
-               !       print *, 'computed Si# in the mantle:', self%Si_number_layers(self%lay + 1)
-
-               !       self%Fe_number_layers(3) = Fe_number_mantle(self%T_CS, &
-               !                                                   self%P_CS, &
-               !                                                   self%xi_all_core)
-               !       !self%Fe_number_layers(3) = 1d-1
-               !       self%Fe_number_layers(4) = self%Fe_number_layers(3)
-               !       print *, 'computed Fe# in the mantle:', self%Fe_number_layers(self%lay + 1)
-               !    end if
-               ! end if
 
                ! print *, "Instantiating layer ", self%lay + 1
                !Initiate next layer lay+1
@@ -1191,8 +1096,7 @@ contains
                                xi_H=self%xi_H_layers(self%lay + 1), &
                                xi_Stv=self%xi_Stv_layers(self%lay + 1), &
                                X_impurity_0=self%X_impurity_0_layers(self%lay + 1), &
-                               X_impurity_slope=self%X_impurity_slope_layers(self%lay + 1), &
-                               external_temp_profile=self%external_temp_profile(self%lay + 1, :))
+                               X_impurity_slope=self%X_impurity_slope_layers(self%lay + 1))
 
                self%n_shells_layers(self%lay) = self%layers(self%lay)%shell_count
                self%lay = self%lay + 1
@@ -1304,15 +1208,14 @@ contains
       trans = .false.
       sh = self%layers(self%lay)%shell_count
 
-!Note that last and current shell here refer to the already constructed
-!shells. As after construction the new shell is already initiated, the
-!last two constructed shells are sh-1 and sh-2
+      !Note that last and current shell here refer to the already constructed
+      !shells. As after construction the new shell is already initiated, the
+      !last two constructed shells are sh-1 and sh-2
       last_shell = self%layers(self%lay)%shells(sh - 2)
       current_shell = self%layers(self%lay)%shells(sh - 1)
-!print *, 'trans before =', trans
-!Check if between last shell and current shell a subphase transition
-!has occured
-!print *, 'contents =', last_shell%contents
+
+      !Check if between last shell and current shell a subphase transition
+      !has occured
       do i = 1, size(last_shell%contents)
          ph1 = last_shell%mixture%units(i)%phase
          ph2 = current_shell%mixture%units(i)%phase
@@ -1321,58 +1224,37 @@ contains
             trans = .true.
          end if
       end do
-!print *, 'trans after =', trans
-!If subphase transition is found, perform the shell refinement
+
+      !If subphase transition is found, perform the shell refinement
       if (trans) then
          if (.not. self%subphase_refine_inhibit) then
 
             self%layers(self%lay)%overshoot = .true.
-!~                 print *, 'Perform subphase refinement between shells', sh, sh-1
 
             call remove_stuff(self=self)
-            !self%layers(self%lay)%overshoot = .true.
-
             call reset_shell(self=self%layers(self%lay)%shells(sh))
-            !call reset_shell(self=self%layers(self%lay)%shells(sh-1))
-!~                 print *, 'old sh =', sh
+
             sh = sh - 1
             self%layers(self%lay)%shell_count = sh
-!~                 print *, 'new sh =', sh
 
             call reset_shell(self=self%layers(self%lay)%shells(sh))
-
             call update_layer(self=self%layers(self%lay))
 
             new_dr = self%layers(self%lay)%dr/real(self%subphase_res)
 
             do i = 1, self%subphase_res
-!~                 print *, 'i =', i
                self%shell_iteration_count = self%shell_iteration_count + 1
 
                !Force dr to be the refined value
                self%layers(self%lay)%dr = new_dr
                sh = self%layers(self%lay)%shell_count
-!~                         print *, 'Constructing shell:', sh
                call construct_layer(self=self%layers(self%lay))
-
                call update_shell(self=self%layers(self%lay)%shells(sh), update_grads=ug, &
                                  compute_mix=cm)
+
                !call update_layer(self=self%layers(self%lay))
-               !print *, 'dens =', self%layers(self%lay)%shells(sh)%mixture%dens
                call merge_shells(self=self%layers(self%lay)%shells(sh + 1), &
                                  other=self%layers(self%lay)%shells(sh))
-
-!                        print *, ''
-!                        print *, 'Shell:', self%layers(self%lay)%shell_count
-
-!                        print *, 'r=', self%layers(self%lay)%radius, &
-!                        'm=', self%layers(self%lay)%mass, &
-!                        'rho=', self%layers(self%lay)%dens, &
-!                        'T=', self%layers(self%lay)%temp, &
-!                        'P=', self%layers(self%lay)%pres, &
-!                        'layer mass =', self%layers(self%lay)%indigenous_mass, &
-!                        'dr =', new_dr
-!                        print *, 'check rho =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%dens
 
                call add_stuff(self=self)
                layer_before = self%lay
@@ -1394,8 +1276,6 @@ contains
                end if
 
             end do
-            !self%layers(self%lay)%bisec = .true.
-            !self%layers(self%lay)%change_bisec = .false.
          end if
       end if
 
@@ -1502,12 +1382,6 @@ contains
                if (self%lay < 3) then
                   self%subphase_refine_inhibit = .true.
                end if
-
-!~       if (self%layers(self%lay)%shell_count.gt.2)then
-!~                 if(.not.self%subphase_refine_inhibit)then
-!~                         call subphase_refine(self=self)
-!~                 endif
-!~       endif
 
                self%bisec = self%layers(self%lay)%bisec
 

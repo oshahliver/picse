@@ -14,7 +14,7 @@ iterator = planet_iterator.Toolkit()
 total_mass = 0.1
 
 t0 = time.time()
-valid_compositions, pres_core_seg = workbench.create_core_mantle_composition(total_mass, num_models=100)
+valid_compositions, pres_core_seg = workbench.create_core_mantle_composition(total_mass, num_models=10)
 t1 = time.time()
 
 # Compute outer core material fractions
@@ -38,7 +38,7 @@ milliseconds = int((elapsed_time - minutes * 60 - seconds) * 1000)
 print(f"Elapsed Time: {minutes} min, {seconds} sec, {milliseconds} ms")
 
 planetary_params = [{"M_surface_should":1.0,
-                    "T_surface_should": 1800.0,
+                    "T_surface_should": 1500.0,
                     "Mg_number_should": 0.5162,
                     "Fe_number_mantle": vc[0],
                     "Si_number_mantle": vc[1],
