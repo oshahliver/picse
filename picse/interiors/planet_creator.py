@@ -6,7 +6,7 @@ This is a temporary script file.
 """
 
 import itertools
-from picse.utils import fortfunctions
+from picse.utils.fortfunctions import functionspy as fortpy
 
 from picse.utils.print_tools.print_tools import print_planet
 from picse.utils.plot_tools.plot_tools import plot_structure
@@ -500,7 +500,7 @@ class Planet:
                 FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
                 SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
                 n = 3
-                core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = self.M_surface_should,
+                core_mass = fortpy.compute_core_mass(m_tot = self.M_surface_should,
                                                                         m_ocean = self.M_surface_should*10**self.ocean_fraction_should,
                                                                         femg = FeMg,
                                                                         simg = SiMg,
@@ -586,7 +586,7 @@ class Planet:
         FeMg = (1.0 - self.Mg_number_should) / self.Mg_number_should
         SiMg = self.Si_number_mantle / (1.0 - self.Si_number_mantle)
 
-        core_mass = fortfunctions.functionspy.compute_core_mass(m_tot = self.M_surface_should,
+        core_mass = fortpy.compute_core_mass(m_tot = self.M_surface_should,
                                                                 m_ocean = self.M_surface_should*10**self.ocean_fraction_should,
                                                                 femg = FeMg,
                                                                 simg = SiMg,

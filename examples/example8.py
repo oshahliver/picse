@@ -14,7 +14,7 @@ iterator = planet_iterator.Toolkit()
 total_mass = 0.1
 
 t0 = time.time()
-valid_compositions, pres_core_seg = workbench.create_core_mantle_composition(total_mass, num_models=10)
+valid_compositions, pres_core_seg = workbench.create_core_mantle_composition(total_mass, num_models=100)
 t1 = time.time()
 
 # Compute outer core material fractions
