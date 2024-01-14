@@ -767,6 +767,7 @@ contains
       !total core mass assuming pure iron in the core. The outer core mass
       !in layer_masses is set to the core mass if only outer core exists.
       reldev = abs(self%layers(1)%indigenous_mass/m_earth - self%layer_masses(2))/self%layer_masses(1)
+
       !Case 1: Total core mass already reached in inner core. Outer core mass
       !must be set to inner core mass so that is skipped.
       if (reldev < eps_layer) then
@@ -781,44 +782,8 @@ contains
 
          !If redistribution of lighter elements is accoutned for:
          !Outer core fractions need to be updated.
-
-         ! #########################################
-         !THIS STUFF HERE DOES NOT WORK YET!
          else
-!~                 print *, 'layer_dims in update_core_mass =', self%layer_dims
-!~                 print *, 'OC ambient mol fractions before =', self%ambient_mixtures(2)%fractions
-!~                 print *, 'OC ambient wt fractions before =', self%ambient_mixtures(2)%weight_fractions
-            !Convert material fractions to atomic mole fractions
-            dummy = mat2at_core(xi=self%ambient_mixtures(2)%fractions, n_mats=4)
-!~                 print *, 'dummy =', dummy
-            !Convert atomic mole fractions to atomic wt fractions
-            dummy = at2wt_core(at=dummy, m=masses, n_mats=4)
-!~                 print *, 'dummy =', dummy
-            !Rescale atomic wt fractions of S, Si, and O. Note that
-            !the Fe content dummy(1) does not have an effect since the
-            !fractions are normalized to unity anyways. Wt fractions are scaled
-            !as wt_new = wt_old * M_Core / M_IC
-            do i = 1, self%layer_dims(2) - 1
-               dummy(i + 1) = dummy(i + 1)*self%layer_masses(2)/ &
-                              (self%layers(1)%indigenous_mass/m_earth)
-            end do
-!~                 print *, 'dummy =', dummy
-            !Compute new atomic mole fractions
-            dummy = xi_general(eta=dummy, m=masses, n_mats=4)
-!~                 print *, 'dummy =', dummy
-            dummy_1 = at2mat_max(at=dummy, n_mats=4)
-!~                 print *, 'dummy 1 =', dummy_1
-!                self%ambient_mixtures(2)%fractions = dummy_1
-!~                 print *, 'OC ambient wt fractions before fct =', self%ambient_mixtures(2)%weight_fractions
-
-!~                 print *, 'OC ambient mol fractions after =', self%ambient_mixtures(2)%fractions
-!~                 print *, 'OC ambient wt fractions after =', self%ambient_mixtures(2)%weight_fractions
-            !call compute_mixture(self = self%ambient_mixtures(2))
-            self%rho0_layers(2) = self%ambient_mixtures(2)%dens
-!~                 print *, 'OC fractions before =', self%fractions%axes(2)%real_array
-            !self%fractions%axes(2)%real_array = self%ambient_mixtures(2)%fractions
-!~                 print *, 'OC fractions after =', self%fractions%axes(2)%real_array
-         ! #########################################
+            ! TODO. Implement redistribution of lighter elements
          end if
 
       end if
@@ -833,13 +798,13 @@ contains
       type(planet), intent(inout) :: self
       integer, intent(in) :: lay
       integer, intent(in) :: skip
-!~ print *, 'get layerconstraints: skip / lay =', skip, lay
-!Indigenous mass
+      
+      !Indigenous mass
       if (self%layer_constraints(lay + skip) == 0) then
          self%constraint_value_is = &
             self%layers(lay)%indigenous_mass
 
-         !if the indigenous mass is probed in the next layer, it is currently
+         !If the indigenous mass is probed in the next layer, it is currently
          !zero if it is checked from the bisection of the previous layer.
          !this has to be set manually as the next layer does not exist yet.
          if (skip .gt. 0) then
@@ -852,39 +817,33 @@ contains
 
          self%direction = 1
 
-!Enclosed mass
+      !Enclosed mass
       else if (self%layer_constraints(lay + skip) == 1) then
          self%constraint_value_is = &
             self%layers(lay)%mass
 
-!  self%constraint_value_should = &
-!  (self%layer_masses(1)+self%layer_masses(2)+ &
-!  self%layer_masses(4))*m_earth
          self%constraint_value_should = self%layer_masses(lay + skip)*m_earth
-
          self%direction = 1
 
-!Radius
+      !Radius
       else if (self%layer_constraints(lay + skip) == 2) then
          self%constraint_value_is = &
             self%layers(lay)%radius
 
          self%constraint_value_should = &
             self%layer_radii(lay + skip)*r_earth
-
          self%direction = 1
 
-!Pressure
+      !Pressure
       else if (self%layer_constraints(lay + skip) == 3) then
          self%constraint_value_is = &
             self%layers(lay)%pres
 
          self%constraint_value_should = &
             self%layer_pres(lay + skip)
-
          self%direction = -1
 
-!Temperature
+      !Temperature
       else if (self%layer_constraints(lay + skip) == 4) then
          self%constraint_value_is = &
             self%layers(lay)%temp
@@ -912,19 +871,19 @@ contains
       real(8) :: a, b, c, r
 
       call get_layer_constraint(self=self, lay=self%lay, skip=0)
-! print *, 'Layer constraint should =', self%constraint_value_should
-! print *, 'Layer constraint is =', self%constraint_value_is
-! print *, 'layermasses =', self%layer_masses
+      ! print *, 'Layer constraint should =', self%constraint_value_should
+      ! print *, 'Layer constraint is =', self%constraint_value_is
+      ! print *, 'layermasses =', self%layer_masses
       reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                self%constraint_value_should
-! print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
-!Overshoot
+      ! print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
+      !Overshoot
       if (reldev*self%direction .lt. -eps_layer) then
 
-   ! print *, 'Overshoot in minor bisection.'
-   ! print *, 'Layer constraint type =', self%layer_constraints(self%lay)
-   ! print *, 'Layer constraint should =', self%constraint_value_should
-   ! print *, 'Layer constraint is =', self%constraint_value_is
+         ! print *, 'Overshoot in minor bisection.'
+         ! print *, 'Layer constraint type =', self%layer_constraints(self%lay)
+         ! print *, 'Layer constraint should =', self%constraint_value_should
+         ! print *, 'Layer constraint is =', self%constraint_value_is
          call remove_stuff(self=self)
          self%layers(self%lay)%overshoot = .true.
          sh = self%layers(self%lay)%shell_count
@@ -933,7 +892,6 @@ contains
          call reset_shell(self=self%layers(self%lay)%shells(sh))
 
          sh = sh - 1
-!~   print *, 'Reconstruct shell =', sh
          self%layers(self%lay)%shell_count = sh
 
          call reset_shell(self=self%layers(self%lay)%shells(sh))
@@ -946,9 +904,6 @@ contains
                                      X_O=self%X_all_core(5), &
                                      X_S=self%X_all_core(3))
             self%layer_temps(1) = self%T_ICB
-!~                 print *, 'Update in minor bisection'
-!~                 print *, 'Tm_Fe / P =', self%T_ICB, self%layers(self%lay)%pres*1d-9
-!~                 print *, 'T =', self%layers(self%lay)%temp
          end if
 
          self%layers(self%lay)%dr = self%layers(self%lay)%dr*0.5d0
@@ -962,7 +917,7 @@ contains
             self%shell_iteration = .false.
          end if
 
-!Layer transition reached
+      ! Layer transition reached
       else if (abs(reldev) .lt. eps_layer) then
          ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
          ! print *, 'Layer constraint should =', self%constraint_value_should
@@ -973,7 +928,6 @@ contains
             ! print *, 'layermasses after update core mass =', self%layer_masses
          end if
 
-!~   print *, 'layermasses(1) after update =', self%layer_masses(1)
          self%layer_complete = .true.
          self%shell_iteration = .false.
          self%change_bisec = .true.
@@ -1141,13 +1095,13 @@ contains
 
       end if
 
-!Overshoot
+      !Overshoot
       if (direction(1)*(param_should - param_is)/param_should < direction(2)*eps &
           .or. param_is .lt. 0.0d0) then
-! print *, ''
-! print *, 'Overshoot in major bisection in layer', self%lay
-! print *, 'Major constraint should =', param_should
-! print *, 'Major constraint is =', param_is
+         ! print *, ''
+         ! print *, 'Overshoot in major bisection in layer', self%lay
+         ! print *, 'Major constraint should =', param_should
+         ! print *, 'Major constraint is =', param_is
          call remove_stuff(self=self)
 
          sh = self%layers(self%lay)%shell_count
@@ -1158,7 +1112,6 @@ contains
          self%layers(self%lay)%shell_count = sh
 
          call reset_shell(self=self%layers(self%lay)%shells(sh))
-
          call update_layer(self=self%layers(self%lay))
 
          self%layers(self%lay)%overshoot = .true.
@@ -1166,7 +1119,7 @@ contains
          self%layers(self%lay)%bisec = .true.
          self%layers(self%lay)%change_bisec = .false.
 
-!Surface reached
+      !Surface reached
       elseif (abs(param_should - param_is)/param_should .lt. eps) then
          ! print *, 'Surface reached!'
 
@@ -1219,7 +1172,6 @@ contains
       do i = 1, size(last_shell%contents)
          ph1 = last_shell%mixture%units(i)%phase
          ph2 = current_shell%mixture%units(i)%phase
-         !print *,'ph1, ph2 =', ph1, ph2
          if (ph1 .ne. ph2) then
             trans = .true.
          end if
@@ -1311,12 +1263,12 @@ contains
          self%layer_iteration = .true.
 
          do while (self%layer_iteration)
-   !   print *, '########################'
-   !   print *, 'Layer:', self%lay
-   !   print *, '########################'
-   !   print *, 'n shell ocean =', self%layers(5)%shell_count
-   !   print *, 'n shell outer core =', self%layers(2)%shell_count
-   !   print *, 'actual layermasses:', self%layer_masses(1), self%layer_masses(2)
+      !   print *, '########################'
+      !   print *, 'Layer:', self%lay
+      !   print *, '########################'
+      !   print *, 'n shell ocean =', self%layers(5)%shell_count
+      !   print *, 'n shell outer core =', self%layers(2)%shell_count
+      !   print *, 'actual layermasses:', self%layer_masses(1), self%layer_masses(2)
             
             self%layer_iteration_count = self%layer_iteration_count + 1
             self%shell_iteration = .true.
@@ -1331,27 +1283,6 @@ contains
 
                self%skip_bisec = .false.
                call construct_layer(self=self%layers(self%lay))
-      !  print *, ''
-      !  print *, 'Shell:', self%layers(self%lay)%shell_count
-
-      ! print *, 'r=', self%layers(self%lay)%radius, &
-      !  'm=', self%layers(self%lay)%mass, &
-      !  'rho=', self%layers(self%lay)%dens, &
-      !  'T=', self%layers(self%lay)%temp, &
-      !  'P (GPa)=', self%layers(self%lay)%pres*1d-9, &
-      !  'layer mass =', self%layers(self%lay)%indigenous_mass, &
-      !  'dr =', self%layers(self%lay)%dr
-!      print *, 'check rho =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%dens
-               !print *, 'xi_H2O =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%xi_H2O
-               !print *, 'xi_H =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%xi_H
-!!!           print *, 'MOI factor =', self%layers(self%lay)%MOI/&
-!!!           self%layers(self%lay)%mass/self%layers(self%lay)%radius**2
-!      print *, 'grads =', self%layers(self%lay)%gradients
-!      print *, 'gammaG0_layers =', self%gammaG0_layers
-!~         print *, 'fracs =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%fractions
-!~         print *, 'conts =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%contents
-!~         print *, 'weight fracs =', self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)%weight_fractions
-
                call add_stuff(self=self)
 
                !Compute the melting temperature of iron at current pressure
@@ -1361,15 +1292,13 @@ contains
                                            X_O=self%X_all_core(5), &
                                            X_S=self%X_all_core(3))
                   self%layer_temps(1) = self%T_ICB
-!~                         print *, 'Tm_Fe / P =', self%T_ICB, self%layers(self%lay)%pres*1d-9
-!~                         print *, 'T =', self%layers(self%lay)%temp
                end if
 
                !Compute Olivine-Perovskite transition pressure
                self%P_MTZ = P_Ol_Pv(T=self%layers(self%lay)%temp)
                self%layer_pres(3) = self%P_MTZ
 
-!~       !Only the major and minor bisection can set overshoot=.true.
+               !Only the major and minor bisection can set overshoot=.true.
                !If neither does, it must be false, so it is set to false. If the
                !integration that has been performed in this step did run into
                !an overshoot, it must be set to .true. for the next step, not the
@@ -1501,7 +1430,7 @@ contains
       ! print *, 'Integration terminated in layer ', self%lay
       ! print *, 'at shell ', self%n_shells
 
-!Check if individual layers exist
+      !Check if individual layers exist
       if (size(self%layers(1)%shells) .eq. 0) then
          self%inner_core_exists = .false.
       end if
