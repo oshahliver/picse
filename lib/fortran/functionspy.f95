@@ -761,6 +761,136 @@ contains
 
 !    END SUBROUTINE update_all_fractions
 
+
+!#######################################################################
+!    SUBROUTINE compute_P_H2(self, average)
+! !Compute hydrogen partial pressure at the CMB according to Wu et al. 2018
+! !Note that in the paper it is stated, that this proceedure is only valid
+! !for P_H2 < 10MPa. However, Roskosz et al. 2013 have compared the Sievert's
+! !law to experimental data for nitrogen in Fe up to pressures of 20 GPa
+! !at temperatures of 2000-3000 K. They find very good agreement between
+! !the experiments and the predictions from Sivert's law. They find Nitrogen
+! !contents of up to ~14 wt% or ~40 mol%. At 3000 K and 20 GPa the density
+! !of iron is ~8.6 gcc. Using the ideal gas law to estimate the order of magnitude
+! !of the partial pressure P_N at these conditions yields  up to ~ 10³MPa.
+! !This implies that the Sievert's law extrapoaltes well to higher partial
+! !gas pressures. It is not clear if this is also true for hydrogen in iron.
+! !But given the simplicity of both system we assume that the hydrogen
+! !solubility in Fe extrapolates well to higher pressures just as for nitrogen.
+
+!       type(planet), intent(inout) :: self
+!       logical, intent(in), optional :: average
+!       logical :: average_dummy
+!       real(8) :: V_mantle, V_innermost_shell, &
+!                  N_H2O_innermost_shell, N_H2O_mantle, T_CMB, R_CMB, rho_H2, test
+!       integer :: i, j, lay
+!       print *, 'computing pH2 in layer ', self%lay
+!       if (.not. (present(average))) then
+!          average_dummy = .false.
+!       else
+!          average_dummy = average
+!       end if
+! !If mantle exists, compute H2 partial pressure in the lowermost shell
+! !of the mantle or the average H2 partial pressure in the entire mantle
+!       if (.not. size(self%layers(2)%shells) .eq. 0) then
+!          T_CMB = self%layers(2)%temp
+!          R_CMB = self%layers(2)%radius
+!          print *, 'Outer core exists'
+!       else
+!          print *, 'No outer core exists'
+!          T_CMB = self%layers(1)%temp
+!          R_CMB = self%layers(1)%radius
+!       end if
+
+! !Only core exists
+!       if (self%lay <= 2) then
+!          self%P_H2 = 0d0
+!          print *, 'No mantle exists'
+!          self%mantle_exists = .false.
+
+!       else
+!          ! No lower mantle
+!          if (self%layers(3)%shells(1)%volume .eq. 0d0) then
+!             print *, 'Setting lay to 4'
+!             lay = 4
+!          else
+!             lay = 3
+!          end if
+!          V_innermost_shell = 4d0/3d0*PI*(self%layers(lay)%shells(1)%radius**3 - &
+!                                          R_CMB**3)
+!          N_H2O_innermost_shell = self%layers(lay)%shells(1)%N_H2O
+!          N_H2O_innermost_shell = self%layers(lay)%shells(1)%indigenous_mass
+!          !N_H2O_innermost_shell = N_H2O_innermost_shell * 2d-1/(mH*2d0+mO)
+!          V_mantle = 4d0/3d0*PI*(self%layers(4)%radius**3 - R_CMB**3)
+!          N_H2O_mantle = 0d0
+
+!          !Comptue the average water content in the mantle
+!          if (average_dummy) then
+!             do i = 3, 4
+!                do j = 1, self%layers(i)%shell_count
+!                   N_H2O_mantle = N_H2O_mantle + self%layers(i)%shells(j)%N_H2O
+!                end do
+!             end do
+
+!             self%P_H2 = N_H2O_mantle*NA*kB*T_CMB/V_mantle
+!             rho_H2 = N_H2O_mantle*mH*2d0/V_mantle
+
+!             !Compute the partial pressure in the lowermost shell
+!          else
+!             self%P_H2 = N_H2O_innermost_shell*NA*kB*T_CMB/ &
+!                         V_innermost_shell
+!             rho_H2 = N_H2O_innermost_shell*mH*2d0/V_innermost_shell
+!          end if
+! !~         print *, 'rho_H2 =', rho_H2
+!          !Use van der Waal equation to estimate partial H2 pressure. Note that
+!          !using the IGL can yield deviations in the resulting hydrogen content
+!          !in the core of up to ~50% for 0-10 earth mass planets.
+!          self%P_H2 = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
+! !~         print *, 'P_H2 =', self%P_H2
+! !~         print *, 'T_CMB =', T_CMB
+!          !This is a stupid way to prevent P_H2 < 0 in the case where eps_H2O = 0
+!          !and large X_impurity. Since impurities are currently only intruduced
+!          !for the anhydrous case this is kinda enough at this point. (But it's
+!          !still stupid!)
+!          self%P_H2 = self%P_H2*self%eps_H2O
+
+!       end if
+
+!       test = rho_H2*Rgas*T_CMB/(2d0*mH - rho_H2*26.61d-6) - rho_H2**2*24.76d-3/(2d0*mH)**2
+! !print *, 'N_H2O_innermost_shell =', N_H2O_innermost_shell
+! !print *, 'V_innermost_shell =', V_innermost_shell
+! !print *, 'P_H2 =', self%P_H2
+! !print *, 'test P_H2 =', test
+! !print *, 'deviation =', (sqrt(test)-sqrt(self%P_H2))/sqrt(self%P_H2)
+!    END SUBROUTINE compute_P_H2
+
+!#######################################################################
+!    SUBROUTINE compute_xi_H_core(self)
+! !Compute molar hydrogen abundance in the core according to Wu et al. 2018
+
+!       type(planet), intent(inout) :: self
+!       real(8) :: T_CMB
+
+!       T_CMB = self%layers(2)%temp
+
+!       call compute_P_H2(self=self)
+
+! !Compute parameter x in Wu et al 2018: (x/2+1) Fe + x/2 H2O
+! !P0 is 1 bar
+!       self%xi_H_core = sqrt(self%P_H2/1d5)*exp((-31.8d3 - T_CMB*38.1d0)/(Rgas*T_CMB))
+
+! !self%xi_H_core = 2d-1
+
+! !Here the actual molar abundance xi_H of H in the core is computed
+! !With this the core composition is (1-xi_H) Fe + xi_H H
+! !It is defined as H/(H+Fe)
+!       self%xi_H_core = self%xi_H_core/(self%xi_H_core + 1d0)!*self%eps_H2O
+
+!       self%xi_H_core = 0d0
+!       print *, 'remember: xi_H_core is set to 0 for Venus!'
+!    END SUBROUTINE compute_xi_H_core
+
+
 !########################################################################
    subroutine construct_abundance_matrix(SiMg, n_mats, &
                                          YMgi, YSii, matrix, b, xiFei, additional)
