@@ -1,7 +1,7 @@
 from tabulate import tabulate
-from picse.physicalparams import r_earth, m_earth, mH2O, material_list_fort
+from picse.physicalparams import r_earth, m_earth, mH2O, material_list_fort, G, sigmaSB
 from picse.utils.function_tools import functionTools as ftool
-
+import numpy as np
 
 def print_planet(self, style=0, digits=3):
     """Prints out a simple overview of all relevant planetary parameters."""
@@ -17,10 +17,8 @@ def print_planet(self, style=0, digits=3):
             print("Major parameters:")
             print("--------------------------------")
             print(
-                "R_surface_is [R_earth]:",
-                round(self.R_surface_is / r_earth, digits),
-                "\nM_surface_is [M_earth]:",
-                round(self.M_surface_is / m_earth, digits),
+                f"R_surface_is [R_earth]: {self.R_surface_is / r_earth:.{digits}g}",
+                f"\nM_surface_is [M_earth]: {self.M_surface_is / m_earth:.{digits}g}",
                 "\nmean density [gcc]:",
                 round(self.mean_density / 1000, digits),
                 "\nT_surface_is [K]:",
@@ -48,6 +46,10 @@ def print_planet(self, style=0, digits=3):
                 # round(self.Si_number_should, digits),
                 "\nSi_number_is:",
                 round(self.Si_number_is, digits),
+                f"\nE_grav_is [U_E]: {self.E_grav_is / (3 * G * m_earth**2 / (5 * r_earth)):.{digits}g}",
+                f"\nE_int_is [U_E]: {self.E_int_is / (3 * G * m_earth**2 / (5 * r_earth)):.{digits}g}",
+                f"\nE_tot_is [U_E]: {self.E_tot_is / (3 * G * m_earth**2 / (5 * r_earth)):.{digits}g}",
+                f"\nL_int_is [L_E]: {self.L_int_is / (4*np.pi*sigmaSB*300**4*r_earth**2):.{digits}g}",    
             )
 
             try:

@@ -75,8 +75,10 @@ contains
                             mantle_exists, &
                             inner_core_exists, &
                             outer_core_exists, &
-                            energy_grav,&
-                            energy_int)
+                            E_grav_is,&
+                            E_int_is, &
+                            E_tot_is, &
+                            L_int_is)
 
       implicit none
 
@@ -143,9 +145,6 @@ contains
       real(8), intent(out) :: S_count
       real(8), intent(out) :: O_count
 
-      real(8), intent(out) :: energy_grav
-      real(8), intent(out) :: energy_int
-
       real(8), intent(out) :: ocean_frac_is
       real(8), intent(out) :: M_surface_is
       real(8), intent(out) :: P_surface_is
@@ -156,6 +155,7 @@ contains
       real(8), intent(out) :: moment_of_inertia
       real(8), intent(out) :: Si_number_mantle
       real(8), intent(out) :: xi_Fe_mantle
+      real(8), intent(out) :: E_tot_is, E_grav_is, E_int_is, L_int_is
 
       real(8), intent(out), dimension(10, 10) :: out_frac
       real(8), intent(out), dimension(size(layer_dims), 6) :: layer_properties
@@ -248,6 +248,7 @@ contains
       call get_profiles(self=pl)
       call compute_E_grav(self=pl)
       call compute_E_int(self=pl)
+      call compute_L_int(self=pl)
 
       do i = 1, 8
          do j = 1, pl%n_shells + pl%lay - 1
@@ -274,15 +275,10 @@ contains
       n_shells_layers = pl%n_shells_layers
       Si_number_mantle = pl%Si_number_layers(3)
       xi_Fe_mantle = pl%Fe_number_layers(3)
-      ! print *, "Si_number_mantle =", Si_number_mantle
-      ! print *, "Si_number =", Si_number_is
-
-! mantle_exists = pl%mantle_exists
-! inner_core_exists = pl%inner_core_exists
-! outer_core_exists = pl%outer_core_exists
-
-!~ print *, 'eosfort_wrapper: integrated up to layer ', pl%lay
-!~ print *, 'out_frac before update in eosfort_wrapper =', out_frac(2,:)
+      E_int_is = pl%E_int_is
+      E_grav_is = pl%E_grav_is
+      E_tot_is = E_int_is + E_grav_is
+      L_int_is = pl%L_int
 
 ! Update layer fractions in case composition changed
       do i = 1, pl%lay

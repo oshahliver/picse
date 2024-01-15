@@ -98,8 +98,10 @@ fortplanet_output_keys = [
     "mantle_exists",
     "inner_core_exists",
     "outer_core_exists",
-    "gravitational_energy",
-    "internal_energy",
+    "E_grav_is",
+    "E_int_is",
+    "E_tot_is",
+    "L_int_is",
 ]
 
 

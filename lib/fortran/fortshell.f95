@@ -20,7 +20,7 @@ MODULE class_shell
       real(8) :: indigenous_mass, gravity, v_esc, volume, &
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
-      real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv
+      real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv, E_grav, E_int
       real(8) :: omega, dE_grav, dr, dE_int
       real(8), dimension(3) :: external_temp_profile
       real(8), dimension(n_params_integration) :: gradients
@@ -36,7 +36,7 @@ contains
 
    SUBROUTINE init_shell(self, contents, fractions, n_mats, T, P, eps_H2O, &
                          Fe_number, lay, m, r, tempType, gammaG0, alloc, eps_T_zero, adiabatType, &
-                         q, rho0, eps_Al, Si_number, MOI, omega, xi_H, xi_Stv, composition_gradients, &
+                         q, rho0, eps_Al, Si_number, MOI, E_grav, E_int, omega, xi_H, xi_Stv, composition_gradients, &
                          external_temp_profile)
 
       logical, optional, intent(in) :: alloc
@@ -49,7 +49,7 @@ contains
                                                           composition_gradients
       real(8), intent(in), optional :: gammaG0, q, rho0, omega, xi_H, xi_Stv
       real(8), intent(in), optional :: T, P, eps_H2O, Fe_number, m, r, &
-                                       Si_number, MOI
+                                       Si_number, MOI, E_grav, E_int
       real(8), intent(in), optional :: eps_T_zero, eps_Al
       integer :: i
       real(8), dimension(3), optional :: external_temp_profile
@@ -150,6 +150,8 @@ contains
          self%Fe_number = Fe_number
          self%Si_number = Si_number
          self%MOI = MOI
+         self%E_grav = E_grav
+         self%E_int = E_int
          self%volume = 0d0
          self%timer = 0.0
          self%xi_Stv = xi_Stv
@@ -231,6 +233,8 @@ contains
          self%initials%real_vals(16) = self%MOI
          self%initials%real_vals(17) = self%omega
          self%initials%real_vals(18) = self%xi_H
+         self%initials%real_vals(19) = self%E_grav
+         self%initials%real_vals(20) = self%E_int
 
 !If shell is being reset, don-t allocate everything and don-t
 !update all parameters. Just reset all parameters to their original
@@ -254,6 +258,8 @@ contains
          self%MOI = self%initials%real_vals(16)
          self%omega = self%initials%real_vals(17)
          self%xi_H = self%initials%real_vals(18)
+         self%E_grav = self%initials%real_vals(19)
+         self%E_int = self%initials%real_vals(20)
          self%fractions(1:self%n_mats) = self%initials%real_arr(19, 1:self%n_mats)
          self%weight_fractions(1:self%n_mats) = self%initials%real_arr(20, 1:self%n_mats)
          self%indigenous_mass = 0.0d0
@@ -420,6 +426,8 @@ contains
       y(4) = self%dens
       y(5) = self%MOI
       y(6) = self%weight_fractions(n_mats)
+      y(7) = self%E_grav
+      y(8) = self%E_int
 
       call gradients(grads=self%gradients, &
                      r=self%radius, &
@@ -528,14 +536,15 @@ contains
 
       type(shell), intent(inout) :: self
 
-!Core
+      !Core
       if (self%lay < 3) then
          self%dE_int = self%indigenous_mass*self%temp*5d2
-!Mantle
+      
+      !Mantle
       elseif (self%lay > 2 .and. self%lay > 5) then
          self%dE_int = self%indigenous_mass*self%temp*1d3
 
-!Hydrosphere
+      !Hydrosphere
       else
          self%dE_int = self%indigenous_mass*self%temp*5d3
       end if
@@ -604,6 +613,8 @@ contains
          params(3) = self%temp
          params(4) = self%dens
          params(5) = self%MOI
+         params(7) = self%E_grav
+         params(8) = self%E_int
 
 !For more than two materials the last one can have composition gradient
 !Else just juse zero as a place holder during the integration
@@ -652,6 +663,8 @@ contains
          self%temp = params(3)
          self%dens = params(4)
          self%MOI = params(5)
+         self%E_grav = params(7)
+         self%E_int = params(8)
          self%dr = dr
 
 !~ print *, 'fractions =', self%fractions
@@ -700,6 +713,8 @@ contains
       self%initials%real_vals(16) = other%MOI
       self%initials%real_vals(17) = other%omega
       self%initials%real_vals(18) = other%xi_H
+      self%initials%real_vals(19) = other%E_grav
+      self%initials%real_vals(20) = other%E_int
       self%initials%real_arr(19, 1:self%n_mats) = other%fractions(1:self%n_mats)
       self%initials%real_arr(20, 1:self%n_mats) = other%weight_fractions(1:self%n_mats)
       self%initials%real_arr(21, :) = self%external_temp_profile(:)

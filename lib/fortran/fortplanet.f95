@@ -27,10 +27,10 @@ MODULE class_planet
                  N_H2O, N_Al, N_O, constraint_value_should, eps_layer, eps_Al, eps_H2O, &
                  N_H, N_S, T_center_is, P_center_is, xi_H_core_predicted
       integer :: tempType, rhoType, adiabatType, layerType, subphase_res
-      real(8) :: inner_core_fraction, MOI_is, omega, P_H2, xi_H_core, &
+      real(8) :: inner_core_fraction, MOI_is, E_grav_is, omega, P_H2, xi_H_core, E_int_is, &
                  eps_T_zero, ocean_frac_should, ocean_frac_is, gravity, &
                  M_core_should, rho_mean, Si_number_mantle, Fe_number_mantle, xi_Stv, &
-                 T_ICB, T_CS, P_CS, T_MTZ, P_MTZ, E_grav, E_int
+                 T_ICB, T_CS, P_CS, T_MTZ, P_MTZ, E_grav, E_int, E_tot, L_int
       real(8), dimension(:), allocatable :: xi_all_core, X_all_core
       real(8), dimension(:), allocatable :: layer_masses, GammaG0_layers, &
                                             temp_jumps, layer_radii, layer_temps, layer_pres, q_layers, rho0_layers, &
@@ -179,16 +179,16 @@ contains
          end do
       end if
 
-!currently hydrogen is only dissolved in the iron core
-!Note: The iron content in any given material is meant with respect
-!to Mg, i.e. Mg_(1-xi_Fe) + Fe_(xi_Fe). In the cas of FeH there is no
-!Mg and hence xi_Fe must be zero from a compositional viewpoint.
-!However, in order to compute the EoS parameters correctly at given
-!hydrogen content, the table interpolation needs the Fe number of FeH_x
-!with respect to hydrogen, i.e. Fe_(xi_Fe) + H_(1-xi_Fe). It is given
-!by (1-xi_H). Hence when the table interpolation is called xi_Fe = 1-xi_H
-!needs to be passed. But to compute the contents in the shell xi_Fe = 1 in
-!order to avoid Mg to be counted in the core.
+      !currently hydrogen is only dissolved in the iron core
+      !Note: The iron content in any given material is meant with respect
+      !to Mg, i.e. Mg_(1-xi_Fe) + Fe_(xi_Fe). In the cas of FeH there is no
+      !Mg and hence xi_Fe must be zero from a compositional viewpoint.
+      !However, in order to compute the EoS parameters correctly at given
+      !hydrogen content, the table interpolation needs the Fe number of FeH_x
+      !with respect to hydrogen, i.e. Fe_(xi_Fe) + H_(1-xi_Fe). It is given
+      !by (1-xi_H). Hence when the table interpolation is called xi_Fe = 1-xi_H
+      !needs to be passed. But to compute the contents in the shell xi_Fe = 1 in
+      !order to avoid Mg to be counted in the core.
       do i = 1, n_layers
          if (i == 2) then
             self%xi_H_layers(i) = self%xi_H_core_predicted
@@ -206,6 +206,10 @@ contains
 
       eps_H2O = 0e0
       eps_Al = 0e0
+      self%E_tot = 0d0
+      self%E_grav = 0d0
+      self%E_int = 0d0
+      self%L_int = 0d0
 
       self%P_center_is = P_center
       self%T_center_is = T_center
@@ -327,9 +331,11 @@ contains
 
       M_seed = 4.0d0/3.0d0*PI*R_seed**3*seed_mixture%dens
       self%MOI_is = 2d0/5d0*M_seed*R_seed**2
-
+      self%E_grav_is = 3d0 * g * M_seed**2 / (5d0 * R_seed)
+      self%E_int_is = 5d2 * M_seed * T_center
+      
+      ! Instantiate the layers
       do i = 1, self%lay
-
          call init_layer(self=self%layers(i), &
                          n_mats=size(self%contents%axes(i)%int_array), &
                          contents=self%contents%axes(i)%int_array, &
@@ -353,6 +359,8 @@ contains
                          Si_number=self%Si_number_layers(self%lay), &
                          Fe_number=self%Fe_number_layers(self%lay), &
                          MOI=self%MOI_is, &
+                         E_grav = self%E_grav_is, &
+                         E_int = self%E_int_is, &
                          omega=self%omega, &
                          xi_H=self%xi_H_layers(self%lay), &
                          xi_Stv=self%xi_Stv_layers(self%lay), &
@@ -360,7 +368,6 @@ contains
                          X_impurity_slope=self%X_impurity_slope_layers(self%lay))
 
          call update_layer(self=self%layers(i))
-
       end do
 
       self%status = 'seed'
@@ -429,6 +436,17 @@ contains
    END SUBROUTINE compute_E_int
 
 !#######################################################################
+   SUBROUTINE compute_L_int(self)
+
+      type(planet), intent(inout) :: self
+      real(8) :: dU, rho1, r, dr, ks
+      integer :: i, j
+
+      self%L_int =  self%T_surface_is**4*sigma_SB*4*self%R_surface_is**2*pi
+
+   END SUBROUTINE compute_L_int
+
+!#######################################################################
    SUBROUTINE get_profiles(self)
 
       type(planet), intent(inout) :: self
@@ -478,7 +496,8 @@ contains
             self%profiles(5, n) = self%layers(i)%shells(j)%mass
             self%profiles(6, n) = self%layers(i)%shells(j)%gravity
             self%profiles(7, n) = self%layers(i)%shells(j)%MOI
-            self%profiles(8, n) = self%layers(i)%shells(j)%dE_grav
+            self%profiles(8, n) = self%layers(i)%shells(j)%E_grav
+            self%profiles(9, n) = self%layers(i)%shells(j)%E_int
 
             if (N > 1) then
                self%profiles(8, n) = self%profiles(8, n) + self%profiles(8, n - 1)
@@ -906,6 +925,8 @@ contains
                                Si_number=self%Si_number_layers(self%lay + 1), &
                                Fe_number=self%Fe_number_layers(self%lay + 1), &
                                MOI=self%layers(self%lay)%MOI, & !MoI is currently the MoI from the last layer
+                               E_grav = self%layers(self%lay)%E_grav, & !E_grav is currently the E_grav from the last layer
+                               E_int = self%layers(self%lay)%E_int, &
                                omega=self%omega, &
                                xi_H=self%xi_H_layers(self%lay + 1), &
                                xi_Stv=self%xi_Stv_layers(self%lay + 1), &
@@ -1268,6 +1289,8 @@ contains
          self%T_surface_is = self%layers(self%lay)%temp
          self%P_surface_is = self%layers(self%lay)%pres
          self%MOI_is = self%layers(self%lay)%MOI
+         self%E_grav_is = self%layers(self%lay)%E_grav
+         self%E_int_is = self%layers(self%lay)%E_int
 
          self%rho_mean = self%M_surface_is/(4.0d0/3.0d0*PI*self%R_surface_is**3)
          self%gravity = self%M_surface_is/self%R_surface_is**2*G

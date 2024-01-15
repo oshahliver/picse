@@ -11,6 +11,7 @@ MODULE constants
    real(kind=8), parameter :: c_light = 2.99792458d8 !Speed of light
    real(kind=8), parameter :: kB = 1.38065d-23 !Boltzmann constant
    real(kind=8), parameter :: NA = 6.0221409d23 !Avogadro number
+   real(kind=8), parameter :: sigma_SB = 5.670374419e-8 !Stefan-Boltzmann constant
 
 !Molar masses in kg
 !Atomic species

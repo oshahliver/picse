@@ -920,19 +920,19 @@ contains
                                               molar_masses
       integer, intent(in), dimension(nmat) :: ll
       real(8), intent(in), dimension(3), optional :: external_temp_profile
-      real(8) :: dPdr, dTdr, drhodr, dmdr, gammaG, dMOIdr, dXdr, dXdm
+      real(8) :: dPdr, dTdr, drhodr, dmdr, gammaG, dMOIdr, dXdr, dXdm, dEgravdr, dEintdr
       real(8), intent(out), dimension(n_params_integration) :: grads
       real(8) :: P, m, T, d, dPdrho_mean, alpha_mean, KS_mean, KT_mean
-      real(8) :: rho_mean, delta_T_zero, T_zero, xi_H2O, xi_Al, X
+      real(8) :: rho_mean, delta_T_zero, T_zero, xi_H2O, xi_Al, X, cp
       real(8), dimension(n_out) :: params_individual
       integer, dimension(n_out) :: params
       real(8), dimension(3) :: vals
       integer :: i, order
 
-!~ print *, 'input to gradients:', r, y(:), fractions, gammaG0, q, d0
-
       order = 1
-!ommit y(5) which is the MoI and only passively integrated
+      
+      ! Ommit y(5) which is the MoI and only passively integrated
+      ! Ommit y(7) which is E_grav and is only passively integrated
       P = y(1)
       m = y(2)
       T = y(3)
@@ -984,7 +984,7 @@ contains
          else
             vals(3) = xi_Fe
          end if
-!~         print *, 'vals in grads =', vals(:)
+
 !~         Returns: rho, dTdP_S, dPdrho, alpha_th
          call compute(vals=vals, which=params, n_out=n_out, ll=ll(i), res=params_individual, &
                       order=order, alloc=.false., eps_H2O=eps_H2O)
@@ -1008,15 +1008,6 @@ contains
 
       alpha_mean = alpha_mean*rho_mean
 
-!~ print *, ''
-!~ print *, 'T (K), P (GPa) =', T, P*1d-9
-!~ print *, 'wt =', weight_fractions(:)
-!~ print *, 'params_individual =', params_individual(:)
-!~ print *, 'alpha_mean in gradients =', alpha_mean
-!~ print *, 'rho_mean in gradients =', rho_mean
-!~ print *, 'K_T_mean in gradients =', KT_mean
-!~ print *, 'q/gammaG0/d0/T/P =', q, gammaG0, d0, T, P
-
 !Compute the radial gradients of all structure parameters:
 
 !pressure
@@ -1036,8 +1027,6 @@ contains
 
       elseif (tempType == 1) then
 
-         !print *, 'T in gradients =', T
-         !print *, 'P in gradients =', P*1.0e-9
          !Assumes that water is not mixed with other materials
          if (ll(1) == 1) then
 
@@ -1055,9 +1044,6 @@ contains
          else
             if (T .lt. T_zero .and. T .lt. 1000.0e0) then
                dTdr = -1.0e-6
-!~                         print *, 'Switching to isothermal profile'
-!~                         print *, 'at: T=', T, 'P=', P*1.0e-9
-
             else
                !Compute Grueneisenparameter at current density
                gammaG = gammaG0*(rho_mean/d0)**(-q)
@@ -1071,15 +1057,10 @@ contains
                   !Check if alpha is nan and take KT instead of KS
                   if (alpha_mean /= alpha_mean) then
                      KS_mean = KT_mean
-!~                                         print *, 'WARNING: alpha is nan'
                   end if
 
                   if (KS_mean .lt. 1.0e9 .or. KS_mean .gt. 1.0e12) then
-!~                                 print *, 'KS bad...'
-!~                                 print *, 'KS =', KS_mean
                      if (KT_mean .lt. KT_zero) then
-!~                                         print *, 'KT too low...'
-!~                                         print *, 'KT =', KT_mean
                         KT_mean = KT_zero
                      end if
 
@@ -1087,13 +1068,6 @@ contains
 
                   end if
 
-!~                                 print *, 'll =', ll
-!~                                 print *, 'KS =', KS_mean
-!~                                 print *, 'alpha =', alpha_mean
-!~                                 print *, 'gammaG =', gammaG
-!~                                 print *, 'KT =', KT_mean
-                  !print *, 'T=', T
-                  !print *, 'P=', P*1.0e-9
                   !Compute radial adiabatic gradient
                   dTdr = dPdr*gammaG*T/KS_mean
                end if
@@ -1101,11 +1075,30 @@ contains
          end if
       end if
 
-!density
+      ! Density
       drhodr = dPdr/dPdrho_mean
 
-!moment of inertia
+      ! Moment of inertia
       dMOIdr = 8d0/3d0*PI*rho_mean*r**4
+
+      ! Gravitational binding enery
+      dEgravdr =   - G * m / r * dmdr
+
+      ! Internal energy
+      !Core
+      if (lay < 3) then
+         cp = 5d2
+      
+      !Mantle
+      elseif (lay > 2 .and. lay > 5) then
+         cp = 1d3
+
+      !Hydrosphere
+      else
+         cp = 5d3
+      end if
+      
+      dEintdr = dmdr * T * cp
 
       grads(1) = dPdr
       grads(2) = dmdr
@@ -1113,11 +1106,8 @@ contains
       grads(4) = drhodr
       grads(5) = dMOIdr
       grads(6) = dXdr
-
-!~ print *, 'fractions =', weight_fractions(:)
-!~ print *, 'vals =', vals(:)
-!~ print *, 'means =', rho_mean, dPdrho_mean, alpha_mean, KT_mean
-!~ print *, 'grads in grads =', grads(:)
+      grads(7) = dEgravdr
+      grads(8) = dEintdr
 
    end subroutine gradients
 !########################################################################

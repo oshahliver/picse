@@ -17,6 +17,7 @@ NA = 6.0221409e23  # Avogadro8's constant
 au = 1.49598e11  # astronomical unit in m
 yr = 365.26  # year in days
 day = 24.0 * 3600  # day in seconds
+E_grav_unit = 2.241835488e32 # grav. bind. energy of uniform density earth
 
 r_sun = 695510.0e3  # solar radius in m
 T_sun = 5778  # solar surface temperature in K

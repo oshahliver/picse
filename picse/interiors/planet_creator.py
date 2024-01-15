@@ -123,6 +123,9 @@ class PlanetaryOutputParams(Parameters):
             "oxygen_fugacity_mantle": None,
             "luminosity_int_is": None,
             "luminosity_eff_is": None,
+            "E_grav_is": None,
+            "E_int_is": None,
+            "E_tot_is": None,
             "atomic_fractions_core": [],
             "inner_core_fraction": None,
             "layer_properties": [],
@@ -156,8 +159,6 @@ class RunOutputParams(Parameters):
             "mantle_exists": False,
             "inner_core_exists": False,
             "outer_core_exists": False,
-            "gravitational_energy": None,
-            "internal_energy": None,
         }
 
 
@@ -179,9 +180,9 @@ class PlanetaryInputParams(Parameters):
             "temperature_jumps": [0.0, 0.0, 0.0, 0.0],
             "grueneisen_gammas_layers": [1.36, 1.36, 1.96, 1.26],
             "debye_exponents_layers": [0.91, 0.91, 2.5, 2.9],
-            "total_energy_should": 0,
-            "luminosity_int_should": 0,
-            "luminosity_eff_should": 0,
+            "E_tot_should": 0,
+            "L_int_should": 0,
+            "L_eff_should": 0,
             "layer_pressures": [0, 0, 25.0e9, 0],
             "layer_radii": [0, 0, 0, 0],
             "layer_temperatures": [0, 0, 0, 0],
@@ -733,6 +734,7 @@ class Planet:
         # fortran wrapper is called here
         # output = test_interface.interface.do_some_science_stuff(**kwargs)
         output = fortplanet.wrapper.create_planet(**kwargs)
+        
         # update planetary output parameters
         for key, value in zip(fortplanet_output_keys, output):
             setattr(self, key, value)

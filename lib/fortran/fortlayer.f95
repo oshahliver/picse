@@ -12,7 +12,7 @@ MODULE class_layer
       real(8) :: r_in, r_out, eps_r, radius, FeMg, SiMg, Fe_number, X_H2O, &
                  Si_number, omega, xi_H, xi_Stv, X_impurity_slope, X_impurity_0
       real(8) :: eps_H2O, eps_Al, N_tot, N_Mg, N_Si, N_Al, N_H2O, N_Fe, N_S
-      real(8) :: rho0, q, eps_T_zero, pres, temp, mass, dens, MOI
+      real(8) :: rho0, q, eps_T_zero, pres, temp, mass, dens, MOI, E_grav, E_int
       real(8) :: mass_should, indigenous_mass, dr, gammaG0
       real(8), dimension(n_params_integration) :: params, gradients
       integer, dimension(:), allocatable :: contents, YMg, YSi, YO, YS
@@ -33,7 +33,7 @@ contains
 
    SUBROUTINE init_layer(self, contents, fractions, n_mats, r_in, m, &
                          T, P, tempType, rhoType, adiabatType, q, gammaG0, eps_r, rho0, &
-                         eps_T_zero, n_shells, eps_H2O, lay, eps_Al, Si_number, Fe_number, MOI, &
+                         eps_T_zero, n_shells, eps_H2O, lay, eps_Al, Si_number, Fe_number, MOI, E_grav, E_int, &
                          omega, xi_H, xi_Stv, X_impurity_0, X_impurity_slope, external_temp_profile)
 
       type(layer), intent(inout) :: self
@@ -41,7 +41,7 @@ contains
       real(8), dimension(n_mats), intent(in) :: fractions
       integer, dimension(n_mats), intent(in) :: contents
       real(8), intent(in) :: r_in, m, T, P, q, gammaG0, eps_r, rho0, &
-                             eps_T_zero, eps_Al, MOI
+                             eps_T_zero, eps_Al, MOI, E_grav, E_int
       real(8), intent(in) :: Fe_number, eps_H2O, Si_number
       integer, intent(in) :: tempType, rhoType, adiabatType
       real(8), intent(in), optional :: omega, xi_H, xi_Stv, X_impurity_0, &
@@ -131,6 +131,8 @@ contains
       self%eps_H2O = eps_H2O
       self%eps_Al = eps_Al
       self%MOI = MOI
+      self%E_grav = E_grav
+      self%E_int = E_int
 
       if (.not. Si_number == 1.0d0) then
          self%SiMg = 1.0d0/(1.0d0 - self%Si_number)
@@ -151,7 +153,7 @@ contains
                       q=q, gammaG0=gammaG0, eps_T_zero=eps_T_zero, alloc=.true., &
                       eps_H2O=eps_H2O, eps_Al=self%eps_Al, Fe_number=self%Fe_number, &
                       n_mats=n_mats, lay=lay, m=m, r=r_in, Si_number=self%Si_number, &
-                      MOI=self%MOI, omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
+                      MOI=self%MOI, E_grav=E_grav, E_int = E_int, omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
                       composition_gradients=self%composition_gradients, &
                       external_temp_profile=self%external_temp_profile)
 
@@ -177,6 +179,8 @@ contains
       self%temp = self%shells(self%shell_count)%temp
       self%dens = self%shells(self%shell_count)%dens
       self%MOI = self%shells(self%shell_count)%MOI
+      self%E_grav = self%shells(self%shell_count)%E_grav
+      self%E_int = self%shells(self%shell_count)%E_int
 
       if (self%shells(self%shell_count)%force_bisection) then
          self%force_bisection = .true.
@@ -187,6 +191,8 @@ contains
       self%params(3) = self%temp
       self%params(4) = self%dens
       self%params(5) = self%MOI
+      self%params(7) = self%E_grav
+      self%params(7) = self%E_int
 
       self%fractions = self%shells(self%shell_count)%fractions
       self%gradients = self%shells(self%shell_count)%gradients
@@ -294,6 +300,8 @@ contains
                          Fe_number=self%Fe_number, &
                          Si_number=self%Si_number, &
                          MOI=self%MOI, &
+                         E_grav = self%E_grav, &
+                         E_int = self%E_int, &
                          omega=self%omega, &
                          xi_H=self%xi_H, &
                          xi_Stv=self%xi_Stv, &

@@ -23,15 +23,15 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.0,  # desired total mass (in earth masses)
+    "M_surface_should": 1,  # desired total mass (in earth masses)
     "T_surface_should": 1200.0,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
-    "Mg_number_should": 0.5162,  # desired bulk magnesium number
-    "Fe_number_mantle": 0.0,  # iron number of the silicates
+    "Mg_number_should": 0.57,  # desired bulk magnesium number
+    "Fe_number_mantle": 0.1,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "temperature_jumps":[0, 1800, 0, 0], # Temperature jumps across each layer transition
     "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
-    "fractions": [[1], [0, .2, 0.05, 0.1], [.5, .5], [.5, .5]], # Mole fractions in each layer
+    "fractions": [[1], [0, .2, 0.01, 0.01], [.5, .5], [.5, .5]], # Mole fractions in each layer
     "inner_core_mass_fraction_should": .387, # The mass fraction of the inner core relative to the core
 }
 
@@ -81,6 +81,10 @@ print ("fractions in the end:" , pl.fractions)
 # print fundamental planeatary properties to standard output
 pl.print(digits=4)
 # pl.plot()
+
+print (f'E_grav_is: {pl.E_grav_is}')
+print (f'E_int_is: {pl.E_int_is}')
+print (f'L_int_is: {pl.L_int_is}')
 
 # You can also access individual parameters as attributes. for instance:
 # print("total radius (km):", pl.R_surface_is * 1e-3)
