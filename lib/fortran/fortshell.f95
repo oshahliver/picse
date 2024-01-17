@@ -178,6 +178,14 @@ contains
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
 
+         self%integration_parameters(1) = P
+         self%integration_parameters(2) = m
+         self%integration_parameters(3) = T
+         self%integration_parameters(5) = MOI
+         self%integration_parameters(6) = self%weight_fractions(n_mats)
+         self%integration_parameters(7) = E_grav
+         self%integration_parameters(8) = E_int
+
 !Compute ambient density
 !Note that the fractions at T=300 K and T=1.0d4 Pa would be in general
 !different but we want to know the ambient conditions of the given shell
@@ -254,16 +262,18 @@ contains
          self%N_Al = 0.0d0
          self%N_S = 0.0d0
          self%N_H = 0d0 !This counts the hydrogen of hydrated substances (e.g. FeH)
+
+         self%integration_parameters(1) = self%initials%real_vals(4)
+         self%integration_parameters(2) = self%initials%real_vals(3)
+         self%integration_parameters(3) = self%initials%real_vals(2)
+         self%integration_parameters(4) = self%initials%real_vals(5)
+         self%integration_parameters(5) = self%initials%real_vals(16)
+         self%integration_parameters(6) = self%initials%real_vals(18)
+         self%integration_parameters(7) = self%initials%real_vals(19)
+         self%integration_parameters(8) = self%initials%real_vals(20)
       end if
 
-      self%integration_parameters(1) = self%pres
-      self%integration_parameters(2) = self%mass
-      self%integration_parameters(3) = self%temp
-      self%integration_parameters(4) = self%dens
-      self%integration_parameters(5) = self%MOI
-      self%integration_parameters(6) = self%weight_fractions(n_mats)
-      self%integration_parameters(7) = self%E_grav
-      self%integration_parameters(8) = self%E_int
+
 
    END SUBROUTINE init_shell
 
@@ -421,7 +431,6 @@ contains
          self%integration_parameters(1) = P
       end if
 
-
 !Update the mean mole fractions and weight fractions
       do i = 1, self%n_mats
          self%mean_fractions(i) = self%fractions(i) + self%initials%real_arr(19, i)
@@ -565,10 +574,10 @@ contains
       type(shell), intent(in) :: other
 
       self%initials%real_vals(1) = other%radius
-      self%initials%real_vals(2) = other%temp
-      self%initials%real_vals(3) = other%mass
-      self%initials%real_vals(4) = other%pres
-      self%initials%real_vals(5) = other%dens
+      self%initials%real_vals(2) = other%integration_parameters(3)
+      self%initials%real_vals(3) = other%integration_parameters(2)
+      self%initials%real_vals(4) = other%integration_parameters(1)
+      self%initials%real_vals(5) = other%integration_parameters(4)
       self%initials%int_vals(6) = other%lay
       self%initials%int_vals(7) = other%tempType
       self%initials%real_vals(8) = other%dPdrho
@@ -579,11 +588,11 @@ contains
       self%initials%real_vals(13) = other%Si_number
       self%initials%real_vals(14) = other%eps_H2O
       self%initials%real_vals(15) = other%eps_Al
-      self%initials%real_vals(16) = other%MOI
+      self%initials%real_vals(16) = other%integration_parameters(5)
       self%initials%real_vals(17) = other%omega
       self%initials%real_vals(18) = other%xi_H
-      self%initials%real_vals(19) = other%E_grav
-      self%initials%real_vals(20) = other%E_int
+      self%initials%real_vals(19) = other%integration_parameters(7)
+      self%initials%real_vals(20) = other%integration_parameters(8)
       self%initials%real_arr(19, 1:self%n_mats) = other%fractions(1:self%n_mats)
       self%initials%real_arr(20, 1:self%n_mats) = other%weight_fractions(1:self%n_mats)
 
