@@ -434,10 +434,11 @@ contains
       self%mixture%weight_fractions = self%weight_fractions
 
       if (compute_mix_dummy) then
-         call compute_mixture(self=self%mixture, T=self%temp, P=self%pres)
+         call compute_mixture(self=self%mixture, T=self%integration_parameters(3), P=self%integration_parameters(1))
 
          self%dens = self%mixture%dens
          self%dPdrho = self%mixture%dPdrho
+         self%integration_parameters(4) = self%mixture%dens
       end if
 
       if (update_grads_dummy) then
@@ -446,26 +447,9 @@ contains
 
       call get_shell_contents(self=self)
 
-      self%gravity = G*self%mass/self%radius**2
+      self%gravity = G*self%integration_parameters(2)/self%radius**2
 
    END SUBROUTINE update_shell
-
-!#######################################################################
-   SUBROUTINE print_shell(self)
-
-      type(shell), intent(inout) :: self
-
-      print *, ''
-      print *, 'These are the shell properties:'
-
-      print *, 'contents:', self%contents(:)
-      print *, 'fractions:', self%fractions(:)
-
-      print *, 'r/m:', self%radius, self%mass
-      print *, 'P/T/rho/alpha:', self%pres, self%temp, self%dens, self%mixture%alpha_th
-      print *, 'gradients:', self%gradients
-
-   END SUBROUTINE print_shell
 
 !#######################################################################
    SUBROUTINE reset_shell(self)
