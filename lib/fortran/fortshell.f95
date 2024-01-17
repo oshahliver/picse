@@ -254,54 +254,18 @@ contains
          self%N_Al = 0.0d0
          self%N_S = 0.0d0
          self%N_H = 0d0 !This counts the hydrogen of hydrated substances (e.g. FeH)
-
       end if
 
+      self%integration_parameters(1) = self%pres
+      self%integration_parameters(2) = self%mass
+      self%integration_parameters(3) = self%temp
+      self%integration_parameters(4) = self%dens
+      self%integration_parameters(5) = self%MOI
+      self%integration_parameters(6) = self%weight_fractions(n_mats)
+      self%integration_parameters(7) = self%E_grav
+      self%integration_parameters(8) = self%E_int
+
    END SUBROUTINE init_shell
-
-!#######################################################################
-!~ SUBROUTINE get_shell_abundances(self)
-
-!~ type(shell), intent(inout) :: self
-!~ real(8), dimension(size(self%contents)) :: abundances, &
-!~ xiAlMgi, xiAlSii
-!~ integer :: i
-
-!~ do i=1, size(self%contents)
-!~   xiAlSii(i) = 0.0d0
-!~   xiAlMgi(i) = 0.0d0
-!~ enddo
-
-!~ self%xi_Fe = compute_xiFei(n_mats=size(self%contents), &
-!~ P=self%pres, &
-!~ T=self%temp, &
-!~ Fe_number=self%Fe_number, &
-!~ contents=self%contents)
-
-!~ !Compute the material fractions for the shell given the specified
-!~ !values for the elemental abundances
-!~ call compute_abundance_vector(SiMg=self%SiMg, &
-!~ FeMg=self%FeMg, &
-!~ n_mats=size(self%contents), &
-!~ YSii=self%YSi, &
-!~ YMgi=self%YMg, &
-!~ xiFei=self%xi_Fe, &
-!~ xiH2Oi=self%xi_H2O, &
-!~ xiAlMgi=xiAlMgi, &
-!~ xiAlSii=xiAlSii, &
-!~ abundances=self%fractions, &
-!~ contents=self%contents)
-
-!~ !Compute weight fractions from mole fractions
-!~ self%weight_fractions = eta_general(self%fractions, self%mixture%molar_masses, &
-!~ size(self%fractions))
-
-!~ !call update_mixture_fractions(self=self%mixture)
-!~ !self%fractions = self%mixture%fractions
-
-!~ print *, 'Shell fractions in get_abundances =', self%fractions(:)
-
-!~ END SUBROUTINE get_shell_abundances
 
 !#######################################################################
    SUBROUTINE get_shell_contents(self)
@@ -316,11 +280,6 @@ contains
          xiAlMgi(i) = 0.0d0
       end do
 
-!xiFei = compute_xiFei(n_mat=size(self%contents), &
-!P=self%pres, &
-!T=self%temp, &
-!FeMg=self%FeMg)
-
       self%N_tot = 0.0d0
       self%N_Mg = 0.0d0
       self%N_Si = 0.0d0
@@ -330,9 +289,7 @@ contains
       self%N_Al = 0.0d0
       self%N_S = 0.0d0
       self%N_H = 0d0
-      ! print *, "Shell contents =", self%contents
-      ! print *, "Shell fractions =", self%fractions
-      ! print *, "Shell mean fractions =", self%mean_fractions
+
 !Compute number of atomic species per mole
       do i = 1, size(self%contents)
 
@@ -342,11 +299,9 @@ contains
          !Count iron from Mg-Fe substitution
          self%N_Fe = self%N_Fe + self%mean_fractions(i)*(1.0d0 - self%xi_H2O(i))* &
                      self%xi_Fe(i)*(1d0 - self%xi_H)*self%YMg(i)
-!~         print *, ''
-!~         print *, 'Fe before counting =', self%N_Fe
+
          !Count iron from pure species
          self%N_Fe = self%N_Fe + self%mean_fractions(i)*self%YFe(i)
-!~         print *, 'Fe after counting =', self%N_Fe
          self%N_Si = self%N_Si + self%mean_fractions(i)*(1.0d0 - self%xi_H2O(i))* &
                      (1.0d0 - xiAlSii(i))*self%YSi(i)
          self%N_Al = self%N_Al + self%mean_fractions(i)*(1.0d0 - self%xi_H2O(i))* &
@@ -364,8 +319,6 @@ contains
             self%N_H = self%N_H + self%mean_fractions(i)*self%xi_H
          end if
       end do
-
-!~ print *, 'Fe total =', self%N_Fe
 
 !Compute total number of moles in the shell
       self%N_tot = self%indigenous_mass/(self%N_Mg*mMg + self%N_Fe*mFe + &
@@ -385,33 +338,30 @@ contains
 !of each species given the number of moles of molecules which are made
 !of these species. Hence the sum of the atomic abundances does not equal
 !the total number of moles of molecules: N_Mg + N_Si + ... is not = N_tot
-!~ print *, 'N_tot =', self%N_tot
-!~ print *, 'N_Mg, N_Si, N_Fe, N_O, N_Al, N_H2O =', self%N_Mg, self%N_Si, &
-!~ self%N_Fe, self%N_O, self%N_Al, self%N_H2O
-!~ print *, 'N_H2O, N_tot, M_ind =', self%N_H2O, self%N_tot, self%indigenous_mass
    END SUBROUTINE get_shell_contents
 
 !#######################################################################
    SUBROUTINE update_shell_gradients(self)
 
       type(shell), intent(inout) :: self
-      real(8), dimension(n_params_integration) :: y
       integer :: i, n_mats
 
       n_mats = size(self%contents)
+ 
+      self%integration_parameters(1) = self%pres
+      self%integration_parameters(2) = self%mass
+      self%integration_parameters(3) = self%temp
+      self%integration_parameters(4) = self%dens
+      self%integration_parameters(5) = self%MOI
+      self%integration_parameters(6) = self%weight_fractions(n_mats)
+      self%integration_parameters(7) = self%E_grav
+      self%integration_parameters(8) = self%E_int
 
-      y(1) = self%pres
-      y(2) = self%mass
-      y(3) = self%temp
-      y(4) = self%dens
-      y(5) = self%MOI
-      y(6) = self%weight_fractions(n_mats)
-      y(7) = self%E_grav
-      y(8) = self%E_int
+      ! self%integration_parameters = y
 
       call gradients(grads=self%gradients, &
                      r=self%radius, &
-                     y=y, &
+                     y=self%integration_parameters, &
                      fractions=self%fractions, &
                      nmat=size(self%fractions), &
                      ll=self%contents, &
@@ -463,6 +413,15 @@ contains
          self%pres = P
       end if
 
+      if (present(T)) then
+         self%integration_parameters(3) = T
+      end if
+
+      if (present(P)) then
+         self%integration_parameters(1) = P
+      end if
+
+
 !Update the mean mole fractions and weight fractions
       do i = 1, self%n_mats
          self%mean_fractions(i) = self%fractions(i) + self%initials%real_arr(19, i)
@@ -486,8 +445,6 @@ contains
       end if
 
       call get_shell_contents(self=self)
-      call compute_dE_grav(self=self)
-      call compute_dE_int(self=self)
 
       self%gravity = G*self%mass/self%radius**2
 
@@ -511,50 +468,6 @@ contains
    END SUBROUTINE print_shell
 
 !#######################################################################
-   SUBROUTINE compute_dE_int(self)
-
-      type(shell), intent(inout) :: self
-
-      !Core
-      if (self%lay < 3) then
-         self%dE_int = self%indigenous_mass*self%temp*5d2
-      
-      !Mantle
-      elseif (self%lay > 2 .and. self%lay > 5) then
-         self%dE_int = self%indigenous_mass*self%temp*1d3
-
-      !Hydrosphere
-      else
-         self%dE_int = self%indigenous_mass*self%temp*5d3
-      end if
-
-   END SUBROUTINE compute_dE_int
-
-!#######################################################################
-   SUBROUTINE compute_dE_grav(self)
-!Computes gravitational energy contribution of each shell approximating the
-!dnesity as a linear function between the bottom and the top of each shell.
-!The total gravitational energy of the planet is obtained by summing up
-!all contributions of the individual shells.
-
-      type(shell), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, k
-      integer :: i, j
-
-      self%dE_grav = 0d0
-
-      rho1 = self%dens
-      r = self%radius
-      dr = self%dr
-
-      dU = rho1**2*r**4*dr
-      self%dE_grav = dU
-
-      self%dE_grav = self%dE_grav*3*G*(4*PI/3)**2
-
-   END SUBROUTINE compute_dE_grav
-
-!#######################################################################
    SUBROUTINE reset_shell(self)
 
       type(shell), intent(inout) :: self
@@ -572,7 +485,7 @@ contains
       type(shell), intent(inout) :: self
       logical, intent(in), optional :: overconstruct
       logical :: overconstruct_dummy, update_grads, compute_mix
-      real(8), dimension(n_params_integration) :: params, params_dummy
+      real(8), dimension(n_params_integration) :: params_dummy
       real(8), intent(in) :: dr
       real(8) :: r_dummy
       integer :: n_mats
@@ -587,29 +500,27 @@ contains
 
       if (.not. self%status == 'constructed' .or. overconstruct_dummy) then
 
-         params(1) = self%pres
-         params(2) = self%mass
-         params(3) = self%temp
-         params(4) = self%dens
-         params(5) = self%MOI
-         params(7) = self%E_grav
-         params(8) = self%E_int
+         self%integration_parameters(1) = self%pres
+         self%integration_parameters(2) = self%mass
+         self%integration_parameters(3) = self%temp
+         self%integration_parameters(4) = self%dens
+         self%integration_parameters(5) = self%MOI
+         self%integration_parameters(7) = self%E_grav
+         self%integration_parameters(8) = self%E_int
 
 !For more than two materials the last one can have composition gradient
 !Else just juse zero as a place holder during the integration
          if (n_mats .gt. 2) then
-            params(6) = self%weight_fractions(n_mats)
+            self%integration_parameters(6) = self%weight_fractions(n_mats)
          else
-            params(6) = 0d0
+            self%integration_parameters(6) = 0d0
          end if
 
          r_dummy = self%radius
-!~ print *, 'contents =', self%contents
-!~ print *, 'fractions before int =', self%fractions
-!~ print *, 'weight fractions before int =', self%weight_fractions
+
          call integrateRK(r_start=r_dummy, &
                           h=dr, &
-                          y_in=params, &
+                          y_in=self%integration_parameters, &
                           gammaG0=self%gammaG0, &
                           fractions=self%fractions, &
                           tempType=self%tempType, &
@@ -633,20 +544,18 @@ contains
                           lay=self%lay, &
                           xi_H=self%xi_H)
 
-         self%indigenous_mass = params_dummy(2) - params(2)
-         params = params_dummy
+         self%indigenous_mass = params_dummy(2) - self%integration_parameters(2)
+         self%integration_parameters = params_dummy
 
-         self%pres = params(1)
-         self%mass = params(2)
-         self%temp = params(3)
-         self%dens = params(4)
-         self%MOI = params(5)
-         self%E_grav = params(7)
-         self%E_int = params(8)
+         self%pres = self%integration_parameters(1)
+         self%mass = self%integration_parameters(2)
+         self%temp = self%integration_parameters(3)
+         self%dens = self%integration_parameters(4)
+         self%MOI = self%integration_parameters(5)
+         self%E_grav = self%integration_parameters(7)
+         self%E_int = self%integration_parameters(8)
          self%dr = dr
 
-!~ print *, 'fractions =', self%fractions
-!~ print *, 'weight fractions =', self%weight_fractions
          self%volume = 4d0/3d0*PI*(self%radius**3 - (self%radius - dr)**3)
 
          update_grads = .false.
@@ -657,8 +566,6 @@ contains
 
          self%status = 'constructed'
 
-!~ print *, 'mean_fractions =', self%mean_fractions
-!~ print *, 'mean weight fracs =', self%mean_weight_fractions
 
       else
          print *, 'WARNING: This shell has already been constructed.'
