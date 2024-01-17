@@ -5,7 +5,7 @@ interior model for a set of boundary conditions.
 
 from picse.interiors import planet_iterator
 from picse.interiors import planet_creator
-from picse.physicalparams import m_earth
+from picse.physicalparams import m_earth, E_grav_unit
 import os
 import numpy as np
 
@@ -24,12 +24,12 @@ iterator = planet_iterator.Toolkit()
 # default value for the corresponding base type
 planetary_params = {
     "M_surface_should": 1,  # desired total mass (in earth masses)
-    "T_surface_should": 1200.0,  # desired surface temperature (in kelvin)
+    "T_surface_should": 300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
     "Mg_number_should": 0.57,  # desired bulk magnesium number
     "Fe_number_mantle": 0.1,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
-    "temperature_jumps":[0, 1000, 0, 0], # Temperature jumps across each layer transition
+    "temperature_jumps":[0, 1800, 0, 1200], # Temperature jumps across each layer transition
     "contents": [[2], [2, 8, 10, 9], [4, 5], [6, 7]],  # composition of each layer
     "fractions": [[1], [0, .2, 0.01, 0.01], [.5, .5], [.5, .5]], # Mole fractions in each layer
     "inner_core_mass_fraction_should": .387, # The mass fraction of the inner core relative to the core
@@ -42,18 +42,18 @@ run_params = {"layer_constraints": [1, 1, 3, 1], # Layer constraint type for eac
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 iterator_specs = {
-    "what": ["M_surface", "T_surface"],  # --> target properties
+    "what": ["M_surface", "E_tot"],  # --> target properties
     "how": ["P_center", "T_center"],  # --> adjustable properties
     "val_should": [
         planetary_params["M_surface_should"] * m_earth,
-        planetary_params["T_surface_should"],
+        -E_grav_unit*.89,
     ],  # --> target values
     "predictor": ["linear", "linear"],  # --> no effect at this point
     "all_val_should_weights": [
         "log",
-        "log",
+        "lin",
     ],  # --> log or lin extrapolation for targets
-    "all_howval_weights": ["exp", "exp"],  # --> exp or lin prediction for adjustables
+    "all_howval_weights": ["exp", "lin"],  # --> exp or lin prediction for adjustables
     "acc": [1e-4, 1e-3],  # --> desired relative accuracies
     "iterationLimit": 20,  # --> max. number of iterations
     "deltaType": 0,  # --> mode for initial adjustment of adjustables

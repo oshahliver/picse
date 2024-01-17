@@ -124,8 +124,8 @@ class Toolkit:
                 "ocean_fraction_is": planet.ocean_fraction_is,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_FeS_core,
-                # "E_tot_is": planet.E_tot_is,
-                # "L_int_is": planet.L_int_is,
+                "E_tot_is": planet.E_tot_is,
+                "L_int_is": planet.L_int_is,
             }
 
         # If layer 4 does not exist, no ocean is there
@@ -139,8 +139,8 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "x_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "E_tot_is": planet.E_tot_is,
-                # "L_int_is": planet.L_int_is,
+                "E_tot_is": planet.E_tot_is,
+                "L_int_is": planet.L_int_is,
             }
 
         except ValueError:
@@ -153,8 +153,8 @@ class Toolkit:
                 "ocean_fraction_is": -10,
                 # "xi_H_core": planet.xi_H_core,
                 # "xi_FeO_mantle": planet.xi_S_core,
-                # "E_tot_is": planet.E_tot_is,
-                # "L_int_is": planet.L_int_is,
+                "E_tot_is": planet.E_tot_is,
+                "L_int_is": planet.L_int_is,
             }
         try:
             all_how = {
@@ -312,12 +312,10 @@ class Toolkit:
         if "iterator_specs" in kwargs:
             for key, val in kwargs["iterator_specs"].items():
                 if key in self.iterator_specs_keys:
-
                     specs.update({key: val})
-
                 else:
                     raise KeyError("Invalid iterator specification given")
-
+        print (f"specs = {specs}")
         passives = []
         passive_predictors = []
         self.iteration = True
@@ -501,12 +499,9 @@ class Toolkit:
                 ):
                     # State dependency of target on probed parameter
                     # negative means target increases with increasing parameter
-                    if (
-                        specs["what"][i] == "M_ocean"
-                        or specs["what"][i] == "ocean_frac"
-                    ):
-                        direction[i] = [-1, None]
-
+                    if specs["what"][i] == "E_tot":
+                        direction[i] = [1, None]
+                    
                     else:
                         direction[i] = [-1, None]
 

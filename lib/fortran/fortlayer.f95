@@ -25,7 +25,6 @@ MODULE class_layer
       type(shell), dimension(:), allocatable :: shells
       logical :: force_bisection = .false., overshoot = .false., &
                  major_overshoot = .false., minor_overshoot = .false., constant_Fe = .true.
-      real(8), dimension(3) :: external_temp_profile
 
    end type layer
 
@@ -34,7 +33,7 @@ contains
    SUBROUTINE init_layer(self, contents, fractions, n_mats, r_in, m, &
                          T, P, tempType, rhoType, adiabatType, q, gammaG0, eps_r, rho0, &
                          eps_T_zero, n_shells, eps_H2O, lay, eps_Al, Si_number, Fe_number, MOI, E_grav, E_int, &
-                         omega, xi_H, xi_Stv, X_impurity_0, X_impurity_slope, external_temp_profile)
+                         omega, xi_H, xi_Stv, X_impurity_0, X_impurity_slope)
 
       type(layer), intent(inout) :: self
       integer, intent(in) :: n_mats, n_shells, lay
@@ -46,7 +45,6 @@ contains
       integer, intent(in) :: tempType, rhoType, adiabatType
       real(8), intent(in), optional :: omega, xi_H, xi_Stv, X_impurity_0, &
                                        X_impurity_slope
-      real(8), dimension(3), optional :: external_temp_profile
       integer :: i
 
       allocate (self%contents(n_mats))
@@ -70,12 +68,6 @@ contains
 ! print *, '-----'
 ! print *, "fractions in init_layer =", fractions
 
-      if (present(external_temp_profile)) then
-         self%external_temp_profile = external_temp_profile
-
-      else
-         self%external_temp_profile = (/0d0, 0d0, 0d0/)
-      end if
 
       if (present(X_impurity_0)) then
          self%X_impurity_0 = X_impurity_0
@@ -154,8 +146,7 @@ contains
                       eps_H2O=eps_H2O, eps_Al=self%eps_Al, Fe_number=self%Fe_number, &
                       n_mats=n_mats, lay=lay, m=m, r=r_in, Si_number=self%Si_number, &
                       MOI=self%MOI, E_grav=E_grav, E_int = E_int, omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
-                      composition_gradients=self%composition_gradients, &
-                      external_temp_profile=self%external_temp_profile)
+                      composition_gradients=self%composition_gradients)
 
 !print *, "Printing shell in init_layer"
 !call print_shell(self=self%shells(1))
@@ -305,8 +296,7 @@ contains
                          omega=self%omega, &
                          xi_H=self%xi_H, &
                          xi_Stv=self%xi_Stv, &
-                         composition_gradients=self%composition_gradients, &
-                         external_temp_profile=self%external_temp_profile)
+                         composition_gradients=self%composition_gradients)
          !print *, 'shell count =', self%shell_count
       end if
 

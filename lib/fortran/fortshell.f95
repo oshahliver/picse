@@ -21,8 +21,8 @@ MODULE class_shell
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
       real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv, E_grav, E_int
+      real(8), dimension(n_params_integration) :: integration_parameters
       real(8) :: omega, dE_grav, dr, dE_int
-      real(8), dimension(3) :: external_temp_profile
       real(8), dimension(n_params_integration) :: gradients
       character(len=30) :: status = 'bare'
       type(dict) :: initials
@@ -36,8 +36,7 @@ contains
 
    SUBROUTINE init_shell(self, contents, fractions, n_mats, T, P, eps_H2O, &
                          Fe_number, lay, m, r, tempType, gammaG0, alloc, eps_T_zero, adiabatType, &
-                         q, rho0, eps_Al, Si_number, MOI, E_grav, E_int, omega, xi_H, xi_Stv, composition_gradients, &
-                         external_temp_profile)
+                         q, rho0, eps_Al, Si_number, MOI, E_grav, E_int, omega, xi_H, xi_Stv, composition_gradients)
 
       logical, optional, intent(in) :: alloc
       logical :: alloc_dummy
@@ -52,21 +51,11 @@ contains
                                        Si_number, MOI, E_grav, E_int
       real(8), intent(in), optional :: eps_T_zero, eps_Al
       integer :: i
-      real(8), dimension(3), optional :: external_temp_profile
 
-!~ print *, '        init shell'
-      if (present(external_temp_profile)) then
-         self%external_temp_profile = external_temp_profile
-
-      else
-         self%external_temp_profile = (/1d0, 0d0, 0d0/)
-      end if
 
       if (present(alloc)) then
-!~ print *, 'present'
          alloc_dummy = alloc
       else
-!~ print *, 'not present'
          alloc_dummy = .true.
       end if
 
@@ -83,7 +72,6 @@ contains
       end if
 
       if (alloc_dummy) then
-!~ print *, 'allocating shell'
          if (.not. allocated(self%contents)) then
             allocate (self%contents(n_mats))
          end if
@@ -177,9 +165,7 @@ contains
             self%FeMg = 1.0d10
          end if
 
-!call get_shell_abundances(self=self)
-!~ print *, 'fractions before init_mixture =', fractions
-!~ print *, '        check 0'
+
          call init_mixture(self=self%mixture, contents=contents, &
                            fractions=fractions, n_mats=n_mats, T=T, P=P, eps_H2O=eps_H2O, &
                            eps_Al=eps_Al, Si_number=self%Si_number, Fe_number=self%Fe_number, &
@@ -191,8 +177,7 @@ contains
          self%xi_H2O = self%mixture%xi_H2O
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
-!print *, '        wt in shell =', self%weight_fractions(:)
-!print *, '        check 1'
+
 !Compute ambient density
 !Note that the fractions at T=300 K and T=1.0d4 Pa would be in general
 !different but we want to know the ambient conditions of the given shell
@@ -206,14 +191,10 @@ contains
 
          self%initials%real_arr(19, 1:self%n_mats) = self%fractions(1:self%n_mats)
          self%initials%real_arr(20, 1:self%n_mats) = self%weight_fractions(1:self%n_mats)
-!self%initials%real_arr(21,:) = self%external_temp_profile
 
 !Here also the mixture must be computed and the shell gradients must
 !be updated
-! print *, 'xi_Fe =', self%xi_Fe
-! print *, 'fractions in init shell 1 =', self%fractions
          call update_shell(self=self)
-! print *, 'fractions in init shell 2 =', self%fractions
 
          self%initials%real_vals(1) = self%radius
          self%initials%real_vals(2) = self%temp
@@ -263,7 +244,6 @@ contains
          self%fractions(1:self%n_mats) = self%initials%real_arr(19, 1:self%n_mats)
          self%weight_fractions(1:self%n_mats) = self%initials%real_arr(20, 1:self%n_mats)
          self%indigenous_mass = 0.0d0
-         self%external_temp_profile(:) = self%initials%real_arr(21, :)
 
          self%N_tot = 0.0d0
          self%N_Mg = 0.0d0
@@ -450,8 +430,7 @@ contains
                      composition_gradients=self%composition_gradients, &
                      molar_masses=self%mixture%molar_masses, &
                      lay=self%lay, &
-                     xi_H=self%xi_H, &
-                     external_temp_profile=self%external_temp_profile)
+                     xi_H=self%xi_H)
 
    END SUBROUTINE update_shell_gradients
 
@@ -652,8 +631,7 @@ contains
                           composition_gradients=self%composition_gradients, &
                           molar_masses=self%mixture%molar_masses, &
                           lay=self%lay, &
-                          xi_H=self%xi_H, &
-                          external_temp_profile=self%external_temp_profile)
+                          xi_H=self%xi_H)
 
          self%indigenous_mass = params_dummy(2) - params(2)
          params = params_dummy
@@ -717,7 +695,6 @@ contains
       self%initials%real_vals(20) = other%E_int
       self%initials%real_arr(19, 1:self%n_mats) = other%fractions(1:self%n_mats)
       self%initials%real_arr(20, 1:self%n_mats) = other%weight_fractions(1:self%n_mats)
-      self%initials%real_arr(21, :) = self%external_temp_profile(:)
 
       call init_shell(self=self, alloc=.false., fractions=other%fractions, &
                       contents=other%contents, n_mats=size(other%contents))

@@ -278,7 +278,7 @@ contains
       E_int_is = pl%E_int_is
       E_grav_is = pl%E_grav_is
       E_tot_is = E_int_is + E_grav_is
-      L_int_is = pl%L_int
+      L_int_is = pl%L_int_is
 
 ! Update layer fractions in case composition changed
       do i = 1, pl%lay

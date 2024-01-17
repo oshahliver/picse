@@ -902,12 +902,12 @@ contains
 
 !    end subroutine compute_abundance_vector
 
+
 !########################################################################
    subroutine gradients(r, y, nmat, ll, gammaG0, tempType, grads, &
                         q, d0, adiabatType, eps_T_zero, xi_Fe, eps_H2O, &
                         eps_Al, omega, phi, fractions, weight_fractions, &
-                        composition_gradients, molar_masses, lay, xi_H, &
-                        external_temp_profile)
+                        composition_gradients, molar_masses, lay, xi_H)
 
       implicit none
 
@@ -919,7 +919,6 @@ contains
       real(8), intent(in), dimension(nmat) :: composition_gradients, &
                                               molar_masses
       integer, intent(in), dimension(nmat) :: ll
-      real(8), intent(in), dimension(3), optional :: external_temp_profile
       real(8) :: dPdr, dTdr, drhodr, dmdr, gammaG, dMOIdr, dXdr, dXdm, dEgravdr, dEintdr
       real(8), intent(out), dimension(n_params_integration) :: grads
       real(8) :: P, m, T, d, dPdrho_mean, alpha_mean, KS_mean, KT_mean
@@ -933,18 +932,12 @@ contains
       
       ! Ommit y(5) which is the MoI and only passively integrated
       ! Ommit y(7) which is E_grav and is only passively integrated
+      ! Ommit y(8) which is E_int and is only passively integrated
       P = y(1)
       m = y(2)
       T = y(3)
       d = y(4)
       X = y(6)
-
-! If an external temperature profile is followed extract the temperature
-! from the data instead of the integration step. Just replace the temp
-! value from the integration step by the one from the data.
-!~ if(present(external_temp_profile))then
-!~         T = extract_temperature(r, external_temp_profile, lay, y)
-!~ endif
 
 !X here is only the impurity mass fraction (case nmat > 2). The other
 !fractions depend on X and must be updated here in order to correctly
@@ -1116,14 +1109,13 @@ contains
    subroutine integrateRK(r, y_in, y_out, r_start, h, nmat, &
                           fractions, tempType, ll, gammaG0, q, d0, adiabatType, grads, &
                           eps_T_zero, xi_Fe, eps_H2O, eps_Al, omega, phi, weight_fractions, &
-                          composition_gradients, molar_masses, lay, xi_H, external_temp_profile)
+                          composition_gradients, molar_masses, lay, xi_H)
 
       implicit none
 
       integer :: i, j, k, s
       integer, intent(in) ::  nmat, tempType, adiabatType, lay
       integer, intent(in), dimension(nmat) :: ll
-      real(8), intent(in), dimension(3), optional :: external_temp_profile
       real(8), intent(inout), dimension(nmat) :: fractions, weight_fractions
       real(8), intent(in), dimension(nmat) :: composition_gradients, &
                                               molar_masses
@@ -1135,36 +1127,29 @@ contains
       real(8), dimension(4, n_params_integration) :: k_list
       real(8), dimension(n_params_integration) :: ki_list
       real(8), intent(out) :: r
-!~ print *, 'y_in =', y_in
+
       r = r_start
       do i = 1, 4
-!        print *, "i=", i
          do k = 1, size(y_out)
             ki_list(k) = y_in(k)
          end do
-!        print *, "ki_list =", ki_list
 
          do j = 1, i - 1
             do s = 1, size(y_out)
                ki_list(s) = ki_list(s) + h*k_list(j, s)*a_list(i, j)
             end do
-!                print *, "ki_list =", ki_list
          end do
          r = r_start + h*c_list(i)
 
          do k = 1, size(y_out)
             y_out(k) = ki_list(k)
          end do
-!        print *, "grads before f=", grads
 
-         !call f(grads, y_out)
          call gradients(r, y_out, nmat, ll, gammaG0, tempType, &
                         grads, q, d0, adiabatType, eps_T_zero, xi_Fe, eps_H2O, eps_Al, &
                         omega, phi, fractions, weight_fractions, &
                         composition_gradients=composition_gradients, &
-                        molar_masses=molar_masses, lay=lay, xi_H=xi_H, &
-                        external_temp_profile=external_temp_profile)
-         !call f(grads, y_out)
+                        molar_masses=molar_masses, lay=lay, xi_H=xi_H)
 
          do k = 1, size(y_out)
             k_list(i, k) = grads(k)
@@ -1181,19 +1166,6 @@ contains
             y_out(i) = y_out(i) + h*k_list(j, i)*b_list(j)
          end do
       end do
-
-! If an external temperature profile is followed extract the temperature
-! from the data instead of the integration step. Just replace the temp
-! value from the integration step by the one from the data.
-!~ if(present(external_temp_profile))then
-!~         y_out(3) = extract_temperature(r, external_temp_profile, lay, y_out)
-!~ endif
-
-!~ print *, "y_out =", y_out
-
-!~ if (y_out(3)<10.0)then
-!~         y_out(3)=10.0
-!~ endif
 
    end subroutine integrateRK
 !########################################################################

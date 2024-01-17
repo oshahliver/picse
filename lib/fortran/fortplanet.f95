@@ -30,7 +30,7 @@ MODULE class_planet
       real(8) :: inner_core_fraction, MOI_is, E_grav_is, omega, P_H2, xi_H_core, E_int_is, &
                  eps_T_zero, ocean_frac_should, ocean_frac_is, gravity, &
                  M_core_should, rho_mean, Si_number_mantle, Fe_number_mantle, xi_Stv, &
-                 T_ICB, T_CS, P_CS, T_MTZ, P_MTZ, E_grav, E_int, E_tot, L_int
+                 T_ICB, T_CS, P_CS, T_MTZ, P_MTZ, E_grav, E_int, E_tot, L_int_is
       real(8), dimension(:), allocatable :: xi_all_core, X_all_core
       real(8), dimension(:), allocatable :: layer_masses, GammaG0_layers, &
                                             temp_jumps, layer_radii, layer_temps, layer_pres, q_layers, rho0_layers, &
@@ -209,7 +209,7 @@ contains
       self%E_tot = 0d0
       self%E_grav = 0d0
       self%E_int = 0d0
-      self%L_int = 0d0
+      self%L_int_is = 0d0
 
       self%P_center_is = P_center
       self%T_center_is = T_center
@@ -439,10 +439,16 @@ contains
    SUBROUTINE compute_L_int(self)
 
       type(planet), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, ks
+      real(8) :: dU, rho1, r, dr, ks, temp
       integer :: i, j
 
-      self%L_int =  self%T_surface_is**4*sigma_SB*4*self%R_surface_is**2*pi
+      if (self%lay == 4) then
+         temp = self%T_surface_is - self%temp_jumps(4)
+      else
+         temp = self%T_surface_is 
+      endif
+
+      self%L_int_is =  temp**4*sigma_SB*4*self%R_surface_is**2*pi
 
    END SUBROUTINE compute_L_int
 
