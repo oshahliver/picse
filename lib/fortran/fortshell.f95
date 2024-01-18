@@ -16,7 +16,7 @@ MODULE class_shell
       real(8), dimension(:), allocatable :: fractions, xi_Fe, xi_H2O, &
                                             X_H2O, xi_Si, weight_fractions, composition_gradients, &
                                             mean_fractions, mean_weight_fractions
-      real(8) :: Si_number, Fe_number, mass, radius
+      real(8) :: Si_number, Fe_number, radius
       real(8) :: indigenous_mass, gravity, v_esc, volume, &
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
@@ -29,14 +29,15 @@ MODULE class_shell
       integer :: lay, adiabatType, tempType, n_mats
       logical :: saturation
       logical :: force_bisection = .false., constant_Fe = .true.
-
    end type shell
 
 contains
 
-   SUBROUTINE init_shell(self, contents, fractions, n_mats, T, P, eps_H2O, &
-                         Fe_number, lay, m, r, tempType, gammaG0, alloc, eps_T_zero, adiabatType, &
-                         q, rho0, eps_Al, Si_number, MOI, E_grav, E_int, omega, xi_H, xi_Stv, composition_gradients)
+   SUBROUTINE init_shell(self, contents, fractions, n_mats, eps_H2O, &
+                         Fe_number, lay, r, tempType, gammaG0, alloc, eps_T_zero, adiabatType, &
+                         q, rho0, eps_Al, Si_number, omega, xi_H, xi_Stv, &
+                         composition_gradients, integration_parameters)
+                         
 
       logical, optional, intent(in) :: alloc
       logical :: alloc_dummy
@@ -47,11 +48,11 @@ contains
       real(8), dimension(n_mats), intent(in), optional :: fractions, &
                                                           composition_gradients
       real(8), intent(in), optional :: gammaG0, q, rho0, omega, xi_H, xi_Stv
-      real(8), intent(in), optional :: T, P, eps_H2O, Fe_number, m, r, &
-                                       Si_number, MOI, E_grav, E_int
+      real(8), intent(in), optional :: eps_H2O, Fe_number, r, &
+                                       Si_number
       real(8), intent(in), optional :: eps_T_zero, eps_Al
+      real(8), intent(in), dimension(n_params_integration), optional :: integration_parameters
       integer :: i
-
 
       if (present(alloc)) then
          alloc_dummy = alloc
@@ -118,7 +119,8 @@ contains
          else
             self%composition_gradients(:) = 0d0
          end if
-
+         
+         self%integration_parameters = integration_parameters
          self%n_mats = n_mats
          self%gammaG0 = gammaG0
          self%q = q
@@ -159,9 +161,9 @@ contains
             self%FeMg = 1.0d10
          end if
 
-
          call init_mixture(self=self%mixture, contents=contents, &
-                           fractions=fractions, n_mats=n_mats, T=T, P=P, eps_H2O=eps_H2O, &
+                           fractions=fractions, n_mats=n_mats, T=self%integration_parameters(3), &
+                           P=self%integration_parameters(1), eps_H2O=eps_H2O, &
                            eps_Al=eps_Al, Si_number=self%Si_number, Fe_number=self%Fe_number, &
                            xi_H=self%xi_H, xi_Stv=self%xi_Stv, lay=self%lay)
 
@@ -172,13 +174,13 @@ contains
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
 
-         self%integration_parameters(1) = P
-         self%integration_parameters(2) = m
-         self%integration_parameters(3) = T
-         self%integration_parameters(5) = MOI
-         self%integration_parameters(6) = self%weight_fractions(n_mats)
-         self%integration_parameters(7) = E_grav
-         self%integration_parameters(8) = E_int
+         ! self%integration_parameters(1) = P
+         ! self%integration_parameters(2) = m
+         ! self%integration_parameters(3) = T
+         ! self%integration_parameters(5) = MOI
+         ! self%integration_parameters(6) = self%weight_fractions(n_mats)
+         ! self%integration_parameters(7) = E_grav
+         ! self%integration_parameters(8) = E_int
 
 !Compute ambient density
 !Note that the fractions at T=300 K and T=1.0d4 Pa would be in general
@@ -547,7 +549,8 @@ contains
       self%initials%real_arr(20, 1:self%n_mats) = other%weight_fractions(1:self%n_mats)
 
       call init_shell(self=self, alloc=.false., fractions=other%fractions, &
-                      contents=other%contents, n_mats=size(other%contents))
+                      contents=other%contents, n_mats=size(other%contents), &
+                      integration_parameters=other%integration_parameters)
 
    END SUBROUTINE merge_shells
 

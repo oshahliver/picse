@@ -14,7 +14,7 @@ MODULE class_layer
       real(8) :: eps_H2O, eps_Al, N_tot, N_Mg, N_Si, N_Al, N_H2O, N_Fe, N_S
       real(8) :: rho0, q, eps_T_zero, pres, temp, mass, dens, MOI, E_grav, E_int
       real(8) :: mass_should, indigenous_mass, dr, gammaG0
-      real(8), dimension(n_params_integration) :: params, gradients
+      real(8), dimension(n_params_integration) :: gradients
       integer, dimension(:), allocatable :: contents, YMg, YSi, YO, YS
       real(8), dimension(:), allocatable :: fractions, composition_gradients
       logical, dimension(:), allocatable :: saturation
@@ -45,6 +45,7 @@ contains
       integer, intent(in) :: tempType, rhoType, adiabatType
       real(8), intent(in), optional :: omega, xi_H, xi_Stv, X_impurity_0, &
                                        X_impurity_slope
+      real(8), dimension(n_params_integration) :: params
       integer :: i
 
       allocate (self%contents(n_mats))
@@ -62,12 +63,6 @@ contains
       self%fractions = fractions
       self%X_impurity_0 = 0d0
       self%X_impurity_slope = 0d0
-
-! print *, '-----'
-! print *, 'Initiating layer ', self%lay
-! print *, '-----'
-! print *, "fractions in init_layer =", fractions
-
 
       if (present(X_impurity_0)) then
          self%X_impurity_0 = X_impurity_0
@@ -126,6 +121,13 @@ contains
       self%E_grav = E_grav
       self%E_int = E_int
 
+      params(1) = P
+      params(2) = m
+      params(3) = T
+      params(5) = MOI
+      params(7) = E_grav
+      params(8) = E_int
+
       if (.not. Si_number == 1.0d0) then
          self%SiMg = 1.0d0/(1.0d0 - self%Si_number)
       else
@@ -138,30 +140,23 @@ contains
          self%FeMg = 1.0d10
       end if
 
-!~ print *, 'check 1'
-!~ print *, 'fracs in layer =', fractions
-      call init_shell(self=self%shells(1), T=T, P=P, contents=contents, &
+      call init_shell(self=self%shells(1), contents=contents, &
                       fractions=fractions, tempType=tempType, adiabatType=adiabatType, &
                       q=q, gammaG0=gammaG0, eps_T_zero=eps_T_zero, alloc=.true., &
                       eps_H2O=eps_H2O, eps_Al=self%eps_Al, Fe_number=self%Fe_number, &
-                      n_mats=n_mats, lay=lay, m=m, r=r_in, Si_number=self%Si_number, &
-                      MOI=self%MOI, E_grav=E_grav, E_int = E_int, omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
-                      composition_gradients=self%composition_gradients)
+                      n_mats=n_mats, lay=lay, r=r_in, Si_number=self%Si_number, &
+                      omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
+                      composition_gradients=self%composition_gradients, integration_parameters = params)
 
-!print *, "Printing shell in init_layer"
-!call print_shell(self=self%shells(1))
-!~ print *, 'check 2'
       call update_layer(self=self)
-!~ print *, '-----'
-!~ print *, 'End init layer', self%lay
-!~ print *, '-----'
+
    END SUBROUTINE init_layer
 
 !#######################################################################
    SUBROUTINE update_layer(self)
 
       type(layer), intent(inout) :: self
-      real(8), dimension(n_params_integration) :: length_scales
+      real(8), dimension(n_params_integration) :: length_scales, params, gradients
       integer :: i
 
       self%radius = self%shells(self%shell_count)%radius
@@ -177,16 +172,13 @@ contains
          self%force_bisection = .true.
       end if
 
-      self%params(1) = self%pres
-      self%params(2) = self%mass
-      self%params(3) = self%temp
-      self%params(4) = self%dens
-      self%params(5) = self%MOI
-      self%params(7) = self%E_grav
-      self%params(8) = self%E_int
+      ! Extract integration parameters from the last shell
+      do i=1, n_params_integration
+         params(i) = self%shells(self%shell_count)%integration_parameters(i)
+      enddo
 
       self%fractions = self%shells(self%shell_count)%fractions
-      self%gradients = self%shells(self%shell_count)%gradients
+      gradients = self%shells(self%shell_count)%gradients
 
       self%indigenous_mass = 0.0d0
 
@@ -196,18 +188,13 @@ contains
       end do
 
       if (.not. self%bisec) then
-         do i = 1, size(self%gradients)
-            length_scales(i) = abs(self%params(i)/self%gradients(i))
+         do i = 1, size(gradients)
+            length_scales(i) = abs(params(i) / gradients(i))
          end do
 
          !Ommit MOI for calculation of dr
          self%dr = minval(length_scales(1:4))*self%eps_r
-
       end if
-
-!print *, 'dr in layer update =', self%dr
-!print *, 'params =', self%params(:)
-!print *, 'grads in layer =', self%gradients(:)
    END SUBROUTINE update_layer
 
 !#######################################################################
@@ -215,11 +202,9 @@ contains
 
       type(layer), intent(inout) :: self
       real(8) :: X0, X1
+      real(8), dimension(n_params_integration) :: params
       logical :: alloc
       integer :: i
-
-!print *, ''
-!print *, 'bisec before before =', self%bisec
 
 !If layer bisection is ongoing and the constraint is currently not
 !overshot that means that the integration step size has been reduces
@@ -230,10 +215,7 @@ contains
       if (self%bisec .and. .not. self%overshoot) then
          call merge_shells(self=self%shells(self%shell_count), &
                            other=self%shells(self%shell_count - 1))
-
       end if
-!print *, 'construct with dr =', self%dr
-!print *, 'initials =', self%temp, self%pres, self%dens
 
       call construct_shell(self=self%shells(self%shell_count), dr=self%dr)
 
@@ -241,29 +223,23 @@ contains
          self%force_bisection = .true.
       end if
 
-!self%indigenous_mass = 0.0d0
-
-!do i=1, self%shell_count
-      ! self%indigenous_mass = self%indigenous_mass + &
-      !self%shells(self%shell_count)%indigenous_mass
-!enddo
-!print *, 'bisec before =', self%bisec
-
       call update_shell(self=self%shells(self%shell_count))
       call update_layer(self=self)
 
-!print *, 'grads =', self%gradients(:)
       self%r_out = self%radius
 
-!~ print *, 'bisec after =', self%bisec
-!~ print *, 'force bisec =', self%force_bisection
-!~ print *, 'overshoot =', self%overshoot
       if (.not. self%force_bisection) then
          if (self%overshoot) then
             alloc = .false.
          else
             alloc = .true.
          end if
+         
+         ! The integration parameters need to be extracted after the shell is updated
+         ! Extract integration parameters from the last shell
+         do i=1, n_params_integration
+               params(i) = self%shells(self%shell_count)%integration_parameters(i)
+         enddo
 
          !Here the fractions are not updated yet. However, the fraction of the
          !third component must already be given here. Thus, if the impurity
@@ -271,12 +247,9 @@ contains
          !the last shell has been constructed but prior to initiating the new
          !shell. This is done in the update_layer call above.
          call init_shell(self=self%shells(self%shell_count + 1), &
-                         T=self%temp, &
-                         P=self%pres, &
                          contents=self%contents, &
                          fractions=self%fractions, &
                          r=self%radius, &
-                         m=self%mass, &
                          tempType=self%tempType, &
                          lay=self%lay, &
                          gammaG0=self%gammaG0, &
@@ -290,17 +263,13 @@ contains
                          alloc=alloc, &
                          Fe_number=self%Fe_number, &
                          Si_number=self%Si_number, &
-                         MOI=self%MOI, &
-                         E_grav = self%E_grav, &
-                         E_int = self%E_int, &
                          omega=self%omega, &
                          xi_H=self%xi_H, &
                          xi_Stv=self%xi_Stv, &
-                         composition_gradients=self%composition_gradients)
-         !print *, 'shell count =', self%shell_count
+                         composition_gradients=self%composition_gradients, &
+                         integration_parameters = params)
       end if
-
-!call update_layer(self=self)
+      ! Increment shell count by one
       self%shell_count = self%shell_count + 1
 
    END SUBROUTINE construct_layer
