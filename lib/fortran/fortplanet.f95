@@ -1213,48 +1213,39 @@ contains
 
                if (self%layers(self%lay)%shell_count .gt. 1) then
                   lastshell = self%layers(self%lay)%shells(self%layers(self%lay)%shell_count - 1)
-
                   currentshell = self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)
                end if
 
                if (self%shell_iteration_count >= n_shells_max_planet) then
                   self%layer_iteration = .false.
                   self%shell_iteration = .false.
-                  print *, 'Total shell iteration limit exceeded.'
-                  print *, 'r=', self%layers(self%lay)%radius, &
-                     'm=', self%layers(self%lay)%mass, &
-                     'rho=', self%layers(self%lay)%dens, &
-                     'T=', self%layers(self%lay)%temp, &
-                     'P=', self%layers(self%lay)%pres, &
-                     'layer mass =', self%layers(self%lay)%indigenous_mass, &
-                     'dr =', self%layers(self%lay)%dr
-
+                  print *, 'Total shell iteration limit exceeded in layer ', self%lay
                end if
 
                if (self%layers(self%lay)%shell_count >= n_shells_max_layer) then
                   self%shell_iteration = .false.
                   self%layer_iteration = .false.
                   print *, 'Layer shell iteration limit exceeded in layer ', self%lay
-                  print *, 'r=', self%layers(self%lay)%radius, &
-                     'm=', self%layers(self%lay)%mass, &
-                     'rho=', self%layers(self%lay)%dens, &
-                     'T=', self%layers(self%lay)%temp, &
-                     'P=', self%layers(self%lay)%pres, &
-                     'layer mass =', self%layers(self%lay)%indigenous_mass, &
-                     'dr =', self%layers(self%lay)%dr
                end if
             end do
          end do
 
          call update_layer(self=self%layers(self%lay))
 
-         self%M_surface_is = self%layers(self%lay)%mass
-         self%R_surface_is = self%layers(self%lay)%radius
-         self%T_surface_is = self%layers(self%lay)%temp
-         self%P_surface_is = self%layers(self%lay)%pres
-         self%MOI_is = self%layers(self%lay)%MOI
-         self%E_grav_is = self%layers(self%lay)%E_grav
-         self%E_int_is = self%layers(self%lay)%E_int
+         ! self%M_surface_is = self%layers(self%lay)%mass
+         self%M_surface_is = currentshell%integration_parameters(2)
+         ! self%R_surface_is = self%layers(self%lay)%radius
+         self%R_surface_is = currentshell%radius
+         ! self%T_surface_is = self%layers(self%lay)%temp
+         self%T_surface_is = currentshell%integration_parameters(3)
+         ! self%P_surface_is = self%layers(self%lay)%pres
+         self%P_surface_is = currentshell%integration_parameters(1)
+         ! self%MOI_is = self%layers(self%lay)%MOI
+         self%MOI_is = currentshell%integration_parameters(5)
+         ! self%E_grav_is = self%layers(self%lay)%E_grav
+         self%E_grav_is = currentshell%integration_parameters(7)
+         ! self%E_int_is = self%layers(self%lay)%E_int
+         self%E_int_is = currentshell%integration_parameters(8)
 
          self%rho_mean = self%M_surface_is/(4.0d0/3.0d0*PI*self%R_surface_is**3)
          self%gravity = self%M_surface_is/self%R_surface_is**2*G

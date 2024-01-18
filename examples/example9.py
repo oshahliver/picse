@@ -79,7 +79,7 @@ print ("fractions in the end:" , pl.fractions)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-pl.print(digits=4)
+pl.print(digits=6)
 # pl.plot()
 
 print (f'E_grav_is: {pl.E_grav_is}')
