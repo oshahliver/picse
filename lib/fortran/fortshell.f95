@@ -16,13 +16,13 @@ MODULE class_shell
       real(8), dimension(:), allocatable :: fractions, xi_Fe, xi_H2O, &
                                             X_H2O, xi_Si, weight_fractions, composition_gradients, &
                                             mean_fractions, mean_weight_fractions
-      real(8) :: temp, pres, dens, Si_number, Fe_number, mass, radius
+      real(8) :: Si_number, Fe_number, mass, radius
       real(8) :: indigenous_mass, gravity, v_esc, volume, &
                  N_Mg, N_H2O, N_Fe, N_Si, N_Al, N_O, N_S, N_H, N_tot, FeMg, SiMg, eps_Al, &
                  eps_H2O
-      real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, MOI, xi_H, xi_Stv, E_grav, E_int
+      real(8) :: dPdr, eps_T_zero, gammaG0, rho0, q, dPdrho, xi_H, xi_Stv
       real(8), dimension(n_params_integration) :: integration_parameters
-      real(8) :: omega, dE_grav, dr, dE_int
+      real(8) :: omega, dr
       real(8), dimension(n_params_integration) :: gradients
       character(len=30) :: status = 'bare'
       type(dict) :: initials
@@ -123,10 +123,10 @@ contains
          self%gammaG0 = gammaG0
          self%q = q
          self%tempType = tempType
-         self%mass = m
+         ! self%mass = m
          self%radius = r
-         self%temp = T
-         self%pres = P
+         ! self%temp = T
+         ! self%pres = P
          self%contents = contents
          self%fractions = fractions
          self%lay = lay
@@ -137,9 +137,9 @@ contains
          self%eps_H2O = eps_H2O
          self%Fe_number = Fe_number
          self%Si_number = Si_number
-         self%MOI = MOI
-         self%E_grav = E_grav
-         self%E_int = E_int
+         ! self%MOI = MOI
+         ! self%E_grav = E_grav
+         ! self%E_int = E_int
          self%volume = 0d0
          self%timer = 0.0
          self%xi_Stv = xi_Stv
@@ -205,10 +205,10 @@ contains
          call update_shell(self=self)
 
          self%initials%real_vals(1) = self%radius
-         self%initials%real_vals(2) = self%temp
-         self%initials%real_vals(3) = self%mass
-         self%initials%real_vals(4) = self%pres
-         self%initials%real_vals(5) = self%dens
+         self%initials%real_vals(2) = self%integration_parameters(3)
+         self%initials%real_vals(3) = self%integration_parameters(2)
+         self%initials%real_vals(4) = self%integration_parameters(1)
+         self%initials%real_vals(5) = self%integration_parameters(4)
          self%initials%int_vals(6) = self%lay
          self%initials%int_vals(7) = self%tempType
          self%initials%real_vals(8) = self%dPdrho
@@ -219,11 +219,11 @@ contains
          self%initials%real_vals(13) = self%Si_number
          self%initials%real_vals(14) = self%eps_H2O
          self%initials%real_vals(15) = self%eps_Al
-         self%initials%real_vals(16) = self%MOI
+         self%initials%real_vals(16) = self%integration_parameters(5)
          self%initials%real_vals(17) = self%omega
          self%initials%real_vals(18) = self%xi_H
-         self%initials%real_vals(19) = self%E_grav
-         self%initials%real_vals(20) = self%E_int
+         self%initials%real_vals(19) = self%integration_parameters(7)
+         self%initials%real_vals(20) = self%integration_parameters(8)
 
 !If shell is being reset, don-t allocate everything and don-t
 !update all parameters. Just reset all parameters to their original
@@ -231,10 +231,10 @@ contains
       else
 !~ print *, 'not allocating shell'
          self%radius = self%initials%real_vals(1)
-         self%temp = self%initials%real_vals(2)
-         self%mass = self%initials%real_vals(3)
-         self%pres = self%initials%real_vals(4)
-         self%dens = self%initials%real_vals(5)
+         ! self%temp = self%initials%real_vals(2)
+         ! self%mass = self%initials%real_vals(3)
+         ! self%pres = self%initials%real_vals(4)
+         ! self%dens = self%initials%real_vals(5)
          self%lay = self%initials%int_vals(6)
          self%tempType = self%initials%int_vals(7)
          self%dPdrho = self%initials%real_vals(8)
@@ -244,11 +244,11 @@ contains
          self%SiMg = self%initials%real_vals(13)
          self%eps_H2O = self%initials%real_vals(14)
          self%eps_Al = self%initials%real_vals(15)
-         self%MOI = self%initials%real_vals(16)
+         ! self%MOI = self%initials%real_vals(16)
          self%omega = self%initials%real_vals(17)
          self%xi_H = self%initials%real_vals(18)
-         self%E_grav = self%initials%real_vals(19)
-         self%E_int = self%initials%real_vals(20)
+         ! self%E_grav = self%initials%real_vals(19)
+         ! self%E_int = self%initials%real_vals(20)
          self%fractions(1:self%n_mats) = self%initials%real_arr(19, 1:self%n_mats)
          self%weight_fractions(1:self%n_mats) = self%initials%real_arr(20, 1:self%n_mats)
          self%indigenous_mass = 0.0d0
@@ -272,8 +272,6 @@ contains
          self%integration_parameters(7) = self%initials%real_vals(19)
          self%integration_parameters(8) = self%initials%real_vals(20)
       end if
-
-
 
    END SUBROUTINE init_shell
 
@@ -358,14 +356,14 @@ contains
 
       n_mats = size(self%contents)
  
-      self%integration_parameters(1) = self%pres
-      self%integration_parameters(2) = self%mass
-      self%integration_parameters(3) = self%temp
-      self%integration_parameters(4) = self%dens
-      self%integration_parameters(5) = self%MOI
-      self%integration_parameters(6) = self%weight_fractions(n_mats)
-      self%integration_parameters(7) = self%E_grav
-      self%integration_parameters(8) = self%E_int
+      ! self%integration_parameters(1) = self%pres
+      ! self%integration_parameters(2) = self%mass
+      ! self%integration_parameters(3) = self%temp
+      ! self%integration_parameters(4) = self%dens
+      ! self%integration_parameters(5) = self%MOI
+      ! self%integration_parameters(6) = self%weight_fractions(n_mats)
+      ! self%integration_parameters(7) = self%E_grav
+      ! self%integration_parameters(8) = self%E_int
 
       ! self%integration_parameters = y
 
@@ -415,13 +413,13 @@ contains
          compute_mix_dummy = compute_mix
       end if
 
-      if (present(T)) then
-         self%temp = T
-      end if
+      ! if (present(T)) then
+      !    self%temp = T
+      ! end if
 
-      if (present(P)) then
-         self%pres = P
-      end if
+      ! if (present(P)) then
+      !    self%pres = P
+      ! end if
 
       if (present(T)) then
          self%integration_parameters(3) = T
@@ -445,7 +443,7 @@ contains
       if (compute_mix_dummy) then
          call compute_mixture(self=self%mixture, T=self%integration_parameters(3), P=self%integration_parameters(1))
 
-         self%dens = self%mixture%dens
+         ! self%dens = self%mixture%dens
          self%dPdrho = self%mixture%dPdrho
          self%integration_parameters(4) = self%mixture%dens
       end if
@@ -493,13 +491,13 @@ contains
 
       if (.not. self%status == 'constructed' .or. overconstruct_dummy) then
 
-         self%integration_parameters(1) = self%pres
-         self%integration_parameters(2) = self%mass
-         self%integration_parameters(3) = self%temp
-         self%integration_parameters(4) = self%dens
-         self%integration_parameters(5) = self%MOI
-         self%integration_parameters(7) = self%E_grav
-         self%integration_parameters(8) = self%E_int
+         ! self%integration_parameters(1) = self%pres
+         ! self%integration_parameters(2) = self%mass
+         ! self%integration_parameters(3) = self%temp
+         ! self%integration_parameters(4) = self%dens
+         ! self%integration_parameters(5) = self%MOI
+         ! self%integration_parameters(7) = self%E_grav
+         ! self%integration_parameters(8) = self%E_int
 
 !For more than two materials the last one can have composition gradient
 !Else just juse zero as a place holder during the integration
@@ -540,13 +538,13 @@ contains
          self%indigenous_mass = params_dummy(2) - self%integration_parameters(2)
          self%integration_parameters = params_dummy
 
-         self%pres = self%integration_parameters(1)
-         self%mass = self%integration_parameters(2)
-         self%temp = self%integration_parameters(3)
-         self%dens = self%integration_parameters(4)
-         self%MOI = self%integration_parameters(5)
-         self%E_grav = self%integration_parameters(7)
-         self%E_int = self%integration_parameters(8)
+         ! self%pres = self%integration_parameters(1)
+         ! self%mass = self%integration_parameters(2)
+         ! self%temp = self%integration_parameters(3)
+         ! self%dens = self%integration_parameters(4)
+         ! self%MOI = self%integration_parameters(5)
+         ! self%E_grav = self%integration_parameters(7)
+         ! self%E_int = self%integration_parameters(8)
          self%dr = dr
 
          self%volume = 4d0/3d0*PI*(self%radius**3 - (self%radius - dr)**3)

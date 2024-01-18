@@ -246,8 +246,6 @@ contains
       
       call construct_planet(self=pl)
       call get_profiles(self=pl)
-      call compute_E_grav(self=pl)
-      call compute_E_int(self=pl)
       call compute_L_int(self=pl)
 
       do i = 1, 8
@@ -301,7 +299,7 @@ contains
          !does not exist a segmentation fault occurs if the bottom density
          !is attempted to be extracted.
          if (pl%layers(i)%shell_count .gt. 4 .and. pl%layers(i)%shell_count .lt. 500) then
-            layer_properties(i, 4) = pl%layers(i)%shells(1)%dens
+            layer_properties(i, 4) = pl%layers(i)%shells(1)%integration_parameters(4)
 
          else
             layer_properties(i, 4) = pl%layers(i)%dens

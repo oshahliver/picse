@@ -394,48 +394,6 @@ contains
    END SUBROUTINE get_integration_time
 
 !#######################################################################
-   SUBROUTINE compute_E_grav(self)
-!Computes gravitational energy contribution of each shell approximating the
-!dnesity as a linear function between the bottom and the top of each shell.
-!The total gravitational energy of the planet is obtained by summing up
-!all contributions of the individual shells.
-
-      type(planet), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, ks
-      integer :: i, j
-
-      self%E_grav = 0d0
-
-      !Iterate over all layers
-      do i = 1, self%lay
-         !Iterate over individual shells within a layer
-         do j = 1, self%layers(i)%shell_count
-            self%E_grav = self%E_grav + self%layers(i)%shells(j)%dE_grav
-         end do
-      end do
-
-   END SUBROUTINE compute_E_grav
-
-!#######################################################################
-   SUBROUTINE compute_E_int(self)
-
-      type(planet), intent(inout) :: self
-      real(8) :: dU, rho1, r, dr, ks
-      integer :: i, j
-
-      self%E_int = 0d0
-
-      !Iterate over all layers
-      do i = 1, self%lay
-         !Iterate over individual shells within a layer
-         do j = 1, self%layers(i)%shell_count
-            self%E_int = self%E_int + self%layers(i)%shells(j)%dE_int
-         end do
-      end do
-
-   END SUBROUTINE compute_E_int
-
-!#######################################################################
    SUBROUTINE compute_L_int(self)
 
       type(planet), intent(inout) :: self
@@ -496,14 +454,14 @@ contains
 
          do j = 1, self%layers(i)%shell_count
             self%profiles(1, n) = self%layers(i)%shells(j)%radius
-            self%profiles(2, n) = self%layers(i)%shells(j)%temp
-            self%profiles(3, n) = self%layers(i)%shells(j)%pres
-            self%profiles(4, n) = self%layers(i)%shells(j)%dens
-            self%profiles(5, n) = self%layers(i)%shells(j)%mass
+            self%profiles(2, n) = self%layers(i)%shells(j)%integration_parameters(3)
+            self%profiles(3, n) = self%layers(i)%shells(j)%integration_parameters(1)
+            self%profiles(4, n) = self%layers(i)%shells(j)%integration_parameters(4)
+            self%profiles(5, n) = self%layers(i)%shells(j)%integration_parameters(2)
             self%profiles(6, n) = self%layers(i)%shells(j)%gravity
-            self%profiles(7, n) = self%layers(i)%shells(j)%MOI
-            self%profiles(8, n) = self%layers(i)%shells(j)%E_grav
-            self%profiles(9, n) = self%layers(i)%shells(j)%E_int
+            self%profiles(7, n) = self%layers(i)%shells(j)%integration_parameters(5)
+            self%profiles(8, n) = self%layers(i)%shells(j)%integration_parameters(7)
+            self%profiles(9, n) = self%layers(i)%shells(j)%integration_parameters(8)
 
             if (N > 1) then
                self%profiles(8, n) = self%profiles(8, n) + self%profiles(8, n - 1)

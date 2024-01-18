@@ -165,13 +165,13 @@ contains
       integer :: i
 
       self%radius = self%shells(self%shell_count)%radius
-      self%pres = self%shells(self%shell_count)%pres
-      self%mass = self%shells(self%shell_count)%mass
-      self%temp = self%shells(self%shell_count)%temp
-      self%dens = self%shells(self%shell_count)%dens
-      self%MOI = self%shells(self%shell_count)%MOI
-      self%E_grav = self%shells(self%shell_count)%E_grav
-      self%E_int = self%shells(self%shell_count)%E_int
+      self%pres = self%shells(self%shell_count)%integration_parameters(1)
+      self%mass = self%shells(self%shell_count)%integration_parameters(2)
+      self%temp = self%shells(self%shell_count)%integration_parameters(3)
+      self%dens = self%shells(self%shell_count)%integration_parameters(4)
+      self%MOI = self%shells(self%shell_count)%integration_parameters(5)
+      self%E_grav = self%shells(self%shell_count)%integration_parameters(7)
+      self%E_int = self%shells(self%shell_count)%integration_parameters(8)
 
       if (self%shells(self%shell_count)%force_bisection) then
          self%force_bisection = .true.
@@ -183,7 +183,7 @@ contains
       self%params(4) = self%dens
       self%params(5) = self%MOI
       self%params(7) = self%E_grav
-      self%params(7) = self%E_int
+      self%params(8) = self%E_int
 
       self%fractions = self%shells(self%shell_count)%fractions
       self%gradients = self%shells(self%shell_count)%gradients
