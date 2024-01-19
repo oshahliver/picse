@@ -167,7 +167,7 @@ contains
       logical, intent(out) :: inner_core_exists
 
       integer :: n_layers, shell_idx
-      integer :: i, j, c
+      integer :: i, j, c, ii
       real(8), dimension(n_params_integration) :: params
       
       ! print *, "creating new planet..."
@@ -254,7 +254,6 @@ contains
             profiles(i, j) = pl%profiles(i, j)
          end do
       end do
-
       M_surface_is = pl%M_surface_is
       R_surface_is = pl%R_surface_is
       P_surface_is = pl%P_surface_is
@@ -288,33 +287,32 @@ contains
          end if
       end do
 
-! !~ print*, 'out fracs in eosfort_wrapper =', out_frac(3,:)
-
 ! Update layer properties
       do i = 1, n_layers
          shell_idx = pl%layers(i)%shell_count
-         params = pl%layers(i)%shells(shell_idx)%integration_parameters
-         layer_properties(i, 1) = params(1)!pl%layers(i)%pres
-         layer_properties(i, 2) = params(3)!pl%layers(i)%temp
-         layer_properties(i, 3) = params(4)!pl%layers(i)%dens
-         !If layer exists, add bottom density. Else bottom and top density are
-         !just the same. Distinction needs to be made here because if layer
-         !does not exist a segmentation fault occurs if the bottom density
-         !is attempted to be extracted.
-         if (pl%layers(i)%shell_count .gt. 4 .and. pl%layers(i)%shell_count .lt. 500) then
-            layer_properties(i, 4) = pl%layers(i)%shells(1)%integration_parameters(4)
+         if (shell_idx > 0) then
+            params = pl%layers(i)%shells(shell_idx)%integration_parameters
+            layer_properties(i, 1) = params(1)
+            layer_properties(i, 2) = params(3)
+            layer_properties(i, 3) = params(4)
+            layer_properties(i, 4) = params(4)
+            layer_properties(i, 5) = pl%layers(i)%indigenous_mass
+            layer_properties(i, 6) = pl%layers(i)%radius
+            !If layer exists, add bottom density. Else bottom and top density are
+            !just the same. Distinction needs to be made here because if layer
+            !does not exist a segmentation fault occurs if the bottom density
+            !is attempted to be extracted.
+            ! if (pl%layers(i)%shell_count .gt. 1) then ! .and. pl%layers(i)%shell_count .lt. 500) then
+            !    layer_properties(i, 4) = pl%layers(i)%shells(1)%integration_parameters(4)
+            ! else
+            !    layer_properties(i, 4) = params(4)!pl%layers(i)%dens
+            ! end if
 
-         else
-            layer_properties(i, 4) = params(4)!pl%layers(i)%dens
-         end if
-         layer_properties(i, 5) = pl%layers(i)%indigenous_mass
-         layer_properties(i, 6) = pl%layers(i)%radius
+         endif
       end do
 
       ! print *, 'NOTE: out_frac(5) is set to 1 manually in eosfort_wrapper! (No impurities in hydrosphere)'
       ! out_frac(5, 1) = 1d0
-
-!call print_shell(self=pl%layers(2)%shells(1))
 
    END SUBROUTINE create_planet
 

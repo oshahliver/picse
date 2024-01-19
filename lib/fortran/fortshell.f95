@@ -469,7 +469,8 @@ contains
          end if
 
          r_dummy = self%radius
-
+         ! print *, "constructing shell with dr:", dr
+         ! print *, "constructing shell from mass:", self%integration_parameters(2)
          call integrateRK(r_start=r_dummy, &
                           h=dr, &
                           y_in=self%integration_parameters, &
@@ -505,12 +506,12 @@ contains
 
          update_grads = .false.
          compute_mix = .false.
-
+         ! print *, "constructed shell to mass:", self%integration_parameters(2)
          call update_shell(self=self, update_grads=update_grads, &
                            compute_mix=compute_mix)
 
          self%status = 'constructed'
-
+         ! print *, "constructed shell to mass:", self%integration_parameters(2)
 
       else
          print *, 'WARNING: This shell has already been constructed.'

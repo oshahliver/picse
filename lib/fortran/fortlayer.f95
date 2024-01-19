@@ -103,9 +103,6 @@ contains
 
       self%r_in = r_in
       self%radius = r_in
-      ! self%mass = m
-      ! self%temp = T
-      ! self%pres = P
       self%q = q
       self%rho0 = rho0
       self%gammaG0 = gammaG0
@@ -118,16 +115,6 @@ contains
       self%Si_number = Si_number
       self%eps_H2O = eps_H2O
       self%eps_Al = eps_Al
-      ! self%MOI = MOI
-      ! self%E_grav = E_grav
-      ! self%E_int = E_int
-
-      ! params(1) = P
-      ! params(2) = m
-      ! params(3) = T
-      ! params(5) = MOI
-      ! params(7) = E_grav
-      ! params(8) = E_int
 
       if (.not. Si_number == 1.0d0) then
          self%SiMg = 1.0d0/(1.0d0 - self%Si_number)
@@ -159,16 +146,8 @@ contains
       type(layer), intent(inout) :: self
       real(8), dimension(n_params_integration) :: length_scales, params, gradients
       integer :: i
-
+      ! print *, "Updating layer with shell:", self%shell_count
       self%radius = self%shells(self%shell_count)%radius
-      ! self%pres = self%shells(self%shell_count)%integration_parameters(1)
-      ! self%mass = self%shells(self%shell_count)%integration_parameters(2)
-      ! self%temp = self%shells(self%shell_count)%integration_parameters(3)
-      ! self%dens = self%shells(self%shell_count)%integration_parameters(4)
-      ! self%MOI = self%shells(self%shell_count)%integration_parameters(5)
-      ! self%E_grav = self%shells(self%shell_count)%integration_parameters(7)
-      ! self%E_int = self%shells(self%shell_count)%integration_parameters(8)
-
       if (self%shells(self%shell_count)%force_bisection) then
          self%force_bisection = .true.
       end if
@@ -180,9 +159,8 @@ contains
 
       self%fractions = self%shells(self%shell_count)%fractions
       gradients = self%shells(self%shell_count)%gradients
-
       self%indigenous_mass = 0.0d0
-
+      
       do i = 1, self%shell_count
          self%indigenous_mass = self%indigenous_mass + &
                                 self%shells(i)%indigenous_mass
@@ -196,6 +174,7 @@ contains
          !Ommit MOI for calculation of dr
          self%dr = minval(length_scales(1:4))*self%eps_r
       end if
+      ! print *, "Updating successful."
    END SUBROUTINE update_layer
 
 !#######################################################################
@@ -206,7 +185,7 @@ contains
       real(8), dimension(n_params_integration) :: params
       logical :: alloc
       integer :: i
-
+      ! print *, "constructing shell in layer:", self%shell_count
 !If layer bisection is ongoing and the constraint is currently not
 !overshot that means that the integration step size has been reduces
 !sufficiently to actually add one more useful shell before the layer
@@ -214,24 +193,34 @@ contains
 !from exactly this point. For this reason it is initially set to have
 !the same properties as the previously integrated shell by merging them.
       if (self%bisec .and. .not. self%overshoot) then
+         ! print *, "merging shells:", self%shell_count, self%shell_count -1 
          call merge_shells(self=self%shells(self%shell_count), &
                            other=self%shells(self%shell_count - 1))
       end if
 
+      ! print *, "constructing shell in layer with idx:", self%shell_count
+      ! print *, "dr in layer =", self%dr
+      ! print *, "The shell that will be constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       call construct_shell(self=self%shells(self%shell_count), dr=self%dr)
-
+      ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       if (self%shells(self%shell_count)%force_bisection) then
          self%force_bisection = .true.
       end if
 
       call update_shell(self=self%shells(self%shell_count))
+      ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       call update_layer(self=self)
-
+      
+      ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       self%r_out = self%radius
 
+      ! TODO. Remove this if possible (think it through again!)
+      ! Since in overshoot, the pre-initiated shell is now completely
+      ! overwritten with an empty shell, it should never be required
+      ! to use alloc = .false.
       if (.not. self%force_bisection) then
          if (self%overshoot) then
-            alloc = .false.
+            alloc = .true.
          else
             alloc = .true.
          end if
@@ -241,7 +230,7 @@ contains
          do i=1, n_params_integration
                params(i) = self%shells(self%shell_count)%integration_parameters(i)
          enddo
-
+       
          !Here the fractions are not updated yet. However, the fraction of the
          !third component must already be given here. Thus, if the impurity
          !fraction is not constant the new value must be evaluated after
@@ -270,9 +259,10 @@ contains
                          composition_gradients=self%composition_gradients, &
                          integration_parameters = params)
       end if
+
       ! Increment shell count by one
       self%shell_count = self%shell_count + 1
-
+      ! print *, "Constructing shell successfull"
    END SUBROUTINE construct_layer
 
 END MODULE class_layer

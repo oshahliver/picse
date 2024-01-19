@@ -495,7 +495,6 @@ contains
       !current shell (the current shell being the one that will be constructed
       !in the subsequent integration step)
       sh = self%layers(self%lay)%shell_count - 1
-
       self%N_Mg = self%N_Mg - self%layers(self%lay)%shells(sh)%N_Mg
       self%N_Al = self%N_Al - self%layers(self%lay)%shells(sh)%N_Al
       self%N_Si = self%N_Si - self%layers(self%lay)%shells(sh)%N_Si
@@ -504,22 +503,18 @@ contains
       self%N_S = self%N_S - self%layers(self%lay)%shells(sh)%N_S
       self%N_H2O = self%N_H2O - self%layers(self%lay)%shells(sh)%N_H2O
       self%N_H = self%N_H - self%layers(self%lay)%shells(sh)%N_H
-
       if (self%N_Fe .eq. 0.0d0 .and. self%N_Mg .eq. 0.0d0) then
          self%Mg_number_is = 0.0d0
       else
          self%Mg_number_is = self%N_Mg/(self%N_Mg + self%N_Fe)
       end if
-
       if (self%N_Si .eq. 0.0d0 .and. self%N_Mg .eq. 0.0d0) then
          self%Si_number_is = 0.0d0
       else
          self%Si_number_is = self%N_Si/(self%N_Mg + self%N_Si)
       end if
-
       self%M_H2O_is = self%N_H2O*mH2O
       self%M_H2O_is = self%M_H2O_is + self%N_H*(0.5d0*mO + mH)
-
    END SUBROUTINE remove_stuff
 
 !#######################################################################
@@ -657,12 +652,13 @@ contains
       ! Note that the next shell as already been instantiated
       ! at this stage so the shell_count has to be reduced by one
       shell_idx = self%layers(lay)%shell_count - 1
+      
 
       !Indigenous mass
       if (self%layer_constraints(lay + skip) == 0) then
          self%constraint_value_is = &
             self%layers(lay)%indigenous_mass
-
+            
          !If the indigenous mass is probed in the next layer, it is currently
          !zero if it is checked from the bisection of the previous layer.
          !this has to be set manually as the next layer does not exist yet.
@@ -681,7 +677,7 @@ contains
          self%constraint_value_is = &
             self%layers(lay)%shells(shell_idx)%integration_parameters(2)
             ! self%layers(lay)%mass
-
+            
          self%constraint_value_should = self%layer_masses(lay + skip)*m_earth
          self%direction = 1
 
@@ -699,7 +695,6 @@ contains
          self%constraint_value_is = &
          self%layers(lay)%shells(shell_idx)%integration_parameters(1)
             ! self%layers(lay)%pres
-
          self%constraint_value_should = &
             self%layer_pres(lay + skip)
          self%direction = -1
@@ -709,7 +704,7 @@ contains
          self%constraint_value_is = &
          self%layers(lay)%shells(shell_idx)%integration_parameters(3)
             ! self%layers(lay)%temp
-
+         
          self%constraint_value_should = &
             self%layer_temps(lay + skip)
 
@@ -721,7 +716,6 @@ contains
             self%direction = -1
          end if
       end if
-
    END SUBROUTINE get_layer_constraint
 
 !#######################################################################
@@ -733,41 +727,28 @@ contains
       real(8) :: a, b, c, r
       real(8), dimension(n_params_integration) :: params
 
-      ! Get latest integrated shell index in layer
-      ! Note that the next shell as already been instantiated
-      ! at this stage so the shell_count has to be reduced by one
-      shell_idx = self%layers(self%lay)%shell_count
-
       call get_layer_constraint(self=self, lay=self%lay, skip=0)
-      ! print *, 'Layer constraint should =', self%constraint_value_should
-      ! print *, 'Layer constraint is =', self%constraint_value_is
+      ! print *, "------"
+      ! print *, 'Layer constraint should (1) =', self%constraint_value_should
+      ! print *, 'Layer constraint is (1) =', self%constraint_value_is
+
       ! print *, 'layermasses =', self%layer_masses
       reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                self%constraint_value_should
-      ! print *, 'reldev, dir, eps =', reldev, self%direction, eps_layer
+      ! print *, 'reldev =', reldev
       !Overshoot
       if (reldev*self%direction .lt. -eps_layer) then
-
-         ! print *, 'Overshoot in minor bisection.'
-         ! print *, 'Layer constraint type =', self%layer_constraints(self%lay)
-         ! print *, 'Layer constraint should =', self%constraint_value_should
-         ! print *, 'Layer constraint is =', self%constraint_value_is
          call remove_stuff(self=self)
          self%layers(self%lay)%overshoot = .true.
+         self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1
          sh = self%layers(self%lay)%shell_count
-
-         !Two shells need to be reset here
-         call reset_shell(self=self%layers(self%lay)%shells(sh))
-
-         sh = sh - 1
-         self%layers(self%lay)%shell_count = sh
-
+         self%layers(self%lay)%shells(sh + 1) = self%layers(self%lay)%shells(sh + 2)
          call reset_shell(self=self%layers(self%lay)%shells(sh))
          call update_layer(self=self%layers(self%lay))
 
          !Compute the melting temperature of iron at current pressure
          if (self%lay == 1) then
-            self%T_ICB = T_melt_iron(P=self%layers(self%lay)%shells(shell_idx)%integration_parameters(1),&!pres, &
+            self%T_ICB = T_melt_iron(P=self%layers(self%lay)%shells(sh)%integration_parameters(1),&!pres, &
                                      X_Si=self%X_all_core(4), &
                                      X_O=self%X_all_core(5), &
                                      X_S=self%X_all_core(3))
@@ -788,33 +769,21 @@ contains
       ! Layer transition reached
       else if (abs(reldev) .lt. eps_layer) then
          ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
-         ! print *, 'Layer constraint should =', self%constraint_value_should
-         ! print *, 'Layer constraint is =', self%constraint_value_is
-         if (self%lay == 1) then
-            ! print *, 'layermasses before update core mass =', self%layer_masses
-            call update_core_mass(self=self)
-            ! print *, 'layermasses after update core mass =', self%layer_masses
-         end if
+         ! print *, 'Layer constraint should (3) =', self%constraint_value_should
+         ! print *, 'Layer constraint is (3) =', self%constraint_value_is
 
+         if (self%lay == 1) then
+            call update_core_mass(self=self)
+         end if
          self%layer_complete = .true.
          self%shell_iteration = .false.
          self%change_bisec = .true.
-
          self%subphase_refine_inhibit = .false.
          skip = 0
-
-         !The construct method has already updated the shell count for the next
-         !iteration. However, this iteration will never take place as the
-         !shell that has just been constructed reached the minor constraint.
-         !The shell count therefore has to be set back to this shell
-         self%layers(self%lay)%shell_count = &
-            self%layers(self%lay)%shell_count - 1
 
          !If this was the last layer, abort integration
          if (self%lay == size(self%contents%axes)) then
             self%layer_iteration = .false.
-            ! print *, 'This was the last layer'
-
          else
             !Check if the condition for the next layer(s) is also met. In this case
             !skip the next layer and continue the integration with the
@@ -829,7 +798,7 @@ contains
                ! print *, 'Next layer constraint is =', self%constraint_value_is
                reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                         self%constraint_value_should
-
+               ! print *, "reldev =", reldev
                if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                   skip = skip + 1
                   ! print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
@@ -844,6 +813,7 @@ contains
                else
                   if (self%lay <= 2) then
                      old_layer_constraint = self%layer_constraints(3)
+                     ! print *, "double checking for transition 2 -> 3"
                      self%layer_constraints(3) = 3
                      call get_layer_constraint(self=self, lay=self%lay, skip=i)
                      self%layer_constraints(3) = old_layer_constraint
@@ -874,42 +844,29 @@ contains
             end do
 
             do i = 1, skip + 1
-               ! print *, 'Layer reached at M =', self%layers(self%lay)%mass/m_earth
                radius = self%layers(self%lay)%radius
-               ! mass = self%layers(self%lay)%mass
-               ! pres = self%layers(self%lay)%pres
-               ! temp = self%layers(self%lay)%temp
-               
-               ! mass = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(2)
-               ! pres = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(1)
-               ! temp = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(3)
-               ! moi = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(5)
-               ! E_grav = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(7)
-               ! E_int = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(8)
 
                !If ICB is reached, update T_ICB
                if (self%lay == 1) then
                   self%T_ICB = temp
                end if
 
+               ! Get latest integrated shell index in layer
+               ! NOTE. It is very importatnt that the shell idx is updated here
+               ! because it will be different in each layer if some layers are skipped.
+               shell_idx = self%layers(self%lay)%shell_count
+               
                !Compute temperature after temperature jump
                deltaT = self%temp_jumps(self%lay)
-               ! temp = max(temp - deltaT, T_zero)
-
-               ! TODO. Check why shell_idx - 1 must be taken here!
-               params = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters
+               params = self%layers(self%lay)%shells(shell_idx)%integration_parameters
                params(3) = max(params(3) - deltaT, T_zero)
-
-               ! print *, "Instantiating layer ", self%lay + 1
+               
                !Initiate next layer lay+1
                call init_layer(self=self%layers(self%lay + 1), &
                                n_mats=size(self%contents%axes(self%lay + 1)%int_array), &
                                contents=self%contents%axes(self%lay + 1)%int_array, &
                                fractions=self%fractions%axes(self%lay + 1)%real_array, &
                                r_in=radius, &
-                              !  m=params(2), &
-                              !  T=params(3), &
-                              !  P=params(1), &
                                tempType=self%tempType, &
                                rhoType=self%rhoType, &
                                adiabatType=self%adiabatType, &
@@ -924,9 +881,6 @@ contains
                                lay=self%lay + 1, &
                                Si_number=self%Si_number_layers(self%lay + 1), &
                                Fe_number=self%Fe_number_layers(self%lay + 1), &
-                              !  MOI=params(5),&!self%layers(self%lay)%MOI, & !MoI is currently the MoI from the last layer
-                              !  E_grav = params(7),&!self%layers(self%lay)%E_grav, & !E_grav is currently the E_grav from the last layer
-                              !  E_int = params(8),&!self%layers(self%lay)%E_int, &
                                omega=self%omega, &
                                xi_H=self%xi_H_layers(self%lay + 1), &
                                xi_Stv=self%xi_Stv_layers(self%lay + 1), &
@@ -977,7 +931,6 @@ contains
          param_should = self%M_surface_should
          eps = eps_M_surface
          direction = (/1, -1/)
-
       end if
 
       !Overshoot
@@ -1061,7 +1014,7 @@ contains
       !If subphase transition is found, perform the shell refinement
       if (trans) then
          if (.not. self%subphase_refine_inhibit) then
-
+            ! print *, "Initiating subphase refinement"
             self%layers(self%lay)%overshoot = .true.
 
             call remove_stuff(self=self)
@@ -1099,6 +1052,7 @@ contains
                !current one.
                self%layers(self%lay)%overshoot = .false.
                call major_bisection(self=self)
+
                call minor_bisection(self=self)
 
                if (self%layers(self%lay)%overshoot) then
@@ -1159,15 +1113,14 @@ contains
             self%subphase_refine_inhibit = .false.
 
             do while (self%shell_iteration)
-               !   print *, 'Constructing shell:', self%layers(self%lay)%shell_count
+               ! print *, 'Constructing shell:', self%layers(self%lay)%shell_count
                self%shell_iteration_count = self%shell_iteration_count + 1
-               ! olddens = self%layers(self%lay)%dens
                self%skip_bisec = .false.
                call construct_layer(self=self%layers(self%lay))
                call add_stuff(self=self)
                shell_idx = self%layers(self%lay)%shell_count - 1
                params = self%layers(self%lay)%shells(shell_idx)%integration_parameters
-               
+
                !Compute the melting temperature of iron at current pressure
                if (self%lay == 1) then
                   self%T_ICB = T_melt_iron(P=params(1), &
@@ -1200,7 +1153,6 @@ contains
                if (.not. self%skip_bisec) then
                   call major_bisection(self=self)
                   call minor_bisection(self=self)
-
                   !For the inner core check if Fe melting is reached
                   if (self%lay == 1) then
                      !If bisection has just been initiated for the the core mass,
@@ -1214,8 +1166,8 @@ contains
                         ! Temporarely set inner core constraint to temp and
                         ! check for layer transition
                         self%layer_constraints(1) = 4
+                        
                         call minor_bisection(self=self)
-
                         ! Reset inner core constraint to original value
                         self%layer_constraints(1) = old_layer_constraint
                         !self%layer_masses(1) = self%layer_masses(2)
@@ -1229,8 +1181,8 @@ contains
                         ! Temporarily set lower mantle constraint to pressure
                         ! and check for layer transition
                         self%layer_constraints(3) = 3
+                        
                         call minor_bisection(self=self)
-
                         ! Reset lower mantle constraint to to original value
                         self%layer_constraints(3) = old_layer_constraint
                         !Set LM mass to UM mass. This is important if an ocean
@@ -1240,26 +1192,22 @@ contains
                         self%layer_masses(3) = self%layer_masses(4)
                      end if
                   end if
-
                end if
-
+               
                if (self%layers(self%lay)%shell_count .gt. 2) then
                   if (.not. self%subphase_refine_inhibit) then
                      call subphase_refine(self=self)
                   end if
                end if
-
                if (self%layers(self%lay)%shell_count .gt. 1) then
                   lastshell = self%layers(self%lay)%shells(self%layers(self%lay)%shell_count - 1)
                   currentshell = self%layers(self%lay)%shells(self%layers(self%lay)%shell_count)
                end if
-
                if (self%shell_iteration_count >= n_shells_max_planet) then
                   self%layer_iteration = .false.
                   self%shell_iteration = .false.
                   print *, 'Total shell iteration limit exceeded in layer ', self%lay
                end if
-
                if (self%layers(self%lay)%shell_count >= n_shells_max_layer) then
                   self%shell_iteration = .false.
                   self%layer_iteration = .false.
@@ -1267,9 +1215,7 @@ contains
                end if
             end do
          end do
-
          call update_layer(self=self%layers(self%lay))
-
          ! self%M_surface_is = self%layers(self%lay)%mass
          self%M_surface_is = currentshell%integration_parameters(2)
          ! self%R_surface_is = self%layers(self%lay)%radius
@@ -1284,37 +1230,31 @@ contains
          self%E_grav_is = currentshell%integration_parameters(7)
          ! self%E_int_is = self%layers(self%lay)%E_int
          self%E_int_is = currentshell%integration_parameters(8)
-
          self%rho_mean = self%M_surface_is/(4.0d0/3.0d0*PI*self%R_surface_is**3)
          self%gravity = self%M_surface_is/self%R_surface_is**2*G
-
          !If planet has five layers, by convention, the last one is the surface ocean
          !Update the total ocean mass fraction in log
          if (self%lay == 5) then
             self%ocean_frac_is = self%layers(self%lay)%indigenous_mass/self%M_surface_is
             self%ocean_frac_is = log10(self%ocean_frac_is)
          end if
-
       end if
-
       do i = 1, self%lay
          do j = 1, self%layers(i)%shell_count
             self%n_shells = self%n_shells + 1
          end do
       end do
-
-      ! print *, 'Integration terminated in layer ', self%lay
-      ! print *, 'at shell ', self%n_shells
+      print *, 'Integration terminated in layer ', self%lay
+      print *, 'at shell ', self%n_shells
+      print *, 'after iterations: ', self%shell_iteration_count
 
       !Check if individual layers exist
       if (size(self%layers(1)%shells) .eq. 0) then
          self%inner_core_exists = .false.
       end if
-
       if (size(self%layers(2)%shells) .eq. 0) then
          self%outer_core_exists = .false.
       end if
-
    END SUBROUTINE construct_planet
 
 END MODULE class_planet

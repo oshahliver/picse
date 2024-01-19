@@ -540,7 +540,7 @@ class Toolkit:
                 # values of two data points are identical
                 rand = random.random()
                 # print("random fluc =", rand)
-                all_how[specs["how"][i]] *= 1.0 + rand * 1e-2
+                all_how[specs["how"][i]] *= 1.0 + rand * 1e-12
 
                 # force newval to stay within the defined value ranges for the
                 # currently iterated parameter

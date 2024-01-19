@@ -23,10 +23,10 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1,  # desired total mass (in earth masses)
+    "M_surface_should": 1.1,  # desired total mass (in earth masses)
     "T_surface_should": 300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
-    "Mg_number_should": 0.57,  # desired bulk magnesium number
+    "Mg_number_should": 0.537,  # desired bulk magnesium number
     "Fe_number_mantle": 0.1,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "temperature_jumps":[0, 1800, 0, 1200], # Temperature jumps across each layer transition
@@ -36,7 +36,8 @@ planetary_params = {
 }
 
 run_params = {"layer_constraints": [1, 1, 3, 1], # Layer constraint type for each layer transition
-              "core_segregation_type": 1}
+              "core_segregation_type": 1,
+              "eps_r": .75}
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a
@@ -46,7 +47,7 @@ iterator_specs = {
     "how": ["P_center", "T_center"],  # --> adjustable properties
     "val_should": [
         planetary_params["M_surface_should"] * m_earth,
-        -E_grav_unit*.89,
+        -E_grav_unit*1.1,
     ],  # --> target values
     "predictor": ["linear", "linear"],  # --> no effect at this point
     "all_val_should_weights": [
@@ -54,7 +55,7 @@ iterator_specs = {
         "lin",
     ],  # --> log or lin extrapolation for targets
     "all_howval_weights": ["exp", "lin"],  # --> exp or lin prediction for adjustables
-    "acc": [1e-5, 1e-5],  # --> desired relative accuracies
+    "acc": [1e-4, 1e-4],  # --> desired relative accuracies
     "iterationLimit": 20,  # --> max. number of iterations
     "deltaType": 0,  # --> mode for initial adjustment of adjustables
     "unpredictable": False,  # --> no effect at this point
@@ -79,7 +80,7 @@ print ("fractions in the end:" , pl.fractions)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-pl.print(digits=7)
+pl.print(digits=4)
 # pl.plot()
 
 print (f'E_grav_is: {pl.E_grav_is}')
