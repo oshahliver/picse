@@ -97,6 +97,7 @@ contains
       integer, intent(in) :: tempType, rhoType, adiabatType, layerType
       logical, intent(in), optional :: echo
       real(8) :: M_seed
+      real(8), dimension(n_params_integration) :: params
       integer, intent(in), optional :: subphase_res
       type(mixture) :: seed_mixture
       integer, dimension(n_layers), intent(in) :: layer_constraints
@@ -243,7 +244,8 @@ contains
       self%contents = contents
       self%fractions = fractions
       self%layer_constraints = layer_constraints
-      
+   
+
       !Individual mol and wt fractions of the elements in the liquid part
       !of the core
       self%xi_all_core = xi_all_core
@@ -333,7 +335,15 @@ contains
       self%MOI_is = 2d0/5d0*M_seed*R_seed**2
       self%E_grav_is = 3d0 * g * M_seed**2 / (5d0 * R_seed)
       self%E_int_is = 5d2 * M_seed * T_center
-      
+ 
+      params(1) = P_center
+      params(2) = M_seed
+      params(3) = T_center
+      params(4) = seed_mixture%dens
+      params(5) = self%MOI_is
+      params(7) = self%E_grav_is
+      params(8) = self%E_int_is
+
       ! Instantiate the layers
       do i = 1, self%lay
          call init_layer(self=self%layers(i), &
@@ -341,9 +351,9 @@ contains
                          contents=self%contents%axes(i)%int_array, &
                          fractions=self%fractions%axes(i)%real_array, &
                          r_in=R_seed, &
-                         m=M_seed, &
-                         T=T_center, &
-                         P=P_center, &
+                        !  m=M_seed, &
+                        !  T=T_center, &
+                        !  P=P_center, &
                          tempType=self%tempType, &
                          rhoType=self%rhoType, &
                          adiabatType=self%adiabatType, &
@@ -358,14 +368,15 @@ contains
                          lay=i, &
                          Si_number=self%Si_number_layers(self%lay), &
                          Fe_number=self%Fe_number_layers(self%lay), &
-                         MOI=self%MOI_is, &
-                         E_grav = self%E_grav_is, &
-                         E_int = self%E_int_is, &
+                        !  MOI=self%MOI_is, &
+                        !  E_grav = self%E_grav_is, &
+                        !  E_int = self%E_int_is, &
                          omega=self%omega, &
                          xi_H=self%xi_H_layers(self%lay), &
                          xi_Stv=self%xi_Stv_layers(self%lay), &
                          X_impurity_0=self%X_impurity_0_layers(self%lay), &
-                         X_impurity_slope=self%X_impurity_slope_layers(self%lay))
+                         X_impurity_slope=self%X_impurity_slope_layers(self%lay),&
+                         integration_parameters = params)
 
          call update_layer(self=self%layers(i))
       end do
@@ -639,9 +650,14 @@ contains
    SUBROUTINE get_layer_constraint(self, lay, skip)
 
       type(planet), intent(inout) :: self
-      integer, intent(in) :: lay
-      integer, intent(in) :: skip
+      integer, intent(in) :: lay, skip
+      integer :: shell_idx
       
+      ! Get latest integrated shell index in layer
+      ! Note that the next shell as already been instantiated
+      ! at this stage so the shell_count has to be reduced by one
+      shell_idx = self%layers(lay)%shell_count - 1
+
       !Indigenous mass
       if (self%layer_constraints(lay + skip) == 0) then
          self%constraint_value_is = &
@@ -663,7 +679,8 @@ contains
       !Enclosed mass
       else if (self%layer_constraints(lay + skip) == 1) then
          self%constraint_value_is = &
-            self%layers(lay)%mass
+            self%layers(lay)%shells(shell_idx)%integration_parameters(2)
+            ! self%layers(lay)%mass
 
          self%constraint_value_should = self%layer_masses(lay + skip)*m_earth
          self%direction = 1
@@ -680,7 +697,8 @@ contains
       !Pressure
       else if (self%layer_constraints(lay + skip) == 3) then
          self%constraint_value_is = &
-            self%layers(lay)%pres
+         self%layers(lay)%shells(shell_idx)%integration_parameters(1)
+            ! self%layers(lay)%pres
 
          self%constraint_value_should = &
             self%layer_pres(lay + skip)
@@ -689,7 +707,8 @@ contains
       !Temperature
       else if (self%layer_constraints(lay + skip) == 4) then
          self%constraint_value_is = &
-            self%layers(lay)%temp
+         self%layers(lay)%shells(shell_idx)%integration_parameters(3)
+            ! self%layers(lay)%temp
 
          self%constraint_value_should = &
             self%layer_temps(lay + skip)
@@ -709,9 +728,15 @@ contains
    SUBROUTINE minor_bisection(self)
 
       type(planet), intent(inout) :: self
-      integer :: sh, skip, i, skip_count, old_layer_constraint
-      real(8) :: reldev, radius, mass, pres, temp, deltaT
+      integer :: sh, skip, i, skip_count, old_layer_constraint, shell_idx
+      real(8) :: reldev, radius, mass, pres, temp, deltaT, moi, E_grav, E_int
       real(8) :: a, b, c, r
+      real(8), dimension(n_params_integration) :: params
+
+      ! Get latest integrated shell index in layer
+      ! Note that the next shell as already been instantiated
+      ! at this stage so the shell_count has to be reduced by one
+      shell_idx = self%layers(self%lay)%shell_count
 
       call get_layer_constraint(self=self, lay=self%lay, skip=0)
       ! print *, 'Layer constraint should =', self%constraint_value_should
@@ -742,7 +767,7 @@ contains
 
          !Compute the melting temperature of iron at current pressure
          if (self%lay == 1) then
-            self%T_ICB = T_melt_iron(P=self%layers(self%lay)%pres, &
+            self%T_ICB = T_melt_iron(P=self%layers(self%lay)%shells(shell_idx)%integration_parameters(1),&!pres, &
                                      X_Si=self%X_all_core(4), &
                                      X_O=self%X_all_core(5), &
                                      X_S=self%X_all_core(3))
@@ -851,9 +876,16 @@ contains
             do i = 1, skip + 1
                ! print *, 'Layer reached at M =', self%layers(self%lay)%mass/m_earth
                radius = self%layers(self%lay)%radius
-               mass = self%layers(self%lay)%mass
-               pres = self%layers(self%lay)%pres
-               temp = self%layers(self%lay)%temp
+               ! mass = self%layers(self%lay)%mass
+               ! pres = self%layers(self%lay)%pres
+               ! temp = self%layers(self%lay)%temp
+               
+               ! mass = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(2)
+               ! pres = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(1)
+               ! temp = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(3)
+               ! moi = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(5)
+               ! E_grav = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(7)
+               ! E_int = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters(8)
 
                !If ICB is reached, update T_ICB
                if (self%lay == 1) then
@@ -862,7 +894,11 @@ contains
 
                !Compute temperature after temperature jump
                deltaT = self%temp_jumps(self%lay)
-               temp = max(temp - deltaT, T_zero)
+               ! temp = max(temp - deltaT, T_zero)
+
+               ! TODO. Check why shell_idx - 1 must be taken here!
+               params = self%layers(self%lay)%shells(shell_idx - 1)%integration_parameters
+               params(3) = max(params(3) - deltaT, T_zero)
 
                ! print *, "Instantiating layer ", self%lay + 1
                !Initiate next layer lay+1
@@ -871,9 +907,9 @@ contains
                                contents=self%contents%axes(self%lay + 1)%int_array, &
                                fractions=self%fractions%axes(self%lay + 1)%real_array, &
                                r_in=radius, &
-                               m=mass, &
-                               T=temp, &
-                               P=pres, &
+                              !  m=params(2), &
+                              !  T=params(3), &
+                              !  P=params(1), &
                                tempType=self%tempType, &
                                rhoType=self%rhoType, &
                                adiabatType=self%adiabatType, &
@@ -888,14 +924,15 @@ contains
                                lay=self%lay + 1, &
                                Si_number=self%Si_number_layers(self%lay + 1), &
                                Fe_number=self%Fe_number_layers(self%lay + 1), &
-                               MOI=self%layers(self%lay)%MOI, & !MoI is currently the MoI from the last layer
-                               E_grav = self%layers(self%lay)%E_grav, & !E_grav is currently the E_grav from the last layer
-                               E_int = self%layers(self%lay)%E_int, &
+                              !  MOI=params(5),&!self%layers(self%lay)%MOI, & !MoI is currently the MoI from the last layer
+                              !  E_grav = params(7),&!self%layers(self%lay)%E_grav, & !E_grav is currently the E_grav from the last layer
+                              !  E_int = params(8),&!self%layers(self%lay)%E_int, &
                                omega=self%omega, &
                                xi_H=self%xi_H_layers(self%lay + 1), &
                                xi_Stv=self%xi_Stv_layers(self%lay + 1), &
                                X_impurity_0=self%X_impurity_0_layers(self%lay + 1), &
-                               X_impurity_slope=self%X_impurity_slope_layers(self%lay + 1))
+                               X_impurity_slope=self%X_impurity_slope_layers(self%lay + 1),&
+                               integration_parameters = params)
 
                self%n_shells_layers(self%lay) = self%layers(self%lay)%shell_count
                self%lay = self%lay + 1
@@ -915,25 +952,28 @@ contains
    SUBROUTINE major_bisection(self)
 
       type(planet), intent(inout) :: self
-      real(kind=8) :: param_is, param_should, eps
+      real(8) :: param_is, param_should, eps, pres
+      real(8), dimension(n_params_integration) :: params
       integer, dimension(2) :: direction
       integer :: sh
 
+      sh = self%layers(self%lay)%shell_count-1
+      params = self%layers(self%lay)%shells(sh)%integration_parameters
+
       if (self%major_constraint == 'P_surface') then
-         param_is = self%layers(self%lay)%pres
+         param_is = params(1)
          param_should = self%P_surface_should
-         !print *, "is, should = ", param_is, param_should
          eps = eps_P_surface
          direction = (/-1, -1/)
 
       elseif (self%major_constraint == 'T_surface') then
-         param_is = self%layers(self%lay)%temp
+         param_is = params(3)
          param_should = self%T_surface_should
          eps = eps_T_surface
          direction = (/-1, -1/)
 
       elseif (self%major_constraint == 'M_surface') then
-         param_is = self%layers(self%lay)%mass
+         param_is = params(2)
          param_should = self%M_surface_should
          eps = eps_M_surface
          direction = (/1, -1/)
@@ -958,7 +998,7 @@ contains
 
          call reset_shell(self=self%layers(self%lay)%shells(sh))
          call update_layer(self=self%layers(self%lay))
-
+         
          self%layers(self%lay)%overshoot = .true.
          self%layers(self%lay)%dr = self%layers(self%lay)%dr*0.5d0
          self%layers(self%lay)%bisec = .true.
@@ -978,12 +1018,8 @@ contains
          self%layers(self%lay)%overshoot = .false.
 
          call update_layer(self=self%layers(self%lay))
-
          self%shell_iteration = .false.
          self%layer_iteration = .false.
-         self%layers(self%lay)%temp = self%layers(self%lay)%temp - &
-                                      self%temp_jumps(self%lay)
-
          self%n_shells_layers(self%lay) = self%layers(self%lay)%shell_count
 
       else
@@ -1084,9 +1120,10 @@ contains
       type(planet), intent(inout) :: self
       logical, intent(inout), optional :: echo
       logical :: echo_dummy
-      real(kind=8) :: olddens
+      ! real(kind=8) :: olddens
       type(shell) :: lastshell, currentshell
-      integer :: i, j, old_layer_constraint
+      integer :: i, j, old_layer_constraint, shell_idx
+      real(8), dimension(n_params_integration) :: params
 
       if (.not. present(echo)) then
          echo_dummy = .false.
@@ -1124,23 +1161,24 @@ contains
             do while (self%shell_iteration)
                !   print *, 'Constructing shell:', self%layers(self%lay)%shell_count
                self%shell_iteration_count = self%shell_iteration_count + 1
-               olddens = self%layers(self%lay)%dens
-
+               ! olddens = self%layers(self%lay)%dens
                self%skip_bisec = .false.
                call construct_layer(self=self%layers(self%lay))
                call add_stuff(self=self)
-
+               shell_idx = self%layers(self%lay)%shell_count - 1
+               params = self%layers(self%lay)%shells(shell_idx)%integration_parameters
+               
                !Compute the melting temperature of iron at current pressure
                if (self%lay == 1) then
-                  self%T_ICB = T_melt_iron(P=self%layers(self%lay)%pres, &
+                  self%T_ICB = T_melt_iron(P=params(1), &
                                            X_Si=self%X_all_core(4), &
                                            X_O=self%X_all_core(5), &
                                            X_S=self%X_all_core(3))
                   self%layer_temps(1) = self%T_ICB
                end if
-
+          
                !Compute Olivine-Perovskite transition pressure
-               self%P_MTZ = P_Ol_Pv(T=self%layers(self%lay)%temp)
+               self%P_MTZ = P_Ol_Pv(T=params(3))
                self%layer_pres(3) = self%P_MTZ
 
                !Only the major and minor bisection can set overshoot=.true.

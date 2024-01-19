@@ -54,7 +54,7 @@ iterator_specs = {
         "lin",
     ],  # --> log or lin extrapolation for targets
     "all_howval_weights": ["exp", "lin"],  # --> exp or lin prediction for adjustables
-    "acc": [1e-4, 1e-3],  # --> desired relative accuracies
+    "acc": [1e-5, 1e-5],  # --> desired relative accuracies
     "iterationLimit": 20,  # --> max. number of iterations
     "deltaType": 0,  # --> mode for initial adjustment of adjustables
     "unpredictable": False,  # --> no effect at this point
@@ -79,7 +79,7 @@ print ("fractions in the end:" , pl.fractions)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-pl.print(digits=6)
+pl.print(digits=7)
 # pl.plot()
 
 print (f'E_grav_is: {pl.E_grav_is}')

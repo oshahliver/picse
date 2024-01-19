@@ -166,8 +166,9 @@ contains
       logical, intent(out) :: outer_core_exists
       logical, intent(out) :: inner_core_exists
 
-      integer :: n_layers
+      integer :: n_layers, shell_idx
       integer :: i, j, c
+      real(8), dimension(n_params_integration) :: params
       
       ! print *, "creating new planet..."
       ! TODO: Define these default values somewhere else!
@@ -291,9 +292,11 @@ contains
 
 ! Update layer properties
       do i = 1, n_layers
-         layer_properties(i, 1) = pl%layers(i)%pres
-         layer_properties(i, 2) = pl%layers(i)%temp
-         layer_properties(i, 3) = pl%layers(i)%dens
+         shell_idx = pl%layers(i)%shell_count
+         params = pl%layers(i)%shells(shell_idx)%integration_parameters
+         layer_properties(i, 1) = params(1)!pl%layers(i)%pres
+         layer_properties(i, 2) = params(3)!pl%layers(i)%temp
+         layer_properties(i, 3) = params(4)!pl%layers(i)%dens
          !If layer exists, add bottom density. Else bottom and top density are
          !just the same. Distinction needs to be made here because if layer
          !does not exist a segmentation fault occurs if the bottom density
@@ -302,7 +305,7 @@ contains
             layer_properties(i, 4) = pl%layers(i)%shells(1)%integration_parameters(4)
 
          else
-            layer_properties(i, 4) = pl%layers(i)%dens
+            layer_properties(i, 4) = params(4)!pl%layers(i)%dens
          end if
          layer_properties(i, 5) = pl%layers(i)%indigenous_mass
          layer_properties(i, 6) = pl%layers(i)%radius

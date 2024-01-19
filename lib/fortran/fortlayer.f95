@@ -12,7 +12,7 @@ MODULE class_layer
       real(8) :: r_in, r_out, eps_r, radius, FeMg, SiMg, Fe_number, X_H2O, &
                  Si_number, omega, xi_H, xi_Stv, X_impurity_slope, X_impurity_0
       real(8) :: eps_H2O, eps_Al, N_tot, N_Mg, N_Si, N_Al, N_H2O, N_Fe, N_S
-      real(8) :: rho0, q, eps_T_zero, pres, temp, mass, dens, MOI, E_grav, E_int
+      real(8) :: rho0, q, eps_T_zero
       real(8) :: mass_should, indigenous_mass, dr, gammaG0
       real(8), dimension(n_params_integration) :: gradients
       integer, dimension(:), allocatable :: contents, YMg, YSi, YO, YS
@@ -30,22 +30,23 @@ MODULE class_layer
 
 contains
 
-   SUBROUTINE init_layer(self, contents, fractions, n_mats, r_in, m, &
-                         T, P, tempType, rhoType, adiabatType, q, gammaG0, eps_r, rho0, &
-                         eps_T_zero, n_shells, eps_H2O, lay, eps_Al, Si_number, Fe_number, MOI, E_grav, E_int, &
-                         omega, xi_H, xi_Stv, X_impurity_0, X_impurity_slope)
+   SUBROUTINE init_layer(self, contents, fractions, n_mats, r_in, &
+                         tempType, rhoType, adiabatType, q, gammaG0, eps_r, rho0, &
+                         eps_T_zero, n_shells, eps_H2O, lay, eps_Al, Si_number, Fe_number, &
+                         omega, xi_H, xi_Stv, X_impurity_0, X_impurity_slope, integration_parameters)
 
       type(layer), intent(inout) :: self
       integer, intent(in) :: n_mats, n_shells, lay
       real(8), dimension(n_mats), intent(in) :: fractions
       integer, dimension(n_mats), intent(in) :: contents
-      real(8), intent(in) :: r_in, m, T, P, q, gammaG0, eps_r, rho0, &
-                             eps_T_zero, eps_Al, MOI, E_grav, E_int
+      real(8), intent(in) :: r_in, q, gammaG0, eps_r, rho0, &
+                             eps_T_zero, eps_Al
       real(8), intent(in) :: Fe_number, eps_H2O, Si_number
       integer, intent(in) :: tempType, rhoType, adiabatType
       real(8), intent(in), optional :: omega, xi_H, xi_Stv, X_impurity_0, &
                                        X_impurity_slope
       real(8), dimension(n_params_integration) :: params
+      real(8), dimension(n_params_integration), intent(in) :: integration_parameters
       integer :: i
 
       allocate (self%contents(n_mats))
@@ -102,9 +103,9 @@ contains
 
       self%r_in = r_in
       self%radius = r_in
-      self%mass = m
-      self%temp = T
-      self%pres = P
+      ! self%mass = m
+      ! self%temp = T
+      ! self%pres = P
       self%q = q
       self%rho0 = rho0
       self%gammaG0 = gammaG0
@@ -117,16 +118,16 @@ contains
       self%Si_number = Si_number
       self%eps_H2O = eps_H2O
       self%eps_Al = eps_Al
-      self%MOI = MOI
-      self%E_grav = E_grav
-      self%E_int = E_int
+      ! self%MOI = MOI
+      ! self%E_grav = E_grav
+      ! self%E_int = E_int
 
-      params(1) = P
-      params(2) = m
-      params(3) = T
-      params(5) = MOI
-      params(7) = E_grav
-      params(8) = E_int
+      ! params(1) = P
+      ! params(2) = m
+      ! params(3) = T
+      ! params(5) = MOI
+      ! params(7) = E_grav
+      ! params(8) = E_int
 
       if (.not. Si_number == 1.0d0) then
          self%SiMg = 1.0d0/(1.0d0 - self%Si_number)
@@ -146,7 +147,7 @@ contains
                       eps_H2O=eps_H2O, eps_Al=self%eps_Al, Fe_number=self%Fe_number, &
                       n_mats=n_mats, lay=lay, r=r_in, Si_number=self%Si_number, &
                       omega=self%omega, xi_H=self%xi_H, xi_Stv=self%xi_Stv, &
-                      composition_gradients=self%composition_gradients, integration_parameters = params)
+                      composition_gradients=self%composition_gradients, integration_parameters = integration_parameters)
 
       call update_layer(self=self)
 
@@ -160,13 +161,13 @@ contains
       integer :: i
 
       self%radius = self%shells(self%shell_count)%radius
-      self%pres = self%shells(self%shell_count)%integration_parameters(1)
-      self%mass = self%shells(self%shell_count)%integration_parameters(2)
-      self%temp = self%shells(self%shell_count)%integration_parameters(3)
-      self%dens = self%shells(self%shell_count)%integration_parameters(4)
-      self%MOI = self%shells(self%shell_count)%integration_parameters(5)
-      self%E_grav = self%shells(self%shell_count)%integration_parameters(7)
-      self%E_int = self%shells(self%shell_count)%integration_parameters(8)
+      ! self%pres = self%shells(self%shell_count)%integration_parameters(1)
+      ! self%mass = self%shells(self%shell_count)%integration_parameters(2)
+      ! self%temp = self%shells(self%shell_count)%integration_parameters(3)
+      ! self%dens = self%shells(self%shell_count)%integration_parameters(4)
+      ! self%MOI = self%shells(self%shell_count)%integration_parameters(5)
+      ! self%E_grav = self%shells(self%shell_count)%integration_parameters(7)
+      ! self%E_int = self%shells(self%shell_count)%integration_parameters(8)
 
       if (self%shells(self%shell_count)%force_bisection) then
          self%force_bisection = .true.
