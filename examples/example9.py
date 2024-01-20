@@ -37,7 +37,7 @@ planetary_params = {
 
 run_params = {"layer_constraints": [1, 1, 3, 1], # Layer constraint type for each layer transition
               "core_segregation_type": 1,
-              "eps_r": .75}
+              "eps_r": .5}
 
 # set up specifications for the iterator
 # parameters that are not specified will be assigned a

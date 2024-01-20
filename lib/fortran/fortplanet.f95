@@ -676,7 +676,6 @@ contains
       else if (self%layer_constraints(lay + skip) == 1) then
          self%constraint_value_is = &
             self%layers(lay)%shells(shell_idx)%integration_parameters(2)
-            ! self%layers(lay)%mass
             
          self%constraint_value_should = self%layer_masses(lay + skip)*m_earth
          self%direction = 1
@@ -694,7 +693,6 @@ contains
       else if (self%layer_constraints(lay + skip) == 3) then
          self%constraint_value_is = &
          self%layers(lay)%shells(shell_idx)%integration_parameters(1)
-            ! self%layers(lay)%pres
          self%constraint_value_should = &
             self%layer_pres(lay + skip)
          self%direction = -1
@@ -703,7 +701,6 @@ contains
       else if (self%layer_constraints(lay + skip) == 4) then
          self%constraint_value_is = &
          self%layers(lay)%shells(shell_idx)%integration_parameters(3)
-            ! self%layers(lay)%temp
          
          self%constraint_value_should = &
             self%layer_temps(lay + skip)
@@ -740,13 +737,23 @@ contains
       if (reldev*self%direction .lt. -eps_layer) then
          call remove_stuff(self=self)
          self%layers(self%lay)%overshoot = .true.
-         self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1
+         self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1 ! Very important!
          sh = self%layers(self%lay)%shell_count
+
+         ! Replace initiated cell that was added after last integration step
+         ! by uninitiated cell
          self%layers(self%lay)%shells(sh + 1) = self%layers(self%lay)%shells(sh + 2)
+         
+         ! Reset the previously integrated cell and update the layer to
+         ! reflect the changes accordingly. This cell will be re-integrated
+         ! in the next step with a smaller integration step.
          call reset_shell(self=self%layers(self%lay)%shells(sh))
          call update_layer(self=self%layers(self%lay))
 
          !Compute the melting temperature of iron at current pressure
+         ! TODO. Move this part to update_layer. it does not belong here!
+         ! T_ICB should not be a property. Directly update the val_should of
+         ! the layer constraint.
          if (self%lay == 1) then
             self%T_ICB = T_melt_iron(P=self%layers(self%lay)%shells(sh)%integration_parameters(1),&!pres, &
                                      X_Si=self%X_all_core(4), &
@@ -755,23 +762,31 @@ contains
             self%layer_temps(1) = self%T_ICB
          end if
 
+         ! Reduce the integration step size by a factor of 2.
+         ! TODO. Here a more sophisticated linear prediction step
+         ! might be employed to reduce the required number of iterations
+         ! for the layer bisection.
          self%layers(self%lay)%dr = self%layers(self%lay)%dr*0.5d0
-         self%layers(self%lay)%bisec = .true.
-         self%layers(self%lay)%change_bisec = .false.
-         self%subphase_refine_inhibit = .true.
+         self%layers(self%lay)%bisec = .true. ! Layer is currently in bisection stage
+         self%layers(self%lay)%change_bisec = .false. ! Layer may not change bisection stage
+         self%subphase_refine_inhibit = .true. ! Subphases may not be refined at this stage
 
-         !If integration step size becomes too small, abort integration
+         ! If integration step size becomes too small, abort integration
+         ! TODO. Min step size should be run parameter
          if (self%layers(self%lay)%dr .lt. 1.0d-10) then
             self%layer_iteration = .false.
             self%shell_iteration = .false.
          end if
 
       ! Layer transition reached
+      ! TODO. eps_layer should be customizable in the API
       else if (abs(reldev) .lt. eps_layer) then
          ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
          ! print *, 'Layer constraint should (3) =', self%constraint_value_should
          ! print *, 'Layer constraint is (3) =', self%constraint_value_is
 
+         ! Update the core mass to compute the outer core mass from the inner
+         ! core mass for the next layer constraint. This is very important!
          if (self%lay == 1) then
             call update_core_mass(self=self)
          end if
@@ -858,6 +873,8 @@ contains
                
                !Compute temperature after temperature jump
                deltaT = self%temp_jumps(self%lay)
+
+               ! Gather all integration parameters in one vector
                params = self%layers(self%lay)%shells(shell_idx)%integration_parameters
                params(3) = max(params(3) - deltaT, T_zero)
                
@@ -1216,22 +1233,16 @@ contains
             end do
          end do
          call update_layer(self=self%layers(self%lay))
-         ! self%M_surface_is = self%layers(self%lay)%mass
          self%M_surface_is = currentshell%integration_parameters(2)
-         ! self%R_surface_is = self%layers(self%lay)%radius
          self%R_surface_is = currentshell%radius
-         ! self%T_surface_is = self%layers(self%lay)%temp
          self%T_surface_is = currentshell%integration_parameters(3)
-         ! self%P_surface_is = self%layers(self%lay)%pres
-         self%P_surface_is = currentshell%integration_parameters(1)
-         ! self%MOI_is = self%layers(self%lay)%MOI
+         self%P_surface_is = currentshell%integration_parameters(1) 
          self%MOI_is = currentshell%integration_parameters(5)
-         ! self%E_grav_is = self%layers(self%lay)%E_grav
          self%E_grav_is = currentshell%integration_parameters(7)
-         ! self%E_int_is = self%layers(self%lay)%E_int
          self%E_int_is = currentshell%integration_parameters(8)
          self%rho_mean = self%M_surface_is/(4.0d0/3.0d0*PI*self%R_surface_is**3)
          self%gravity = self%M_surface_is/self%R_surface_is**2*G
+
          !If planet has five layers, by convention, the last one is the surface ocean
          !Update the total ocean mass fraction in log
          if (self%lay == 5) then
@@ -1244,9 +1255,6 @@ contains
             self%n_shells = self%n_shells + 1
          end do
       end do
-      print *, 'Integration terminated in layer ', self%lay
-      print *, 'at shell ', self%n_shells
-      print *, 'after iterations: ', self%shell_iteration_count
 
       !Check if individual layers exist
       if (size(self%layers(1)%shells) .eq. 0) then
