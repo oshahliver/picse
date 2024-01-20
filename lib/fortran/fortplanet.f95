@@ -57,7 +57,7 @@ MODULE class_planet
       logical :: outer_core_exists = .true.
       logical :: core_segregation_model = .true.
       logical :: inner_core_segregation_model = .false.
-      real(8), dimension(2) :: x_vec, y_vec
+      real(8), dimension(2) :: x_vec, y_vec, yy_vec
 
    end type planet
 
@@ -512,7 +512,7 @@ contains
       end if
       if (self%N_Si .eq. 0.0d0 .and. self%N_Mg .eq. 0.0d0) then
          self%Si_number_is = 0.0d0
-      else
+      else 
          self%Si_number_is = self%N_Si/(self%N_Mg + self%N_Si)
       end if
       self%M_H2O_is = self%N_H2O*mH2O
@@ -748,12 +748,15 @@ SUBROUTINE predict_bisection_step(self)
    real(8) :: dx_is, dy_is, slope, dx_should, dy_should, dx_curr
 
    ! self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
-   dx_is = self%x_vec(2) - self%x_vec(1)
-   dy_is = self%y_vec(2) - self%y_vec(1)
+   dx_is = self%x_vec(2) - self%x_vec(1) ! difference in radius
+   dy_is = self%y_vec(2) - self%y_vec(1) ! difference in constraint value is
+   ! dyy_is = self%yy_vec(2) - self%yy_vec(1) ! difference in constraint value should
    slope = dy_is / dx_is
+
    dy_should = self%constraint_value_should - self%y_vec(1)
    dx_should = dy_should / slope
    dx_curr = self%layers(self%lay)%dr
+
    ! print *, "x_vec =", self%x_vec
    ! print *, "y_vec =", self%y_vec
    ! print *, "dx, dy =", dx_is, dy_is
@@ -762,9 +765,16 @@ SUBROUTINE predict_bisection_step(self)
    ! print *, "current dx =", dx_curr
    ! print *, "dx predicted =", dx_should
    ! print *, "dx bisec =", dx_curr / 2d0
-   ! dx_should = min(dx_should, dx_curr * .99)
-   ! self%layers(self%lay)%dr = dx_should
-   self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
+   dx_should = min(dx_should, dx_curr * .9999)
+
+   if (self%lay == 1) then
+      if (self%layer_constraints(1) == 4) then
+         dx_should = self%layers(self%lay)%dr * 0.5d0
+      endif
+   endif
+
+   self%layers(self%lay)%dr = dx_should
+   ! self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
    
 END SUBROUTINE predict_bisection_step
 
@@ -945,6 +955,8 @@ END SUBROUTINE predict_bisection_step
                            self%layer_iteration = .false.
                            skip = skip - 1
                         end if
+                     else
+                        ! print *, "Not reached!"
                      end if
                   end if
                end if
@@ -1286,7 +1298,6 @@ END SUBROUTINE predict_bisection_step
                if (.not. self%skip_bisec) then
                   call major_bisection(self=self)
                   call minor_bisection(self=self)
-                  
                   ! For the inner core check if Fe melting is reached
                   if (self%lay == 1) then
                      !If bisection has just been initiated for the the core mass,

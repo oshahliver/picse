@@ -10,7 +10,7 @@ MODULE run_params
 
 !Maximum number of shells per layer and per planet
    integer, parameter :: n_shells_max_layer = 1000
-   integer, parameter :: n_shells_max_planet = 5000
+   integer, parameter :: n_shells_max_planet = 2500
 
 !Number of integration parameters
    integer, parameter :: n_params_integration = 8

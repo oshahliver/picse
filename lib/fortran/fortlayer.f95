@@ -173,7 +173,9 @@ contains
 
          !Ommit MOI for calculation of dr
          self%dr = minval(length_scales(1:4))*self%eps_r
+         ! print *, "New dr in layer =", self%dr
       end if
+
       ! print *, "Updating successful."
    END SUBROUTINE update_layer
 
@@ -199,7 +201,7 @@ contains
       end if
 
       ! print *, "constructing shell in layer with idx:", self%shell_count
-      ! print *, "dr in layer =", self%dr
+      ! print *, "Constructing layer with dr =", self%dr
       ! print *, "The shell that will be constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       call construct_shell(self=self%shells(self%shell_count), dr=self%dr)
       ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
