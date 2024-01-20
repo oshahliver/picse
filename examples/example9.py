@@ -24,10 +24,10 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.1,  # desired total mass (in earth masses)
+    "M_surface_should": 1.11,  # desired total mass (in earth masses)
     "T_surface_should": 300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
-    "Mg_number_should": 0.537,  # desired bulk magnesium number
+    "Mg_number_should": 0.53,  # desired bulk magnesium number
     "Fe_number_mantle": 0.1,  # iron number of the silicates
     "Si_number_mantle": 0.4,  # silicon number of the silicates
     "temperature_jumps":[0, 1800, 0, 1200], # Temperature jumps across each layer transition
@@ -85,7 +85,7 @@ print ("fractions in the end:" , pl.fractions)
 #######################################################################
 
 # print fundamental planeatary properties to standard output
-pl.print(digits=4)
+pl.print(digits=7)
 # pl.plot()
 
 print (f'E_grav_is: {pl.E_grav_is}')

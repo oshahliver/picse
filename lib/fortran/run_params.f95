@@ -3,7 +3,7 @@ MODULE run_params
    implicit none
 
 !Relative uncertainties allowed for probing various parameters
-   real(8), parameter :: eps_layer = 1d-6
+   real(8), parameter :: eps_layer = 1d-8
    real(8), parameter :: eps_P_surface = 1d-4
    real(8), parameter :: eps_M_surface = 1d-4
    real(8), parameter :: eps_T_surface = 1d-2

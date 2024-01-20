@@ -1064,7 +1064,7 @@ contains
       ! Compute the coefficients for the core mass computation based on the composition
       Q = get_core_mass_q_vector(Fe_number_mantle, xi_all_core, fractions, contents)
 
-      ! Compute core mass from the absolut inner core mass
+      ! Compute core mass from the absolute inner core mass
       if (mode == 1 .and. present(inner_core_mass)) then
          core_fraction = (1d0 - M_ocean / M_tot)
          core_fraction = core_fraction * (Q(3) / Q(2) - Q(1) / Q(2) * FeMg)
