@@ -6,8 +6,9 @@ interior model for a set of boundary conditions.
 from picse.interiors import planet_iterator
 from picse.interiors import planet_creator
 from picse.physicalparams import m_earth, E_grav_unit
-import os
+import time
 import numpy as np
+import math
 
 # Load the EoS tables
 planet_creator.load_eos_tables()
@@ -64,6 +65,7 @@ iterator_specs = {
 #######################################################################
 # Model creation and execution
 #######################################################################
+t0 = time.time()
 
 # Initialize a telluric planet instance with the specified properties
 pl = planet_creator.TelluricPlanet(planetary_params=planetary_params, run_params = run_params)
@@ -71,9 +73,12 @@ pl = planet_creator.TelluricPlanet(planetary_params=planetary_params, run_params
 # Perform initial structure integration
 pl.construct()
 
+t1 = time.time()
 # Pass planet instance to iterator to match boundary conditions
 # NOTE. planetary objects passed to the iterator must be constructed!
 iterator.iterate(planet=pl, iterator_specs=iterator_specs)
+
+t2 = time.time()
 print ("fractions in the end:" , pl.fractions)
 #######################################################################
 # Model inspection
@@ -87,6 +92,16 @@ print (f'E_grav_is: {pl.E_grav_is}')
 print (f'E_int_is: {pl.E_int_is}')
 print (f'L_int_is: {pl.L_int_is}')
 
+dt1 = t2 - t0
+sec1 = math.floor(dt1)
+ms1 = 1000 * (dt1 - sec1)
+
+dt2 = t2 - t1
+sec2 = math.floor(dt2)
+ms2 = 1000 * (dt2 - sec2)
+
+print (f"Elapsed time total: {sec1} sec {ms1:.3g} ms")
+print (f"Elapsed time iteration: {sec2} sec {ms2:.3g} ms")
 # You can also access individual parameters as attributes. for instance:
 # print("total radius (km):", pl.R_surface_is * 1e-3)
 # print("mean density (gcc):", pl.mean_density * 1e-3)
