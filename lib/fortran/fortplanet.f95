@@ -43,6 +43,7 @@ MODULE class_planet
       integer :: shell_iteration_count = 0
       integer :: layer_iteration_count = 0
       integer :: layer_bisection_iteration_count = 0
+      integer :: major_bisection_iteration_count = 0
       logical :: change_bisec = .true., bisec = .false.
       logical :: shell_iteration = .true.
       logical :: layer_iteration = .true.
@@ -746,7 +747,7 @@ SUBROUTINE predict_bisection_step(self)
 
    type(planet), intent(inout) :: self
    real(8) :: dx_is, dy_is, dyy_is, dx_should, dy_should, dx_curr, a, b
-
+   print *, "Predicting new dr..."
    dx_is = self%x_vec(2) - self%x_vec(1) ! difference in radius
    dy_is = self%y_vec(2) - self%y_vec(1) ! difference in constraint value is
    dyy_is = self%yy_vec(2) - self%yy_vec(1) ! difference in constraint value should
@@ -764,7 +765,7 @@ SUBROUTINE predict_bisection_step(self)
    ! print *, "dy should =", dy_should
    ! print *, "a, b =", a, b
    ! print *, "dx, predicted =", dx_should
-   dx_should = min(dx_should, dx_curr * .9999)
+   ! dx_should = min(dx_should, dx_curr * .9999)
 
    ! if (self%lay == 1) then
    !    if (self%layer_constraints(1) == 4) then
@@ -773,9 +774,95 @@ SUBROUTINE predict_bisection_step(self)
    ! endif
 
    self%layers(self%lay)%dr = dx_should
+   self%layer_bisection_iteration_count = self%layer_bisection_iteration_count + 1
+   print *, "Predicted dr =", dx_should
    ! self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
    
 END SUBROUTINE predict_bisection_step
+
+!#######################################################################
+   SUBROUTINE get_bisection_vectors(self, offset)
+      type(planet), intent(inout) :: self
+      integer, intent(in), optional :: offset
+      integer :: shell_idx1, shell_idx2, lay_idx1, lay_idx2, sh
+      integer :: offset_dummy
+      if (present(offset)) then
+         offset_dummy = offset
+      else
+         offset_dummy = 0
+      endif
+
+      sh = self%layers(self%lay)%shell_count
+
+      ! TODO. Refactor this part!!!
+      ! Put it in standalone method or utility function.
+      ! Should be merged with get_layer_constraints in a
+      ! generalized form
+      !==================================================
+      ! If overshoot occurs in first shell after layer transition,
+      ! the previous values have to be taken from the previous layer
+      if (sh < 2) then
+         shell_idx1 = self%layers(self%lay - 1)%shell_count + offset_dummy
+         shell_idx2 = 1 + offset_dummy
+         lay_idx1 = self%lay - 1
+         lay_idx2 = self%lay
+      else
+         shell_idx1 = self%layers(self%lay)%shell_count - 1 + offset_dummy
+         shell_idx2 = self%layers(self%lay)%shell_count + offset_dummy
+         lay_idx1 = self%lay
+         lay_idx2 = self%lay
+      endif
+
+      self%yy_vec = self%constraint_value_should
+      ! print *, "shell idx =", shell_idx
+      !Indigenous mass
+      if (self%layer_constraints(self%lay) == 0) then
+         self%y_vec(1) = &
+            self%layers(lay_idx1)%indigenous_mass
+         self%y_vec(2) = &
+            self%layers(lay_idx2)%indigenous_mass
+      !Enclosed mass
+      else if (self%layer_constraints(self%lay) == 1) then
+         self%y_vec(1) = &
+            self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(2)
+         self%y_vec(2) = &
+            self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(2)
+      !Radius
+      else if (self%layer_constraints(self%lay) == 2) then
+         self%y_vec(1) = &
+            self%layers(lay_idx1)%radius
+         self%y_vec(2) = &
+            self%layers(lay_idx2)%radius
+      !Pressure
+      else if (self%layer_constraints(self%lay) == 3) then
+         self%y_vec(1) = &
+         self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1)
+         self%y_vec(2) = &
+         self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1)
+      !Temperature
+      ! TODO. the melting temperature of iron needs only to be computed if
+      ! lay == 1
+      else if (self%layer_constraints(self%lay) == 4) then
+         self%y_vec(1) = &
+         self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(3)
+         self%y_vec(2) = &
+         self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(3)
+
+         ! Compute melting temperature of iron
+         self%yy_vec(1) = T_melt_iron(P=self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1),&!pres, &
+         X_Si=self%X_all_core(4), &
+         X_O=self%X_all_core(5), &
+         X_S=self%X_all_core(3))
+         self%yy_vec(2) = T_melt_iron(P=self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1),&!pres, &
+         X_Si=self%X_all_core(4), &
+         X_O=self%X_all_core(5), &
+         X_S=self%X_all_core(3))
+      end if
+      self%x_vec(1) = self%layers(lay_idx1)%shells(shell_idx1)%radius
+      self%x_vec(2) = self%layers(lay_idx2)%shells(shell_idx2)%radius
+
+   END SUBROUTINE get_bisection_vectors
+
 
 !#######################################################################
    SUBROUTINE minor_bisection(self)
@@ -787,90 +874,35 @@ END SUBROUTINE predict_bisection_step
       ! real(8) :: a, b, c, r
       real(8), dimension(n_params_integration) :: params
 
+
       call get_layer_constraint(self=self, lay=self%lay, skip=0)             
 
-      ! print *, "------"
-      ! print *, 'Layer constraint should (1) =', self%constraint_value_should
-      ! print *, 'Layer constraint is (1) =', self%constraint_value_is
+      print *, "------"
+      print *, 'Layer constraint should (1) =', self%constraint_value_should
+      print *, 'Layer constraint is (1) =', self%constraint_value_is
+      if (self%constraint_value_is /= self%constraint_value_is .or. &
+      self%constraint_value_should /= self%constraint_value_should) then
+         self%shell_iteration = .false.
+         self%layer_iteration = .false.
+      endif
       ! print *, "Radius =", self%layers(self%lay)%radius
       ! print *, 'layermasses =', self%layer_masses
+      print *, "overshoot =", self%layers(self%lay)%overshoot
       reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                self%constraint_value_should
-      ! print *, 'reldev =', reldev
+      print *, 'reldev =', reldev
       !Overshoot
       if (reldev*self%direction .lt. -eps_layer) then
-         ! print *, "Overshoot in minor bisection..."
+         print *, "Overshoot in minor bisection..."
          call remove_stuff(self=self)
          self%layers(self%lay)%overshoot = .true.
          self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1 ! Very important!
          sh = self%layers(self%lay)%shell_count
-         ! print *, "shell count =", sh
+         print *, "shell count =", sh
          ! Replace initiated cell that was added after last integration step
          ! by uninitiated cell
          self%layers(self%lay)%shells(sh + 1) = self%layers(self%lay)%shells(sh + 2)
-
-         ! TODO. Refactor this part!!!
-         !==================================================
-         ! If overshoot occurs in first shell after layer transition,
-         ! the previous values have to be taken from the previous layer
-         if (sh < 2) then
-            shell_idx1 = self%layers(self%lay - 1)%shell_count
-            shell_idx2 = 1
-            lay_idx1 = self%lay - 1
-            lay_idx2 = self%lay
-         else
-            shell_idx1 = self%layers(self%lay)%shell_count - 1
-            shell_idx2 = self%layers(self%lay)%shell_count
-            lay_idx1 = self%lay
-            lay_idx2 = self%lay
-         endif
-
-         self%yy_vec = self%constraint_value_should
-         ! print *, "shell idx =", shell_idx
-         !Indigenous mass
-         if (self%layer_constraints(self%lay) == 0) then
-            self%y_vec(1) = &
-               self%layers(lay_idx1)%indigenous_mass
-            self%y_vec(2) = &
-               self%layers(lay_idx2)%indigenous_mass
-         !Enclosed mass
-         else if (self%layer_constraints(self%lay) == 1) then
-            self%y_vec(1) = &
-               self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(2)
-            self%y_vec(2) = &
-               self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(2)
-         !Radius
-         else if (self%layer_constraints(self%lay) == 2) then
-            self%y_vec(1) = &
-               self%layers(lay_idx1)%radius
-            self%y_vec(2) = &
-               self%layers(lay_idx2)%radius
-         !Pressure
-         else if (self%layer_constraints(self%lay) == 3) then
-            self%y_vec(1) = &
-            self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1)
-            self%y_vec(2) = &
-            self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1)
-         !Temperature
-         else if (self%layer_constraints(self%lay) == 4) then
-            self%y_vec(1) = &
-            self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(3)
-            self%y_vec(2) = &
-            self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(3)
-
-            ! Compute melting temperature of iron
-            self%yy_vec(1) = T_melt_iron(P=self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1),&!pres, &
-            X_Si=self%X_all_core(4), &
-            X_O=self%X_all_core(5), &
-            X_S=self%X_all_core(3))
-            self%yy_vec(2) = T_melt_iron(P=self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1),&!pres, &
-            X_Si=self%X_all_core(4), &
-            X_O=self%X_all_core(5), &
-            X_S=self%X_all_core(3))
-         end if
-         self%x_vec(1) = self%layers(lay_idx1)%shells(shell_idx1)%radius
-         self%x_vec(2) = self%layers(lay_idx2)%shells(shell_idx2)%radius
-         ! =============================================================
+         call get_bisection_vectors(self=self)
 
          ! Reset the previously integrated cell and update the layer to
          ! reflect the changes accordingly. This cell will be re-integrated
@@ -890,8 +922,6 @@ END SUBROUTINE predict_bisection_step
             self%layer_temps(1) = self%T_ICB
          end if
 
-         self%layer_bisection_iteration_count = self%layer_bisection_iteration_count + 1
-
          call predict_bisection_step(self=self)
 
          ! Very important: These parameters need to be set AFTER the predict_bisection_step was called!
@@ -909,9 +939,9 @@ END SUBROUTINE predict_bisection_step
       ! Layer transition reached
       ! TODO. eps_layer should be customizable in the API
       else if (abs(reldev) .lt. eps_layer) then
-         ! print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
-         ! print *, 'Layer constraint should (3) =', self%constraint_value_should
-         ! print *, 'Layer constraint is (3) =', self%constraint_value_is
+         print *, 'Layer transition reached:', self%lay,'->', self%lay + 1
+         print *, 'Layer constraint should (3) =', self%constraint_value_should
+         print *, 'Layer constraint is (3) =', self%constraint_value_is
          ! print *, "Indigenous mass =", self%layers(self%lay)%indigenous_mass/m_earth
          sh = self%layers(self%lay)%shell_count
          ! print *, "Enclosed mass =", self%layers(self%lay)%shells(sh)%integration_parameters(2) /m_earth
@@ -943,15 +973,15 @@ END SUBROUTINE predict_bisection_step
             !Check layer transitions for all remaining layers
             do i = 1, size(self%contents%axes) - self%lay
                call get_layer_constraint(self=self, lay=self%lay, skip=i)
-               ! print *, 'Next layer constraint should =', self%constraint_value_should
-               ! print *, 'Next layer constraint is =', self%constraint_value_is
+               print *, 'Next layer constraint should =', self%constraint_value_should
+               print *, 'Next layer constraint is =', self%constraint_value_is
                ! print *, "layer masses =", self%layer_masses
                reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                         self%constraint_value_should
-               ! print *, "reldev =", reldev
+               print *, "reldev =", reldev
                if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                   skip = skip + 1
-                  ! print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
+                  print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
                   if (self%lay + skip == size(self%contents%axes)) then
                      self%layer_iteration = .false.
                      skip = skip - 1
@@ -963,18 +993,18 @@ END SUBROUTINE predict_bisection_step
                else
                   if (self%lay <= 2) then
                      old_layer_constraint = self%layer_constraints(3)
-                     ! print *, "Double checking for transition 2 -> 3"
+                     print *, "Double checking for transition 2 -> 3"
                      self%layer_constraints(3) = 3
                      call get_layer_constraint(self=self, lay=self%lay, skip=i)
                      self%layer_constraints(3) = old_layer_constraint
-                     ! print *, 'Next layer constraint should =', self%constraint_value_should
-                     ! print *, 'Next layer constraint is =', self%constraint_value_is
+                     print *, 'Next layer constraint should =', self%constraint_value_should
+                     print *, 'Next layer constraint is =', self%constraint_value_is
                      reldev = (self%constraint_value_should - self%constraint_value_is)/ &
                               self%constraint_value_should
-                     ! print *, "reldev =", reldev
+                     print *, "reldev =", reldev
                      if (abs(reldev) .lt. eps_layer .or. reldev*self%direction .lt. -eps_layer) then
                         skip = skip + 1
-                        ! print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
+                        print *, 'Next layer transition reached aswell:', self%lay + i, '->', self%lay + i + 1
                         if (self%lay + skip == size(self%contents%axes)) then
                            self%layer_iteration = .false.
                            skip = skip - 1
@@ -1047,8 +1077,9 @@ END SUBROUTINE predict_bisection_step
             end do
          end if
 
-!Nothing special happened
+      !Nothing special happened
       else
+         print *, "Nothing to report in minor bisection..."
          if (self%layers(self%lay)%change_bisec) then
             self%layers(self%lay)%bisec = .false.
          end if
@@ -1063,11 +1094,14 @@ END SUBROUTINE predict_bisection_step
       real(8) :: param_is, param_should, eps, pres
       real(8), dimension(n_params_integration) :: params
       integer, dimension(2) :: direction
-      integer :: sh
+      integer :: sh, shell_idx1, shell_idx2, lay_idx1, lay_idx2
+      integer :: offset_dummy = 0
 
       sh = self%layers(self%lay)%shell_count-1
       params = self%layers(self%lay)%shells(sh)%integration_parameters
 
+      ! TODO. This part should be merged with get_layer_constraints
+      !-------------
       if (self%major_constraint == 'P_surface') then
          param_is = params(1)
          param_should = self%P_surface_should
@@ -1086,28 +1120,77 @@ END SUBROUTINE predict_bisection_step
          eps = eps_M_surface
          direction = (/1, -1/)
       end if
+      ! -----------------
 
       !Overshoot
       if (direction(1)*(param_should - param_is)/param_should < direction(2)*eps &
           .or. param_is .lt. 0.0d0) then
-         ! print *, ''
-         ! print *, 'Overshoot in major bisection in layer', self%lay
-         ! print *, 'Major constraint should =', param_should
-         ! print *, 'Major constraint is =', param_is
+         print *, ''
+         print *, 'Overshoot in major bisection in layer', self%lay
+         print *, 'Major constraint should =', param_should
+         print *, 'Major constraint is =', param_is
          call remove_stuff(self=self)
+         self%layers(self%lay)%overshoot = .true.
 
+         self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1 ! Very important!
+         sh = self%layers(self%lay)%shell_count
+         print *, "shell count =", sh
+         ! Replace initiated cell that was added after last integration step
+         ! by uninitiated cell
+         self%layers(self%lay)%shells(sh + 1) = self%layers(self%lay)%shells(sh + 2)
+
+         ! -----------------------------------
          sh = self%layers(self%lay)%shell_count
 
-         call reset_shell(self=self%layers(self%lay)%shells(sh))
+         ! TODO. Refactor this part!!!
+         ! Put it in standalone method or utility function.
+         ! Should be merged with get_layer_constraints in a
+         ! generalized form
+         !==================================================
+         ! If overshoot occurs in first shell after layer transition,
+         ! the previous values have to be taken from the previous layer
+         if (sh < 2) then
+            shell_idx1 = self%layers(self%lay - 1)%shell_count + offset_dummy
+            shell_idx2 = 1 + offset_dummy
+            lay_idx1 = self%lay - 1
+            lay_idx2 = self%lay
+         else
+            shell_idx1 = self%layers(self%lay)%shell_count - 1 + offset_dummy
+            shell_idx2 = self%layers(self%lay)%shell_count + offset_dummy
+            lay_idx1 = self%lay
+            lay_idx2 = self%lay
+         endif
 
-         sh = sh - 1
-         self%layers(self%lay)%shell_count = sh
+         self%yy_vec = param_should
 
+         if (self%major_constraint == 'P_surface') then
+            self%y_vec(1) = &
+               self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1)
+            self%y_vec(2) = &
+               self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1)
+   
+         elseif (self%major_constraint == 'T_surface') then
+            self%y_vec(1) = &
+               self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(3)
+            self%y_vec(2) = &
+               self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(3)
+   
+         elseif (self%major_constraint == 'M_surface') then
+            self%y_vec(1) = &
+               self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(2)
+            self%y_vec(2) = &
+               self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(2)
+         end if
+         self%x_vec(1) = self%layers(lay_idx1)%shells(shell_idx1)%radius
+         self%x_vec(2) = self%layers(lay_idx2)%shells(shell_idx2)%radius
+         !==================================================
          call reset_shell(self=self%layers(self%lay)%shells(sh))
          call update_layer(self=self%layers(self%lay))
          
-         self%layers(self%lay)%overshoot = .true.
-         self%layer_bisection_iteration_count = self%layer_bisection_iteration_count + 1
+         call predict_bisection_step(self=self)
+
+         ! self%layer_bisection_iteration_count = self%layer_bisection_iteration_count + 1
+         self%major_bisection_iteration_count = self%major_bisection_iteration_count + 1
          
          ! TODO. Generalize bisection to combine logic for minor and major bisection
          ! The predictor step should be applicable directly to the major bisection as well
@@ -1119,8 +1202,6 @@ END SUBROUTINE predict_bisection_step
 
       !Surface reached
       elseif (abs(param_should - param_is)/param_should .lt. eps) then
-         ! print *, 'Surface reached!'
-
          !The construct method has already updated the shell count for the next
          !iteration. However, this iteration will never take place as the
          !shell that has just been constructed reached the major constraint.
@@ -1174,7 +1255,7 @@ END SUBROUTINE predict_bisection_step
       !If subphase transition is found, perform the shell refinement
       if (trans) then
          if (.not. self%subphase_refine_inhibit) then
-            ! print *, "Initiating subphase refinement"
+            print *, "Initiating subphase refinement"
             self%layers(self%lay)%overshoot = .true.
 
             call remove_stuff(self=self)
@@ -1213,7 +1294,6 @@ END SUBROUTINE predict_bisection_step
                !current one.
                self%layers(self%lay)%overshoot = .false.
                call major_bisection(self=self)
-
                call minor_bisection(self=self)
 
                if (self%layers(self%lay)%overshoot) then
@@ -1271,7 +1351,8 @@ END SUBROUTINE predict_bisection_step
             self%subphase_refine_inhibit = .false.
 
             do while (self%shell_iteration)
-               ! print *, 'Constructing shell:', self%layers(self%lay)%shell_count
+               print *, "=============================="
+               print *, 'Constructing shell:', self%layers(self%lay)%shell_count
                self%shell_iteration_count = self%shell_iteration_count + 1
                self%skip_bisec = .false.
                
@@ -1327,7 +1408,7 @@ END SUBROUTINE predict_bisection_step
                      !core mass is exceeded core integration needs to stop regardless
                      !of ICB is reached.
                      if (self%bisec .eqv. self%layers(self%lay)%bisec) then
-                        ! print *, 'check melting'
+                        print *, 'Check melting ...'
                         old_layer_constraint = self%layer_constraints(1)
                         ! Temporarely set inner core constraint to temp and
                         ! check for layer transition
@@ -1381,6 +1462,7 @@ END SUBROUTINE predict_bisection_step
                end if
             end do
          end do
+
          call update_layer(self=self%layers(self%lay))
          self%M_surface_is = currentshell%integration_parameters(2)
          self%R_surface_is = currentshell%radius
@@ -1414,8 +1496,9 @@ END SUBROUTINE predict_bisection_step
       end if
 
       print *, "Total iteration count:", self%shell_iteration_count
-      print *, "Bisection iteration count:", self%layer_bisection_iteration_count
-      print *, "Percentage spent in bisection:", INT((REAL(self%layer_bisection_iteration_count) /&
+      print *, "Layer bisection iteration count:", self%layer_bisection_iteration_count
+      print *, "Major bisection iteration count:", self%major_bisection_iteration_count
+      print *, "Percentage spent in layer bisection:", INT((REAL(self%layer_bisection_iteration_count) /&
        REAL(self%shell_iteration_count)) * 100)
    END SUBROUTINE construct_planet
 

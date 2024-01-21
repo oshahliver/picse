@@ -9,7 +9,7 @@ MODULE run_params
    real(8), parameter :: eps_T_surface = 1d-2
 
 !Maximum number of shells per layer and per planet
-   integer, parameter :: n_shells_max_layer = 1000
+   integer, parameter :: n_shells_max_layer = 500
    integer, parameter :: n_shells_max_planet = 2500
 
 !Number of integration parameters
