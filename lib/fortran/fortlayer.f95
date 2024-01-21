@@ -201,7 +201,7 @@ contains
       end if
 
       ! print *, "constructing shell in layer with idx:", self%shell_count
-      ! print *, "Constructing layer with dr =", self%dr
+      
       ! print *, "The shell that will be constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       call construct_shell(self=self%shells(self%shell_count), dr=self%dr)
       ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
@@ -212,7 +212,7 @@ contains
       call update_shell(self=self%shells(self%shell_count))
       ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       call update_layer(self=self)
-      
+      ! print *, "Constructing layer with dr =", self%dr
       ! print *, "The shell that was constructed has mass:", self%shells(self%shell_count)%integration_parameters(2)
       self%r_out = self%radius
 

@@ -745,33 +745,32 @@ contains
 SUBROUTINE predict_bisection_step(self)
 
    type(planet), intent(inout) :: self
-   real(8) :: dx_is, dy_is, slope, dx_should, dy_should, dx_curr
+   real(8) :: dx_is, dy_is, dyy_is, dx_should, dy_should, dx_curr, a, b
 
-   ! self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
    dx_is = self%x_vec(2) - self%x_vec(1) ! difference in radius
    dy_is = self%y_vec(2) - self%y_vec(1) ! difference in constraint value is
-   ! dyy_is = self%yy_vec(2) - self%yy_vec(1) ! difference in constraint value should
-   slope = dy_is / dx_is
-
-   dy_should = self%constraint_value_should - self%y_vec(1)
-   dx_should = dy_should / slope
+   dyy_is = self%yy_vec(2) - self%yy_vec(1) ! difference in constraint value should
    dx_curr = self%layers(self%lay)%dr
+
+   a = dy_is / dx_is
+   b = dyy_is / dx_is
+   dy_should = self%yy_vec(1) - self%y_vec(1)
+   dx_should = dy_should / (a - b)
 
    ! print *, "x_vec =", self%x_vec
    ! print *, "y_vec =", self%y_vec
-   ! print *, "dx, dy =", dx_is, dy_is
+   ! print *, "yy_vec =", self%yy_vec
+   ! print *, "dx, dy, dyy is =", dx_is, dy_is, dyy_is
    ! print *, "dy should =", dy_should
-   ! print *, "slope =", slope
-   ! print *, "current dx =", dx_curr
-   ! print *, "dx predicted =", dx_should
-   ! print *, "dx bisec =", dx_curr / 2d0
+   ! print *, "a, b =", a, b
+   ! print *, "dx, predicted =", dx_should
    dx_should = min(dx_should, dx_curr * .9999)
 
-   if (self%lay == 1) then
-      if (self%layer_constraints(1) == 4) then
-         dx_should = self%layers(self%lay)%dr * 0.5d0
-      endif
-   endif
+   ! if (self%lay == 1) then
+   !    if (self%layer_constraints(1) == 4) then
+   !       dx_should = self%layers(self%lay)%dr * 0.5d0
+   !    endif
+   ! endif
 
    self%layers(self%lay)%dr = dx_should
    ! self%layers(self%lay)%dr = self%layers(self%lay)%dr * 0.5d0
@@ -782,9 +781,10 @@ END SUBROUTINE predict_bisection_step
    SUBROUTINE minor_bisection(self)
 
       type(planet), intent(inout) :: self
-      integer :: sh, skip, i, skip_count, old_layer_constraint, shell_idx
+      integer :: sh, skip, i, skip_count, old_layer_constraint, shell_idx, shell_idx1, shell_idx2
+      integer :: lay_idx1, lay_idx2
       real(8) :: reldev, radius, mass, pres, temp, deltaT, moi, E_grav, E_int
-      real(8) :: a, b, c, r
+      ! real(8) :: a, b, c, r
       real(8), dimension(n_params_integration) :: params
 
       call get_layer_constraint(self=self, lay=self%lay, skip=0)             
@@ -804,48 +804,72 @@ END SUBROUTINE predict_bisection_step
          self%layers(self%lay)%overshoot = .true.
          self%layers(self%lay)%shell_count = self%layers(self%lay)%shell_count - 1 ! Very important!
          sh = self%layers(self%lay)%shell_count
-         
+         ! print *, "shell count =", sh
          ! Replace initiated cell that was added after last integration step
          ! by uninitiated cell
          self%layers(self%lay)%shells(sh + 1) = self%layers(self%lay)%shells(sh + 2)
 
          ! TODO. Refactor this part!!!
          !==================================================
-         shell_idx = self%layers(self%lay)%shell_count - 1
+         ! If overshoot occurs in first shell after layer transition,
+         ! the previous values have to be taken from the previous layer
+         if (sh < 2) then
+            shell_idx1 = self%layers(self%lay - 1)%shell_count
+            shell_idx2 = 1
+            lay_idx1 = self%lay - 1
+            lay_idx2 = self%lay
+         else
+            shell_idx1 = self%layers(self%lay)%shell_count - 1
+            shell_idx2 = self%layers(self%lay)%shell_count
+            lay_idx1 = self%lay
+            lay_idx2 = self%lay
+         endif
+
+         self%yy_vec = self%constraint_value_should
          ! print *, "shell idx =", shell_idx
          !Indigenous mass
          if (self%layer_constraints(self%lay) == 0) then
             self%y_vec(1) = &
-               self%layers(self%lay)%indigenous_mass
+               self%layers(lay_idx1)%indigenous_mass
             self%y_vec(2) = &
-               self%layers(self%lay)%indigenous_mass
+               self%layers(lay_idx2)%indigenous_mass
          !Enclosed mass
          else if (self%layer_constraints(self%lay) == 1) then
             self%y_vec(1) = &
-               self%layers(self%lay)%shells(shell_idx)%integration_parameters(2)
+               self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(2)
             self%y_vec(2) = &
-               self%layers(self%lay)%shells(shell_idx+1)%integration_parameters(2)
+               self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(2)
          !Radius
          else if (self%layer_constraints(self%lay) == 2) then
             self%y_vec(1) = &
-               self%layers(self%lay)%radius
+               self%layers(lay_idx1)%radius
             self%y_vec(2) = &
-               self%layers(self%lay)%radius
+               self%layers(lay_idx2)%radius
          !Pressure
          else if (self%layer_constraints(self%lay) == 3) then
             self%y_vec(1) = &
-            self%layers(self%lay)%shells(shell_idx)%integration_parameters(1)
+            self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1)
             self%y_vec(2) = &
-            self%layers(self%lay)%shells(shell_idx+1)%integration_parameters(1)
+            self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1)
          !Temperature
          else if (self%layer_constraints(self%lay) == 4) then
             self%y_vec(1) = &
-            self%layers(self%lay)%shells(shell_idx)%integration_parameters(3)
+            self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(3)
             self%y_vec(2) = &
-            self%layers(self%lay)%shells(shell_idx+1)%integration_parameters(3)
+            self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(3)
+
+            ! Compute melting temperature of iron
+            self%yy_vec(1) = T_melt_iron(P=self%layers(lay_idx1)%shells(shell_idx1)%integration_parameters(1),&!pres, &
+            X_Si=self%X_all_core(4), &
+            X_O=self%X_all_core(5), &
+            X_S=self%X_all_core(3))
+            self%yy_vec(2) = T_melt_iron(P=self%layers(lay_idx2)%shells(shell_idx2)%integration_parameters(1),&!pres, &
+            X_Si=self%X_all_core(4), &
+            X_O=self%X_all_core(5), &
+            X_S=self%X_all_core(3))
          end if
-         self%x_vec(1) = self%layers(self%lay)%shells(shell_idx)%radius
-         self%x_vec(2) = self%layers(self%lay)%shells(shell_idx + 1)%radius
+         self%x_vec(1) = self%layers(lay_idx1)%shells(shell_idx1)%radius
+         self%x_vec(2) = self%layers(lay_idx2)%shells(shell_idx2)%radius
          ! =============================================================
 
          ! Reset the previously integrated cell and update the layer to
@@ -1239,10 +1263,7 @@ END SUBROUTINE predict_bisection_step
       !   print *, '########################'
       !   print *, 'Layer:', self%lay
       !   print *, '########################'
-      !   print *, 'n shell ocean =', self%layers(5)%shell_count
-      !   print *, 'n shell outer core =', self%layers(2)%shell_count
-      !   print *, 'actual layermasses:', self%layer_masses(1), self%layer_masses(2)
-            
+
             self%layer_iteration_count = self%layer_iteration_count + 1
             self%shell_iteration = .true.
             self%change_bisec = .true.

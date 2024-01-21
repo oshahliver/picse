@@ -24,7 +24,7 @@ iterator = planet_iterator.Toolkit()
 # parameters that are not specified will be assigned a
 # default value for the corresponding base type
 planetary_params = {
-    "M_surface_should": 1.11,  # desired total mass (in earth masses)
+    "M_surface_should": 1.,  # desired total mass (in earth masses)
     "T_surface_should": 300,  # desired surface temperature (in kelvin)
     "P_surface_should": 1e5,  # desired surface pressure (in Pa)
     "Mg_number_should": 0.53,  # desired bulk magnesium number
@@ -48,7 +48,7 @@ iterator_specs = {
     "how": ["P_center", "T_center"],  # --> adjustable properties
     "val_should": [
         planetary_params["M_surface_should"] * m_earth,
-        -E_grav_unit*1.1,
+        -E_grav_unit*1.,
     ],  # --> target values
     "predictor": ["linear", "linear"],  # --> no effect at this point
     "all_val_should_weights": [
@@ -87,10 +87,6 @@ print ("fractions in the end:" , pl.fractions)
 # print fundamental planeatary properties to standard output
 pl.print(digits=7)
 # pl.plot()
-
-print (f'E_grav_is: {pl.E_grav_is}')
-print (f'E_int_is: {pl.E_int_is}')
-print (f'L_int_is: {pl.L_int_is}')
 
 dt1 = t2 - t0
 sec1 = math.floor(dt1)
