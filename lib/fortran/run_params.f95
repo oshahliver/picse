@@ -3,10 +3,14 @@ MODULE run_params
    implicit none
 
 !Relative uncertainties allowed for probing various parameters
-   real(8), parameter :: eps_layer = 1d-8
+   real(8), parameter :: eps_layer = 1d-6
+   real(8), dimension(5), parameter :: eps_layer_list = (/1d-6, 1d-4, 1d-3, 1d-3, 1d-6/)
+   real(8), dimension(5), parameter :: eps_major_list = (/1d-4, 1d-4, 1d-4, 1d-2, 1d-6/)
    real(8), parameter :: eps_P_surface = 1d-4
    real(8), parameter :: eps_M_surface = 1d-4
    real(8), parameter :: eps_T_surface = 1d-2
+   integer, parameter, dimension(5) :: layer_bisection_direction_list_1 = (/1, 1, -1, 1, 1/)
+   integer, parameter, dimension(5) :: layer_bisection_direction_list_2 = (/-1, -1, -1, -1, -1/)
 
 !Maximum number of shells per layer and per planet
    integer, parameter :: n_shells_max_layer = 500

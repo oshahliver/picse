@@ -25,6 +25,7 @@ MODULE class_layer
       type(shell), dimension(:), allocatable :: shells
       logical :: force_bisection = .false., overshoot = .false., &
                  major_overshoot = .false., minor_overshoot = .false., constant_Fe = .true.
+      real(8), dimension(5) :: vals_should
 
    end type layer
 
@@ -64,6 +65,7 @@ contains
       self%fractions = fractions
       self%X_impurity_0 = 0d0
       self%X_impurity_slope = 0d0
+      self%indigenous_mass = 0d0
 
       if (present(X_impurity_0)) then
          self%X_impurity_0 = X_impurity_0

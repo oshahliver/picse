@@ -169,6 +169,7 @@ contains
       integer :: n_layers, shell_idx
       integer :: i, j, c, ii
       real(8), dimension(n_params_integration) :: params
+      real(8) :: major_vals_should(5)
       
       ! print *, "creating new planet..."
       ! TODO: Define these default values somewhere else!
@@ -229,7 +230,7 @@ contains
             out_frac(i, j) = fracs%axes(i)%real_array(j)
          end do
       end do
-
+      major_vals_should = (/M_surface_should, R_surface_should, P_surface_should, T_surface_should, M_surface_should/)
 ! Initiate custom type planet instance
       call init_planet(self=pl, T_center=T_center, P_center=P_center, &
                        R_seed=r_seed, contents=conts, fractions=fracs, tempType=tempType, rhoType=rhoType, &
@@ -243,7 +244,8 @@ contains
                        X_all_core=X_all_core, P_CS=pres_core_segregation, core_segregation_model=core_segregation_type, &
                        M_surface_should=M_surface_should, M_ocean_should=M_ocean_should, &
                        Mg_number_should=Mg_number_should, M_core_should=M_core_should, &
-                       inner_core_segregation_model=inner_core_segregation_type, R_surface_should=R_surface_should)
+                       inner_core_segregation_model=inner_core_segregation_type, R_surface_should=R_surface_should,&
+                       major_vals_should = major_vals_should)
       
       call construct_planet(self=pl)
       call get_profiles(self=pl)

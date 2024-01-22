@@ -1,0 +1,12 @@
+ESSENTIAL
+---------
+
+- The indexing of the integration_parameters and the vals_should must be identical
+
+ADVANTAGEOUS
+---------
+
+- Use only dimensionless units (everything in terms of Earth-units)
+
+DESIRABLE
+---------

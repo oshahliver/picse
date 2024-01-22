@@ -174,14 +174,6 @@ contains
          self%X_H2O = self%mixture%X_H2O
          self%xi_Fe = self%mixture%xi_Fe
 
-         ! self%integration_parameters(1) = P
-         ! self%integration_parameters(2) = m
-         ! self%integration_parameters(3) = T
-         ! self%integration_parameters(5) = MOI
-         ! self%integration_parameters(6) = self%weight_fractions(n_mats)
-         ! self%integration_parameters(7) = E_grav
-         ! self%integration_parameters(8) = E_int
-
 !Compute ambient density
 !Note that the fractions at T=300 K and T=1.0d4 Pa would be in general
 !different but we want to know the ambient conditions of the given shell
@@ -252,14 +244,14 @@ contains
          self%N_S = 0.0d0
          self%N_H = 0d0 !This counts the hydrogen of hydrated substances (e.g. FeH)
 
-         self%integration_parameters(1) = self%initials%real_vals(4)
-         self%integration_parameters(2) = self%initials%real_vals(3)
-         self%integration_parameters(3) = self%initials%real_vals(2)
-         self%integration_parameters(4) = self%initials%real_vals(5)
-         self%integration_parameters(5) = self%initials%real_vals(16)
-         self%integration_parameters(6) = self%initials%real_vals(18)
-         self%integration_parameters(7) = self%initials%real_vals(19)
-         self%integration_parameters(8) = self%initials%real_vals(20)
+         self%integration_parameters(1) = self%initials%real_vals(4) ! Pressure
+         self%integration_parameters(2) = self%initials%real_vals(3) ! Enclosed mass
+         self%integration_parameters(3) = self%initials%real_vals(2) ! Temperature
+         self%integration_parameters(4) = self%initials%real_vals(5) ! Density
+         self%integration_parameters(5) = self%initials%real_vals(16) ! Weight fraction
+         self%integration_parameters(6) = self%initials%real_vals(18) ! Moment of inertia factor
+         self%integration_parameters(7) = self%initials%real_vals(19) ! Gravitational energy
+         self%integration_parameters(8) = self%initials%real_vals(20) ! Internal energy
       end if
 
    END SUBROUTINE init_shell
